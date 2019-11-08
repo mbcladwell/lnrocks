@@ -1,0 +1,42 @@
+id	sys-name	name	description	plate-format-id	replicates	targets	use-edge	num-controls	unknown-n	control-loc	source-dest
+1	LYT-1	4 controls col 12	1S1T	96	1	1	1	4	92	E12-H12	source
+2	LYT-2	4 controls cols 23 24	1S4T	384	1	4	1	4	368	I23-P24	dest
+3	LYT-3	4 controls cols 23 24	2S2T	384	2	2	1	4	368	I23-P24	dest
+4	LYT-4	4 controls cols 23 24	2S4T	384	2	4	1	4	368	I23-P24	dest
+5	LYT-5	4 controls cols 23 24	4S1T	384	4	1	1	4	368	I23-P24	dest
+6	LYT-6	4 controls cols 23 24	4S2T	384	4	2	1	4	368	I23-P24	dest
+7	LYT-7	8 controls col 12	1S1T	96	1	1	1	8	88	A12-H12	source
+8	LYT-8	8 controls cols 23 24	1S4T	384	1	4	1	8	352	A23-P24	dest
+9	LYT-9	8 controls cols 23 24	2S2T	384	2	2	1	8	352	A23-P24	dest
+10	LYT-10	8 controls cols 23 24	2S4T	384	2	4	1	8	352	A23-P24	dest
+11	LYT-11	8 controls cols 23 24	4S1T	384	4	1	1	8	352	A23-P24	dest
+12	LYT-12	8 controls cols 23 24	4S2T	384	4	2	1	8	352	A23-P24	dest
+13	LYT-13	8 controls col 24	1S1T	384	1	1	1	8	376	I24-P24	source
+14	LYT-14	8 controls cols 47 48	1S4T	1536	1	4	1	8	1504	Q47-AF48	dest
+15	LYT-15	8 controls cols 47 48	2S2T	1536	2	2	1	8	1504	Q47-AF48	dest
+16	LYT-16	8 controls cols 47 48	2S4T	1536	2	4	1	8	1504	Q47-AF48	dest
+17	LYT-17	8 controls cols 47 48	4S1T	1536	4	1	1	8	1504	Q47-AF48	dest
+18	LYT-18	8 controls cols 47 48	4S2T	1536	4	2	1	8	1504	Q47-AF48	dest
+19	LYT-19	16 controls col 24	1S1T	384	1	1	1	16	368	A24-P24	source
+20	LYT-20	16 controls cols 47 48	1S4T	1536	1	4	1	16	1472	A47-AF48	dest
+21	LYT-21	16 controls cols 47 48	2S2T	1536	2	2	1	16	1472	A47-AF48	dest
+22	LYT-22	16 controls cols 47 48	2S4T	1536	2	4	1	16	1472	A47-AF48	dest
+23	LYT-23	16 controls cols 47 48	4S1T	1536	4	1	1	16	1472	A47-AF48	dest
+24	LYT-24	16 controls cols 47 48	4S2T	1536	4	2	1	16	1472	A47-AF48	dest
+25	LYT-25	7 controls col 23	1S1T	384	1	1	0	7	301	I23-O23	source
+26	LYT-26	7 controls cols 46 47	1S4T	1536	1	4	0	7	1204	Q46-AE47	dest
+27	LYT-27	7 controls cols 46 47	2S2T	1536	2	2	0	7	1204	Q46-AE47	dest
+28	LYT-28	7 controls cols 46 47	2S4T	1536	2	4	0	7	1204	Q46-AE47	dest
+29	LYT-29	7 controls cols 46 47	4S1T	1536	4	1	0	7	1204	Q46-AE47	dest
+30	LYT-30	7 controls cols 46 47	4S2T	1536	4	2	0	7	1204	Q46-AE47	dest
+31	LYT-31	14 controls col 23	1S1T	384	1	1	0	14	294	B23-O23	source
+32	LYT-32	14 controls cols 46 47	1S4T	1536	1	4	0	14	1176	B46-AE47	dest
+33	LYT-33	14 controls cols 46 47	2S2T	1536	2	2	0	14	1176	B46-AE47	dest
+34	LYT-34	14 controls cols 46 47	2S4T	1536	2	4	0	14	1176	B46-AE47	dest
+35	LYT-35	14 controls cols 46 47	4S1T	1536	4	1	0	14	1176	B46-AE47	dest
+36	LYT-36	14 controls cols 46 47	4S2T	1536	4	2	0	14	1176	B46-AE47	dest
+37	LYT-37	8 controls cols 47 48	1S1T	1536	1	1	1	8	1504	Q47-AF48	source
+38	LYT-38	16 controls cols 47 48	1S1T	1536	1	1	1	16	1472	A47-AF48	source
+39	LYT-39	7 controls cols 46 47	1S1T	1536	1	1	0	7	1204	Q46-AE47	source
+40	LYT-40	14 controls cols 46 47	1S1T	1536	1	1	0	14	1176	B46-AE47	source
+41	LYT-41	all blanks	not reformattable	1536	1	1	0	0	0	none	dest

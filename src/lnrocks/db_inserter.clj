@@ -1,15 +1,11 @@
-(ns ln.db-inserter
-  (:require [next.jdbc :as j]
-            [next.jdbc.prepare :as p]
-            [clojure.string :only [split split-lines trim]]
-            [ln.codax-manager :as cm]
-            [ln.db-manager :as dbm]
-
+(ns lnrocks.db-inserter
+  (:require [clojure.string :only [split split-lines trim]]
+                       [crux.api :as crux]
+;;[lnrocks.core :as lnrc]
          ;;    [ln.db-manager :as dbm])
          ;;   [clojure.data.csv :as csv]
             [clojure.java.io :as io])
-           
-  (:import [java.sql.DriverManager] [javax.swing.JOptionPane]))
+           )
 
 (defn tokens
   [s]
@@ -27,6 +23,8 @@
     (for [x contents]
   (into (sorted-map)(pairs column-keys x)))))
 
+
+
 (defn table-to-map [ file]
   (->
     file
@@ -35,6 +33,20 @@
 
 (defn get-col-names [ file ]
  (first (map tokens (clojure.string/split-lines (slurp file)))))
+
+
+(defn load-plate-layouts []
+(table-to-map "resources/data/plate_layouts_for_import.txt"))
+
+(defn load-plate-layoutnames []
+(table-to-map "resources/data/plate_layout_name.txt"))
+
+(defn load-well-numbers []
+(table-to-map "resources/data/well_numbers_for_import.txt"))
+
+
+
+
 
 
 (defn import-barcode-ids [ plateset-id barcode-file]
