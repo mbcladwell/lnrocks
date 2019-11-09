@@ -34,12 +34,34 @@
 (defn get-col-names [ file ]
  (first (map tokens (clojure.string/split-lines (slurp file)))))
 
+(defn process-layout-data
+  "processes that tab delimitted, R generated layouts for import
+   order is important; must correlate with SQL statement order of ?'s"
+  [x]
+(into {} { :id (Integer/parseInt(:id x)) :well (Integer/parseInt(:well x )) :type  (Integer/parseInt(:type x )) :reps (Integer/parseInt(:reps x )) :target (Integer/parseInt(:target x ))}))
 
 (defn load-plate-layouts []
-(table-to-map "resources/data/plate_layouts_for_import.txt"))
+       (let   [  table (table-to-map "resources/data/plate_layouts_for_import.txt")
+               content (into [] (map #(process-layout-data %) table))]
+         content))
+
+(load-plate-layouts)
 
 (defn load-plate-layoutnames []
 (table-to-map "resources/data/plate_layout_name.txt"))
+
+
+
+
+ (def a  [ {:id "41", :reps "1", :target "1", :type "4", :well "1523"} {:id "41", :reps "1", :target "1", :type "4", :well "1524"} {:id "41", :reps "1", :target "1", :type "4", :well "1525"} ])
+
+(apply merge a)
+
+
+(Integer/parseInt (:id (first a)))
+
+
+
 
 (defn load-well-numbers []
 (table-to-map "resources/data/well_numbers_for_import.txt"))
