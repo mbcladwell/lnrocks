@@ -23,6 +23,15 @@
 
 (crux/submit-tx core/node [[:crux.tx/put counters]] )
 
+(defn easy-ingest
+  "Uses Crux put transaction to add a vector of documents to a specified
+  node"
+  [node docs]
+  (crux/submit-tx node
+                  (vec (for [doc docs]
+                         [:crux.tx/put doc]))))
+
+
 (def props
   {:crux.db/id :props
    :help-url-prefix "http://labsolns.com/software/"
@@ -35,16 +44,42 @@
 (crux/submit-tx node [[:crux.tx/put props]] )
 
 (def helpers
-  {:plate-formats {:96 96 :384 384 :1536 1536}
-   :plate-type {:assay "assay" :rearray "rearray" :master "master" :daughter "daughter" :archive "archive" :replicate "replicate"}
-   :plate-layout (dbi/load-plate-layouts)
-   :assay-type { :elisa "ELISA" :octet "Octet" :SNP "SNP" :HCS "HCS" :HTRF "HTRF" :FACS "FACS"}
-   :well-type { :1 "unknown" :2 "positive" :3 "negative" :4 "blank" :5 "edge"}
-  ;;:well-numbers  (dbi/load-well-numbers)
-   })
+  [{:crux.db/id :plate-formats :96 96 :384 384 :1536 1536}
+   {:crux.db/id :plate-type 1 "assay" 2 "rearray" 3 "master" 4 "daughter" 5 "archive" 6 "replicate"}
+   {:crux.db/id :plate-layout :plate-layout (dbi/load-plate-layouts)}
+   {:crux.db/id :assay-type  1 "ELISA" 2 "Octet" 3 "SNP" 4 "HCS" 5 "HTRF" 6 "FACS"}
+   {:crux.db/id :well-type  1 "unknown" 2 "positive" 3 "negative" 4 "blank" 5 "edge"}
+   {:crux.db/id :well-numbers :well-numbers (dbi/load-well-numbers) }
+   {:crux.db/id :layout-src-dest    [{:source 1 :dest  2}{:source 1 :dest 3}{:source 1 :dest 4}{:source 1 :dest 5}{:source 1 :dest 6}{:source 7 :dest 8}{:source 7 :dest 9}{:source 7 :dest 10}{:source 7 :dest 11}{:source 7 :dest 12}{:source 13 :dest 14}{:source 13 :dest 15}{:source 13 :dest 16}{:source 13 :dest 17}{:source 13 :dest 18}{:source 19 :dest 20}{:source 19 :dest 21}{:source 19 :dest 22}{:source 19 :dest 23}{:source 19 :dest 24}{:source 25 :dest 26}{:source 25 :dest 27}{:source 25 :dest 28}{:source 25 :dest 29}{:source 25 :dest 30}{:source 31 :dest 32}{:source 31 :dest 33}{:source 31 :dest 34}{:source 31 :dest 35}{:source 31 :dest 36}{:source 37 :dest 41}{:source 38 :dest 41}{:source 39 :dest 41}{:source 40 :dest 41}]
+   ])
 
-(crux/submit-tx core/node [[:crux.tx/put helpers]] )
 
+
+;; (easy-ingest core/node helpers)
+
+(defn get-well-numbers
+  ;;x: 96, 384, or 1536
+  [x]
+  (filter #(= (:format %) x) (:well-numbers  (crux/entity (crux/db core/node ) :well-numbers))))
+
+;;(get-well-numbers 96)
+
+
+(defn get-plate-layout
+  ;;x is :id e.g.  41
+  [x]
+  (filter #(= (:id %) x) (:plate-layout  (crux/entity (crux/db core/node ) :plate-layout))))
+
+
+
+  (def example-data
+ [{:crux.db/id :projects
+
+    )
+
+
+  
+;;(get-plate-layout 41)
 
 ;; (def all-table-names
 ;;   ;;for use in a map function that will delete all tables

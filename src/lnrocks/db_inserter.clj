@@ -1,6 +1,7 @@
 (ns lnrocks.db-inserter
   (:require [clojure.string :only [split split-lines trim]]
-                       [crux.api :as crux]
+            [crux.api :as crux]
+            [clojure.set :as s]
 ;;[lnrocks.core :as lnrc]
          ;;    [ln.db-manager :as dbm])
          ;;   [clojure.data.csv :as csv]
@@ -9,7 +10,7 @@
 
 (defn tokens
   [s]
-  (-> s clojure.string/trim (clojure.string/split #"\s+")))
+  (-> s clojure.string/trim (clojure.string/split #"\t")))
 
 (defn pairs
   [coll1 coll2]
@@ -40,35 +41,70 @@
   [x]
 (into {} { :id (Integer/parseInt(:id x)) :well (Integer/parseInt(:well x )) :type  (Integer/parseInt(:type x )) :reps (Integer/parseInt(:reps x )) :target (Integer/parseInt(:target x ))}))
 
+(defn process-layout-names
+  "processes that tab delimitted, R generated layouts for import
+   order is important; must correlate with SQL statement order of ?'s"
+  [x]
+(into {} { :id (Integer/parseInt(:id x)) :sys-name (:sys-name x ) :name (:name x ) :description (:description x ) :plate-format-id (Integer/parseInt(:plate-format-id x ))  :replicates (Integer/parseInt(:replicates x)) :targets (Integer/parseInt(:targets x)) :use-edge (Integer/parseInt(:use-edge x)) :num-controls (Integer/parseInt(:num-controls x)) :unknown-n (Integer/parseInt(:unknown-n x)) :control-loc (:control-loc x) :source-dest (:source-dest x)  }))
+
+(defn extract-data-for-id
+  ;;get the data for a single id; remove the id from the collection
+  ;;x the id
+  ;;coll the collection
+  [x coll]
+  (map #(dissoc % :id) (filter #(= (:id %) x) coll ) ))
+
+
 (defn load-plate-layouts []
-       (let   [  table (table-to-map "resources/data/plate_layouts_for_import.txt")
-               content (into [] (map #(process-layout-data %) table))]
-         content))
-
-(load-plate-layouts)
-
-(defn load-plate-layoutnames []
-(table-to-map "resources/data/plate_layout_name.txt"))
-
+  ;;add data to layout names using the key :layout
+  (let   [table (table-to-map "resources/data/plate_layouts_for_import.txt")
+          layout-data (into [] (map #(process-layout-data %) table))
+          table2 (table-to-map "resources/data/plate_layout_name.txt")
+          layout-names (into [] (map #(process-layout-names %) table2))
+          result (map #(assoc % :layout (extract-data-for-id (:id %)  layout-data)) layout-names)]
+         result))
 
 
-
- (def a  [ {:id "41", :reps "1", :target "1", :type "4", :well "1523"} {:id "41", :reps "1", :target "1", :type "4", :well "1524"} {:id "41", :reps "1", :target "1", :type "4", :well "1525"} ])
-
-(apply merge a)
-
-
-(Integer/parseInt (:id (first a)))
-
+(defn process-well-numbers-data
+  "processes that tab delimitted, R generated well_numbers for import
+because some are strings, all imported as string
+   order is important; must correlate with SQL statement order of ?'s"
+  [x]
+  (into {} {:format (Integer/parseInt (String. (:format x)))
+            :wellname (:wellname x )
+            :row (:row x )
+            :rownum (Integer/parseInt (String. (:rownum x )))
+            :col (Integer/parseInt (String. (:col x )))
+            :totcolcount (Integer/parseInt (String. (:totcolcount x)))
+            :byrow (Integer/parseInt (String. (:byrow x )))
+            :bycol (Integer/parseInt (String. (:bycol x )))
+            :quad (Integer/parseInt (String. (:quad x )))
+            :parentwell (Integer/parseInt (String. (:parentwell x ))) }))
 
 
 
 (defn load-well-numbers []
-(table-to-map "resources/data/well_numbers_for_import.txt"))
+         (let   [  table (table-to-map "resources/data/well_numbers_for_import.txt")
+               content (into [] (map #(process-well-numbers-data %) table))]
+         content))
 
 
+(defn process-eg-prj-data
+  "id 	project-sys-name	description	name	lnsession-id"
+  [x]
+  (into {} {:id (Integer/parseInt (String. (:id x)))
+            :project-sys-name (:project-sys-name x )
+            :description (:description x )
+            :name (:name x )
+            :lnsession-id (Integer/parseInt (String. (:lnsession-id x))) }))
 
 
+(defn load-eg-projects []
+         (let   [  table (table-to-map "resources/data/projects.txt")
+               content (into [] (map #(process-eg-prj-data %) table))]
+           content))
+
+;(load-eg-projects)
 
 
 (defn import-barcode-ids [ plateset-id barcode-file]
