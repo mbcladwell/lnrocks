@@ -2,38 +2,12 @@
   (:require [clojure.string :only [split split-lines trim]]
             [crux.api :as crux]
             [clojure.set :as s]
-;;[lnrocks.core :as lnrc]
+            [lnrocks.util :as util]
          ;;    [ln.db-manager :as dbm])
          ;;   [clojure.data.csv :as csv]
             [clojure.java.io :as io])
            )
 
-(defn tokens
-  [s]
-  (-> s clojure.string/trim (clojure.string/split #"\t")))
-
-(defn pairs
-  [coll1 coll2]
-  (map vector coll1 coll2))
-
-(defn parse-table
-  [raw-table-data]
-  (let [table-data (map tokens (clojure.string/split-lines raw-table-data))
-        column-keys (map keyword (first table-data))
-        contents  (next table-data)]
-    (for [x contents]
-  (into (sorted-map)(pairs column-keys x)))))
-
-
-
-(defn table-to-map [ file]
-  (->
-    file
-    slurp
-    parse-table))
-
-(defn get-col-names [ file ]
- (first (map tokens (clojure.string/split-lines (slurp file)))))
 
 (defn process-layout-data
   "processes that tab delimitted, R generated layouts for import
@@ -57,9 +31,9 @@
 
 (defn load-plate-layouts []
   ;;add data to layout names using the key :layout
-  (let   [table (table-to-map "resources/data/plate_layouts_for_import.txt")
+  (let   [table (util/table-to-map "resources/data/plate_layouts_for_import.txt")
           layout-data (into [] (map #(process-layout-data %) table))
-          table2 (table-to-map "resources/data/plate_layout_name.txt")
+          table2 (util/table-to-map "resources/data/plate_layout_name.txt")
           layout-names (into [] (map #(process-layout-names %) table2))
           result (map #(assoc % :layout (extract-data-for-id (:id %)  layout-data)) layout-names)]
          result))
@@ -84,7 +58,7 @@ because some are strings, all imported as string
 
 
 (defn load-well-numbers []
-         (let   [  table (table-to-map "resources/data/well_numbers_for_import.txt")
+         (let   [  table (util/table-to-map "resources/data/well_numbers_for_import.txt")
                content (into [] (map #(process-well-numbers-data %) table))]
          content))
 
@@ -100,12 +74,40 @@ because some are strings, all imported as string
 
 
 (defn load-eg-projects []
-         (let   [  table (table-to-map "resources/data/projects.txt")
+         (let   [  table (util/table-to-map "resources/data/projects.txt")
                content (into [] (map #(process-eg-prj-data %) table))]
-           content))
+            content))
 
+
+(def table (util/table-to-map "resources/data/projects.txt"))
+(process-eg-prj-data (println (first table))
+
+(defn process-eg-plate-set-data
+"id	plate-set-name	descr	plate-set-sys-name	num-plates	plate-format-id	plate-type-id	project-id	plate-layout-name-id	lnsession-id"
+ [x]
+  (into {} {:id (Integer/parseInt (String. (:id x)))
+            :plate-set-name (:plate-set-name x )
+            :descr (:descr x )
+            :plate-set-sys-name (:plate-set-sys-name x )
+            :num-plates (Integer/parseInt (String. (:num-plates x)))
+            :plate-format-id (Integer/parseInt (String. (:plate-format-id x)))
+            :plate-type-id (Integer/parseInt (String. (:plate-type-id x)))
+            :project-id (Integer/parseInt (String. (:project-id x)))
+            :plate-layout-name-id (Integer/parseInt (String. (:plate-layout-name-id x)))
+            :lnsession-id (Integer/parseInt (String. (:lnsession-id x))) }))
+
+
+(defn load-eg-plate-sets []
+         (let   [  table (util/table-to-map "resources/data/plate-set.txt")
+               content (into [] (map #(process-eg-plate-set-data %) table))]
+            content))
+                     
+(def a (load-eg-plate-sets))
+(:id (first a))
+
+(Integer/parseInt (String. (:lnsession-id (first table) )))
 ;(load-eg-projects)
-
+(select-keys (first table) [:id])
 
 (defn import-barcode-ids [ plateset-id barcode-file]
 
@@ -121,7 +123,7 @@ because some are strings, all imported as string
     
   (let [ col1name (first (get-col-names barcode-file))
         col2name (first (rest (get-col-names barcode-file)))
-        table (table-to-map barcode-file)
+        table (util/table-to-map barcode-file)
         sql-statement (str "UPDATE plate SET barcode = ? WHERE plate.ID IN ( SELECT plate.id FROM plate_set, plate_plate_set, plate  WHERE plate_plate_set.plate_set_id=" (str plateset-id) " AND plate_plate_set.plate_id=plate.id AND plate_plate_set.plate_order=? )")
         content (into [] (zipmap (map #(:barcode.id %) table) (map #(Integer. (:plate %)) table)))
         ]
@@ -132,4 +134,7 @@ because some are strings, all imported as string
       (javax.swing.JOptionPane/showMessageDialog nil  (str "Expecting the headers \"plate\", and \"barcode.id\", but found\n" col1name  ", and " col2name  "."  )))))
 
 ;; Diagnostic select:  select plate.id, plate.barcode, plate.plate_sys_name from plate, plate_set, plate_plate_set where plate_plate_set.plate_id=plate.id and plate_plate_set.plate_set_id=plate_set.id and plate_set.id=7 order by plate.barcode; 
+
+(def a {:A01 111 :B01 222 :C01 333 :D01 nil})
+
 

@@ -496,6 +496,9 @@ because some are strings, all imported as string
                    ))
 ;;(add-projects)
 
+;; \copy (Select * From plate_set) To '/home/mbc/projects/lnrocks/resources/data/plate-set.csv' With CSV
+
+  
 (defn add-plate-sets []
   (do
             (dbi/new-plate-set "with AR (low values), HL", "2 96 well plates", 2,96,1,1,1,true) 
