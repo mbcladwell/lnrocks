@@ -18,10 +18,14 @@
  {:crux.db/id :counters
   :project 0
   :plate-set 0
+  :plate 0
   :sample 0 }
   )
 
 (crux/submit-tx core/node [[:crux.tx/put counters]] )
+
+
+
 
 (defn easy-ingest
   "Uses Crux put transaction to add a vector of documents to a specified
@@ -65,12 +69,8 @@
 ;;(get-well-numbers 96)
 
 
-(defn get-plate-layout
-  ;;x is :id e.g.  41
-  [x]
-  (filter #(= (:id %) x) (:plate-layout  (crux/entity (crux/db core/node ) :plate-layout))))
 
-
+  ;;(:unknown-n (first (get-plate-layout 2)))
 
   (def example-data
  [{:crux.db/id :projects

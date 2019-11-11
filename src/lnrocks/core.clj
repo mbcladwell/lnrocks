@@ -1,5 +1,6 @@
 (ns lnrocks.core
-  (:require [crux.api :as crux])
+  (:require [crux.api :as crux]
+            [lnrocks.util :as util])
   (:import [crux.api ICruxAPI])
   (:gen-class))
 
@@ -19,6 +20,13 @@
     (crux/submit-tx node [[:crux.tx/cas old new]])
     {:start start :end end}))
 
+;;(counter :sample 368)
+
+
+(defn get-plate-layout
+  ;;x is :id e.g.  41
+  [x]
+  (filter #(= (:id %) x) (:plate-layout  (crux/entity (crux/db node ) :plate-layout))))
 
 
 (defn new-project
@@ -43,21 +51,48 @@
                   (vec (for [doc docs]
                          [:crux.tx/put doc]))))
 
+(defn fill-wells
+  ;;wells: the map of wells
+  ;;ids: a map {:start nn :end nn}
+  [wells ids]
+  (let [start (:start ids)
+        end  (:end ids)
+        wells-vector (case (count wells)
+                       96 util/vec96well
+                       384 util/vec384well
+                       1536 util/vec1536well)  ]
+    (loop [id-counter start  ;;counts through the ids by id number
+           vec-counter 0     ;;index of the id vector
+           filled-wells wells]
+      (if (> id-counter end)
+        filled-wells
+        (recur (+ id-counter 1)
+               (+ vec-counter 1)
+               (assoc filled-wells (get wells-vector vec-counter)  id-counter))))))
 
+
+;;(fill-wells util/map96wells (counter :sample 10))
 
 (defn new-plate
   ;;with-samples: boolean
-  [ project-id plate-set-id plate-id plate-format-id plate-type-id with-samples] 
-  (let [ plt-doc {:crux.db/id (keyword (str "plt-" plate-id))
-                  :plate-format-id plate-format-id
-                  :plate-type-id plate-type-id
-                  :project-id project-id}]
-    (crux/submit-tx node [[:crux.tx/put plt-doc]] )
-     
-    )
-  )
+  [ project-id plate-set-id plate-id plate-format-id plate-type-id plate-layout-name-id with-samples] 
+  (let [wells (case plate-format-id
+                96 util/map96wells
+                384 util/map384wells
+                1536 util/map1536wells)
+        unk-needed (:unknown-n (first (get-plate-layout plate-layout-name-id)))
+        sample-ids (counter :sample unk-needed)
+        plt-doc { ;; :crux.db/id (keyword (str "plt-" plate-id))
+                 :plate-format-id plate-format-id
+                 :plate-type-id plate-type-id
+                 :project-id project-id
+                 :id plate-id
+                 :wells (if with-samples (fill-wells wells sample-ids) wells)}]
+    ;;(crux/submit-tx node [[:crux.tx/put plt-doc]] )
+    plate-id))
 
-
+(:unknown-n (first (get-plate-layout 1)))
+;;(new-plate 1 1 2 96  1 1 true)
 
 (defn new-plate-set
   ;;with-samples: boolean
@@ -75,17 +110,19 @@
                 :plate-type-id plate-type-id
                 :project-id project-id
                 :plate-layout-name-id plate-layout-name-id
-                :session lnsession-id}
-        ]
-     (crux/submit-tx node [[:crux.tx/put doc]] )
-     
+                :session lnsession-id
+                :plates (loop [id-counter start         
+                               plates []]
+                          (if (> id-counter end)
+                            plates
+                            (recur (+ id-counter 1)           
+                                   (conj plates (new-plate project-id ps-id id-counter plate-format-id plate-type-id plate-layout-name-id with-samples)))))}]
+;;     (crux/submit-tx node [[:crux.tx/put doc]] )
+     (println ps-doc)
     )
   )
 
-
-
-(counter :plate-set 1)
-
+;;(new-plate-set "my set 1" "desc" 3 96 1 1 1 1 true)
 
 
 (defn -main
