@@ -8,6 +8,12 @@
             [clojure.java.io :as io])
            )
 
+;; \copy (Select * From assay_run) To '/home/mbc/projects/lnrocks/resources/data/assay-run.csv' With CSV
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;Required data
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn process-layout-data
   "processes that tab delimitted, R generated layouts for import
@@ -63,6 +69,13 @@ because some are strings, all imported as string
          content))
 
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;Optional example data
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
 (defn process-eg-prj-data
   "id 	project-sys-name	description	name	lnsession-id"
   [x]
@@ -77,6 +90,50 @@ because some are strings, all imported as string
          (let   [  table (util/table-to-map "resources/data/projects.txt")
                content (into [] (map #(process-eg-prj-data %) table))]
             content))
+
+
+
+(defn process-assay-run-names
+  "id	assay-run-sys-name	assay-run-name	description	assay-type-id	plate-set-id	plate-layout-name-id	lnsession-id"
+[x]
+ (into {} {:id (Integer/parseInt (String. (:id x)))
+            :assay-run-sys-name (:assay-run-sys-name x )
+            :assay-run-name (:assay-run-name x )
+            :description (:description x )
+           :assay-type-id (Integer/parseInt (String. (:assay-type-id x)))
+           :plate-set-id (Integer/parseInt (String. (:plate-set-id x)))
+           :plate-layout-name-id (Integer/parseInt (String. (:plate-layout-name-id x)))
+           :lnsession-id (Integer/parseInt (String. (:lnsession-id x)))
+           }))
+
+
+(defn process-assay-run-data
+  "assay.id	PlateOrder	WellNum	Response	Bk_Sub	Norm	NormPos	pEnhanced"
+[x]
+ (into {} {:id (Integer/parseInt (String. (:assay.id x)))
+           :plate-order (Integer/parseInt (String. (:PlateOrder x)))
+           :well-num (Integer/parseInt (String. (:WellNum x)))
+           :response (Double/parseDouble (String. (:Response x)))
+           :bk-sub (Double/parseDouble (String. (:Bk_Sub x)))
+           :norm (Double/parseDouble (String. (:Norm x)))
+           :normpos (Double/parseDouble (String. (:NormPos x)))
+           :penhanced (Double/parseDouble (String. (:pEnhanced x)))
+           }))
+
+
+(defn load-assay-run-data []
+  ;;add data to assay-run names using the key :pdata  (for processed data)
+  (let   [table (util/table-to-map "resources/data/assay-run.txt")
+          assay-names (into [] (map #(process-assay-run-names %) table))
+          table2 (util/table-to-map "resources/data/processed_data_for_import.txt")
+          assay-data (into [] (map #(process-assay-run-data %) table2))
+          result (map #(assoc % :pdata (extract-data-for-id (:id %)  assay-data)) assay-names)]
+         result))
+
+;;(load-assay-run-data)
+
+
+
 
 
 (def table (util/table-to-map "resources/data/projects.txt"))

@@ -1,0 +1,6 @@
+id	assay-run-sys-name	assay-run-name	description	assay-type-id	plate-set-id	plate-layout-name-id	lnsession-id
+1	AR-1	assay_run1	PS-1 LYT-1 96/4in12	1	1	1	1
+2	AR-2	assay_run2	PS-2 LYT-1 96/4in12	1	2	1	1
+3	AR-3	assay_run3	PS-3 LYT-1 96/4in12	5	3	1	1
+4	AR-4	assay_run4	PS-4 LYT-13 384/8in24	1	4	13	1
+5	AR-5	assay_run5	PS-5 LYT-37 1536/32in47,48	1	5	37	1

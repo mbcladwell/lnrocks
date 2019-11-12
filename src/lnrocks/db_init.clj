@@ -69,7 +69,6 @@
 ;;(get-well-numbers 96)
 
 
-
   ;;(:unknown-n (first (get-plate-layout 2)))
 
   (def example-data
