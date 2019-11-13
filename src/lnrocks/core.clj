@@ -1,57 +1,44 @@
 (ns lnrocks.core
   (:require [crux.api :as crux]
-            [lnrocks.util :as util])
+            [lnrocks.util :as util]
+            [lnrocks.db-retriever :as dbr]
+            [lnrocks.db-inserter :as dbi]
+            [lnrocks.db-init :as init]
+            )
   (:import [crux.api ICruxAPI])
   (:gen-class))
 
 ;;https://juxt.pro/blog/posts/crux-tutorial-datalog.html
 
-;;(load lnrocks/util.clj)
+(load "util")
+(load "db_inserter")
+(load "db_retriever")
 
-(defn counter
-  ;;entity:  plate, plate-set, sample or project
-  ;;need: how many will be created
-  ;;returns vector of start and end id
-  ;;can only get one per method or transaction aborted
-  [ entity need ]
-  (let [old (crux/entity (crux/db node) :counters)
-        start (+ 1 (entity old))
-        end (+ start (- need 1))
-        new (assoc old entity end)]
-    (crux/submit-tx node [[:crux.tx/cas old new]])
-    {:start start :end end}))
+(defn define-db-var []
+ (def ^crux.api.ICruxAPI node
+    (crux/start-node
+       {:crux.node/topology :crux.standalone/topology
+        :crux.node/kv-store "crux.kv.rocksdb/kv"
+        :crux.standalone/event-log-dir "data/eventlog-1"
+        :crux.kv/db-dir "data/db-dir1"
+        :crux.standalone/event-log-kv-store "crux.kv.rocksdb/kv"}))
+  )
+
+(if (.exists (io/as-file "data"))
+ (define-db-var)
+ (do
+   (define-db-var)
+   (load "db_init"))
+
+
+
+
+
+  
+
 
 ;;(counter :sample 368)
 
-(defn get-ps-plt-spl-ids
-  ;;args are the integer quantities needed
-  ;; :plate-set :plate :sample
-  ;;returns vector of start ids for each  
-  [ need-ps need-plt need-spl ]
-  (let [orig-counters (crux/entity (crux/db node) :counters)
-        old-ps (:plate-set orig-counters)
-        ps (+ 1 old-ps) ;;this is the start id
-        ps-end (+ old-ps need-ps) ;;this goes into the db as the next start id
-        old-plt (:plate orig-counters)
-        plt (+ 1 old-plt) ;;this is the start id
-        plt-end (+ old-plt need-plt) ;;this goes into the db as the next start id
-        old-spl (:sample orig-counters)
-        spl (+ 1 old-spl) ;;this is the start id
-        spl-end (+ old-spl need-spl) ;;this goes into the db as the next start id
-        new1 (assoc orig-counters :plate-set ps-end)
-        new2 (assoc new1 :plate plt-end)
-        new3 (assoc new2 :sample spl-end)
-        ]
-    (crux/submit-tx node [[:crux.tx/cas orig-counters new3]])
-    {:plate-set ps :plate plt :sample spl}))
-
-;;(crux/entity (crux/db node ) :counters)
-;;(get-ps-plt-spl-ids 1 2 3)
-
-(defn get-plate-layout
-  ;;x is :id e.g.  41
-  [x]
-  (filter #(= (:id %) x) (:plate-layout  (crux/entity (crux/db node ) :plate-layout))))
 
 
 (defn new-project
@@ -69,34 +56,7 @@
 (crux/entity (crux/db node) :prj-1)
 
 
-(defn easy-ingest
-  "Uses Crux put transaction to add a vector of documents to a specified
-  node"
-  [node docs]
-  (crux/submit-tx node
-                  (vec (for [doc docs]
-                         [:crux.tx/put doc]))))
 
-(defn fill-wells
-  ;;wells: the map of wells
-  ;;ids: a map {:start nn :end nn}
-  [wells id-start unk-needed]
-  (let [      
-        wells-vector (case (count wells)
-                       96 util/vec96wells
-                       384 util/vec384wells
-                       1536 util/vec1536wells)  ]
-    (loop [id-counter id-start  ;;counts through the ids by id number
-           vec-counter 0
-           filled-wells wells]
-      (if (= id-counter (+ id-start unk-needed))
-        filled-wells
-        (recur (+ id-counter 1)
-               (+ vec-counter 1)
-               (assoc filled-wells (get wells-vector vec-counter)  id-counter))))))
-
-
-;;(fill-wells util/map96wells 3 3)
 
 (defn new-plate
   ;;with-samples: boolean
@@ -112,7 +72,7 @@
                  :project-id project-id
                  :id plate-id
                  :plate-sys-name (str "PLT-" plate-id)
-                 :wells (if with-samples (fill-wells wells sample-id-start unk-per-plate-needed) wells)}]
+                 :wells (if with-samples (util/fill-wells wells sample-id-start unk-per-plate-needed) wells)}]
     plt-doc))
 
 ;;(new-plate 1 1 2 96  1 1 true 3 3)
@@ -145,7 +105,9 @@
                             plates
                             (recur (+ plate-id-counter 1)
                                    (+ spl-vector-counter 1)
-                                   (conj plates (new-plate project-id ps-id plate-id-counter plate-format-id plate-type-id plate-layout-name-id with-samples (get spl-ids-start-vec spl-vector-counter) unk-per-plate-needed)))))}]
+                                   (conj plates (new-plate project-id ps-id plate-id-counter plate-format-id
+                                                           plate-type-id plate-layout-name-id with-samples
+                                                           (get spl-ids-start-vec spl-vector-counter) unk-per-plate-needed)))))}]
     (crux/submit-tx node [[:crux.tx/put ps-doc]])
     ps-id))
 
@@ -155,28 +117,19 @@
 ;;(crux/entity (crux/db node ) :counters)
 (defn get-plates-in-project [x]
   (crux/q (crux/db node)
-          '{:find [id pd pid ptid  ]
-            :where [[e :ln-entity pd]
-                    [e :project-id pid]
-                    [e :plate-type-id ptid]
-                    [e :crux.db/id id]]
+          '{:find [e p  ]
+            :where [[e :ps-name p]]}))
                     
-            }
-        ))
+             :args [{ 'p "PS-12"  }
+                   
+                   ]}))
 
-;;(get-plates-in-project 2)
+;;(count (get-plates-in-project 2))
 
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-   (def ^crux.api.ICruxAPI node
-    (crux/start-node
-       {:crux.node/topology :crux.standalone/topology
-        :crux.node/kv-store "crux.kv.rocksdb/kv"
-        :crux.standalone/event-log-dir "data/eventlog-1"
-        :crux.kv/db-dir "data/db-dir1"
-        :crux.standalone/event-log-kv-store "crux.kv.rocksdb/kv"}))
 
 (println "In main"))
 
