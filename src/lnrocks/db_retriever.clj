@@ -12,7 +12,7 @@
   ;;need: how many will be created
   ;;returns vector of start and end id
   ;;can only get one per method or transaction aborted
-  [ entity need ]
+  [node entity need ]
   (let [old (crux/entity (crux/db node) :counters)
         start (+ 1 (entity old))
         end (+ start (- need 1))
@@ -24,7 +24,7 @@
   ;;args are the integer quantities needed
   ;; :plate-set :plate :sample
   ;;returns vector of start ids for each  
-  [ need-ps need-plt need-spl ]
+  [ node need-ps need-plt need-spl ]
   (let [orig-counters (crux/entity (crux/db node) :counters)
         old-ps (:plate-set orig-counters)
         ps (+ 1 old-ps) ;;this is the start id
@@ -47,7 +47,7 @@
 
 (defn get-plate-layout
   ;;x is :id e.g.  41
-  [x]
+  [node x]
   (filter #(= (:id %) x) (:plate-layout  (crux/entity (crux/db node ) :plate-layout))))
 
 

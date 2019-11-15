@@ -4,7 +4,8 @@
             [lnrocks.db-retriever :as dbr]
             [lnrocks.db-inserter :as dbi]
             [lnrocks.db-init :as init]
-            )
+          [clojure.java.io :as io]
+              )
   (:import [crux.api ICruxAPI])
   (:gen-class))
 
@@ -13,6 +14,8 @@
 (load "util")
 (load "db_inserter")
 (load "db_retriever")
+(load "db_init")
+
 
 (defn define-db-var []
  (def ^crux.api.ICruxAPI node
@@ -28,7 +31,8 @@
  (define-db-var)
  (do
    (define-db-var)
-   (load "db_init"))
+   ;;(load "db_init")
+   ))
 
 
 
@@ -43,7 +47,7 @@
 
 (defn new-project
   [ name description session-id]
-  (let [ prj-id (:start (counter :project 1))
+  (let [ prj-id (:start (dbr/counter node :project 1))
         doc  {:crux.db/id (keyword (str "prj-" prj-id))
               :ln-entity "project"
                 :prj-name name
@@ -81,8 +85,8 @@
   ;;with-samples: boolean
   [ plate-set-name description num-plates plate-format-id plate-type-id
    project-id plate-layout-name-id lnsession-id with-samples] 
-  (let [unk-per-plate-needed (:unknown-n (first (get-plate-layout plate-layout-name-id)))
-        start-ids (get-ps-plt-spl-ids 1 num-plates (* num-plates unk-per-plate-needed) )
+  (let [unk-per-plate-needed (:unknown-n (first (dbr/get-plate-layout node plate-layout-name-id)))
+        start-ids (dbr/get-ps-plt-spl-ids node 1 num-plates (* num-plates unk-per-plate-needed) )
         ps-id (:plate-set start-ids)
         plate-start (:plate start-ids)
         plate-end (+ plate-start (- num-plates 1) )
@@ -120,11 +124,37 @@
           '{:find [e p  ]
             :where [[e :ps-name p]]}))
                     
-             :args [{ 'p "PS-12"  }
+         ;;    :args [{ 'p "PS-12"  }
                    
-                   ]}))
+           ;;        ]}))
 
 ;;(count (get-plates-in-project 2))
+
+(init/load-eg-projects node)
+
+
+;;I will load projects with plate-set-names (no plates)
+;;also assay run names and data
+;;also hit lists
+;;Use algorithm to generate plates/wells/samples and copy to plate-set
+(defn load-example-data []
+  ;; (new-plate-set  plate-set-name description num-plates plate-format-id plate-type-id
+  ;;  project-id plate-layout-name-id lnsession-id with-samples)
+  (let [all-projects (init/load-eg-projects)
+        ps1-dummy (new-plate-set "dummy" "dummy" 2 96 1 1 1 1 true )
+        ps2-dummy (new-plate-set "dummy" "dummy" 2 96 1 1 1 1 true )
+        ps3-dummy (new-plate-set "dummy" "dummy" 2 96 1 1 1 1 true )
+        ps4-dummy (new-plate-set "dummy" "dummy" 2 384 1 1 2 13 true )
+        ps5-dummy (new-plate-set "dummy" "dummy" 1 1536 1 1 3 37 true )
+        ps6-dummy (new-plate-set "dummy" "dummy" 10 96 1 1 10 1 true )
+        ps7-dummy (new-plate-set "dummy" "dummy" 10 96 1 1 10 1 true )
+        ps8-dummy (new-plate-set "dummy" "dummy" 3 96 1 1 10 1 true )
+
+        ]
+    ))
+
+
+
 
 
 (defn -main

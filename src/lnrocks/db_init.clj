@@ -1,39 +1,19 @@
 (ns lnrocks.db-init
   (:require
    ;;[clojure.data.csv :as csv]
-            [clojure.java.io :as io]
-            [crux.api :as crux]
-            [lnrocks.core :as core]
-            [lnrocks.db-inserter :as dbi]
-            )
+   [clojure.java.io :as io]
+   [crux.api :as crux]
+   [lnrocks.core :as core]
+   [lnrocks.db-inserter :as dbi]
+   [lnrocks.db-retriever :as dbr]
+    [lnrocks.util :as util])
   (:import [crux.api ICruxAPI])
-             (:gen-class))
+  (:gen-class))
 
     
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;Database setup
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn open-or-create-db
-  ;;1. check working directory - /home/user/my-working-dir
-  ;;2. check home directory      /home/user
-  []
-  (if (.exists (io/as-file "ln-props"))
-    (def props (c/open-database! "ln-props"))  
-    (if (.exists (io/as-file (str (java.lang.System/getProperty "user.home") "/ln-props") ))
-      (def props (c/open-database! (str (java.lang.System/getProperty "user.home") "/ln-props") ))
-      (if (.exists (io/as-file (str (java.lang.System/getProperty "user.dir") "/limsnucleus.properties") ))
-        (do
-          (create-ln-props-from-text)
-          (def props (c/open-database! "ln-props")))
-        (do            ;;no limsnucleus.properties - login to elephantSQL
-          (login-to-elephantsql)
-          (def props (c/open-database! "ln-props"))
-          (JOptionPane/showMessageDialog nil "limsnucleus.properties file is missing\nLogging in to example database!"  )
-          )))))
-
-
-(open-or-create-db)
 
 
 
@@ -48,7 +28,7 @@
   :work-list 0}
   )
 
-(crux/submit-tx core/node [[:crux.tx/put counters]] )
+;;(crux/submit-tx core/node [[:crux.tx/put counters]] )
 
 
 
@@ -71,7 +51,7 @@
    :plate-set-sys-name "PS-1"
    :plate-set-id 1})
   
-(crux/submit-tx node [[:crux.tx/put props]] )
+;;(crux/submit-tx node [[:crux.tx/put props]] )
 
 (def helpers
   [{:crux.db/id :plate-formats :96 96 :384 384 :1536 1536}
@@ -80,7 +60,7 @@
    {:crux.db/id :assay-type  1 "ELISA" 2 "Octet" 3 "SNP" 4 "HCS" 5 "HTRF" 6 "FACS"}
    {:crux.db/id :well-type  1 "unknown" 2 "positive" 3 "negative" 4 "blank" 5 "edge"}
    {:crux.db/id :well-numbers :well-numbers (dbi/load-well-numbers) }
-   {:crux.db/id :layout-src-dest    [{:source 1 :dest  2}{:source 1 :dest 3}{:source 1 :dest 4}{:source 1 :dest 5}{:source 1 :dest 6}{:source 7 :dest 8}{:source 7 :dest 9}{:source 7 :dest 10}{:source 7 :dest 11}{:source 7 :dest 12}{:source 13 :dest 14}{:source 13 :dest 15}{:source 13 :dest 16}{:source 13 :dest 17}{:source 13 :dest 18}{:source 19 :dest 20}{:source 19 :dest 21}{:source 19 :dest 22}{:source 19 :dest 23}{:source 19 :dest 24}{:source 25 :dest 26}{:source 25 :dest 27}{:source 25 :dest 28}{:source 25 :dest 29}{:source 25 :dest 30}{:source 31 :dest 32}{:source 31 :dest 33}{:source 31 :dest 34}{:source 31 :dest 35}{:source 31 :dest 36}{:source 37 :dest 41}{:source 38 :dest 41}{:source 39 :dest 41}{:source 40 :dest 41}]
+   {:crux.db/id :layout-src-dest :layout-src-dest   [{:source 1 :dest  2}{:source 1 :dest 3}{:source 1 :dest 4}{:source 1 :dest 5}{:source 1 :dest 6}{:source 7 :dest 8}{:source 7 :dest 9}{:source 7 :dest 10}{:source 7 :dest 11}{:source 7 :dest 12}{:source 13 :dest 14}{:source 13 :dest 15}{:source 13 :dest 16}{:source 13 :dest 17}{:source 13 :dest 18}{:source 19 :dest 20}{:source 19 :dest 21}{:source 19 :dest 22}{:source 19 :dest 23}{:source 19 :dest 24}{:source 25 :dest 26}{:source 25 :dest 27}{:source 25 :dest 28}{:source 25 :dest 29}{:source 25 :dest 30}{:source 31 :dest 32}{:source 31 :dest 33}{:source 31 :dest 34}{:source 31 :dest 35}{:source 31 :dest 36}{:source 37 :dest 41}{:source 38 :dest 41}{:source 39 :dest 41}{:source 40 :dest 41}]}
    ])
 
 
@@ -89,18 +69,10 @@
 
 (defn get-well-numbers
   ;;x: 96, 384, or 1536
-  [x]
-  (filter #(= (:format %) x) (:well-numbers  (crux/entity (crux/db core/node ) :well-numbers))))
+  [node x]
+  (filter #(= (:format %) x) (:well-numbers  (crux/entity (crux/db node ) :well-numbers))))
 
 ;;(get-well-numbers 96)
-
-
-  ;;(:unknown-n (first (get-plate-layout 2)))
-
-  (def example-data
- [{:crux.db/id :projects
-
-    )
 
 
   
@@ -177,106 +149,226 @@ because some are strings, all imported as string
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defn add-projects [ ]
-  (do
-                   (dbi/new-project "3 plate sets with 2 96 well plates each", "With AR, HL", 1 ) 
-                   (dbi/new-project "1 plate set with 2 384 well plates each", "With AR", 1 ) 
-                   (dbi/new-project "1 plate set with 1 1536 well plate", "With AR", 1 ) 
-                   (dbi/new-project "description 4", "MyTestProj4", 1 ) 
-                   (dbi/new-project "description 5", "MyTestProj5", 1 ) 
-                   (dbi/new-project "description 6", "MyTestProj6", 1 ) 
-                   (dbi/new-project "description 7", "MyTestProj7", 1 ) 
-                   (dbi/new-project "description 8", "MyTestProj8", 1 ) 
-                   (dbi/new-project "description 9", "MyTestProj9", 1 ) 
-                   (dbi/new-project "2 plate sets with 10 96 well plates each", "Plates only, no data", 1 ) 
-                   ))
-;;(add-projects)
+(def hitlists [
+               ;;for project1
+{:name "hit list 1"
+ :description "descr1"
+ :hits [87 39 51 59 16 49 53 73 65 43]
+ :prj-id 1}
+{:name "hit list 2"
+ :description "descr2"
+ :hits  [154, 182, 124, 172, 171, 164, 133, 155, 152, 160, 118, 93, 123, 142, 183, 145, 95, 120, 158, 131]
+ :prj-id 1}
+               ;;for project2
+{:name "hit list 3"
+ :description "descr3"
+ :hits [216, 193, 221, 269, 244, 252, 251, 204, 217, 256]
+ :prj-id 2}
+{:name "hit list 4"
+ :description "descr4"
+ :hits [311, 277, 357, 314, 327, 303, 354, 279, 346, 318, 344, 299, 355, 300, 325, 290, 278, 326, 282, 334]
+ :prj-id 2}
+               ;;for project3
+{:name "hit list 5"
+ :description "descr5"
+ :hits [410, 412, 393, 397, 442, 447, 428, 374, 411, 437]
+ :prj-id 3}
+{:name "hit list 6"
+ :description "descr6"
+ :hits [545, 514, 479, 516, 528, 544, 501, 472, 463, 494, 531, 482, 513, 468, 465, 510, 535, 478, 502, 488]
+ :prj-id 3}])
 
-;; \copy (Select * From plate_set) To '/home/mbc/projects/lnrocks/resources/data/plate-set.csv' With CSV
-
-  
-(defn add-plate-sets []
-  (do
-            (dbi/new-plate-set "with AR (low values), HL", "2 96 well plates", 2,96,1,1,1,true) 
-            (dbi/new-plate-set "with AR (low values), HL", "2 96 well plates", 2,96,1,1,1,true) 
-            (dbi/new-plate-set "with AR (high values), HL", "2 96 well plates", 2,96,1,1,1,true) 
-            (dbi/new-plate-set "with AR (low values), HL", "2 384 well plates", 2,384,1,2,13,true) 
-            (dbi/new-plate-set "with AR (low values), HL", "1 1536 well plate", 1, 1536, 1, 3, 37,true) 
-            (dbi/new-plate-set "using LYT-1/;96/;4in12", "Plates only", 10,96,1,10,1,true) 
-             (dbi/new-plate-set "using LYT-1/;96/;4in12", "Plates only", 10,96,1,10,1,true) 
-             ))
-;;(add-plate-sets)
-
-(defn load-assay-data
-  "hits must be handle separately so name and description can be entered"
-  [] 
-  (do
-    (dbi/associate-data-with-plate-set "assay_run1", "PS-1 LYT-1;96;4in12", ["PS-1"] 96, 1, 1, "resources/data/ar1raw.txt" false nil nil)
-    (dbi/associate-data-with-plate-set "assay_run2", "PS-2 LYT-1;96;4in12", ["PS-2"] 96, 1, 1, "resources/data/ar2raw.txt" false nil nil)
-    (dbi/associate-data-with-plate-set "assay_run3", "PS-3 LYT-1;96;4in12", ["PS-3"] 96, 5, 1, "resources/data/ar3raw.txt" false nil nil)
-    (dbi/associate-data-with-plate-set "assay_run4", "PS-4 LYT-13;384;8in24", ["PS-4"] 384, 1, 13, "resources/data/ar4raw.txt" false nil nil)
-    (dbi/associate-data-with-plate-set "assay_run5", "PS-5 LYT-37;1536;32in47,48", ["PS-5"] 1536, 1, 37, "resources/data/ar5raw.txt" false nil nil)))
-    
-
-
-(defn add-hit-lists []
-                    (dbi/new-hit-list "hit list 1", "descr1", 10, 1,   [87 39 51 59 16 49 53 73 65 43]) 
-                    (dbi/new-hit-list "hit list 2", "descr2", 20, 1,   [154, 182, 124, 172, 171, 164, 133, 155, 152, 160, 118, 93, 123, 142, 183, 145, 95, 120, 158, 131]) 
-                    (dbi/new-hit-list "hit list 3", "descr3", 10, 2,   [216, 193, 221, 269, 244, 252, 251, 204, 217, 256]) 
-                    (dbi/new-hit-list "hit list 4", "descr4", 20, 2,   [311, 277, 357, 314, 327, 303, 354, 279, 346, 318, 344, 299, 355, 300, 325, 290, 278, 326, 282, 334]) 
-                    (dbi/new-hit-list "hit list 5", "descr5", 10, 3,  [410, 412, 393, 397, 442, 447, 428, 374, 411, 437]) 
-                    (dbi/new-hit-list "hit list 6", "descr6", 20, 3,  [545, 514, 479, 516, 528, 544, 501, 472, 463, 494, 531, 482, 513, 468, 465, 510, 535, 478, 502, 488]))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;executables used by interface
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn drop-database
-;;needed for interface button
-[]
-  (jdbc/db-do-commands cm/conn true  "DROP DATABASE lndb"))
-
-;;(drop-database)
-
-(defn initialize-limsnucleus
-  ;;(map #(jdbc/db-do-commands cm/conn (jdbc/drop-table-ddl % {:conditional? true } )) all-table-names)
-  []
-    (doall (map #(jdbc/db-do-commands cm/conn true  %) (map #(format  "DROP TABLE IF EXISTS %s CASCADE" %)  all-table-names ) ))
-  ;;(jdbc/db-do-commands cm/conn-create true  "CREATE DATABASE lndb")
-  (doall (map #(jdbc/db-do-commands cm/conn true %) all-tables))
-  (doall  (map #(jdbc/db-do-commands cm/conn true %) all-indices))
-  ;; this errors because brackets not stripped
-  ;;(map #(jdbc/insert-multi! cm/conn %) required-data)
-  (doall  (map #(apply jdbc/insert-multi! cm/conn % ) required-data))
-  (cm/set-init false))
-
-;;(initialize-limsnucleus)
-;;(println cm/conn)
-
-;;root@xps:/home/mbc# mysql --user=root -p2727 lndb
-;;mysql>CREATE USER 'ln_admin'@'%' IDENTIFIED BY 'welcome';
-;;mysql>GRANT ALL PRIVILEGES ON *.* TO 'ln_admin'@'%' WITH GRANT OPTION;
+(defn process-assay-run-names
+  "id	assay-run-sys-name	assay-run-name	description	assay-type-id	plate-set-id	plate-layout-name-id	lnsession-id"
+[x]
+ (into {} {:id (Integer/parseInt (String. (:id x)))
+            :assay-run-sys-name (:assay-run-sys-name x )
+            :assay-run-name (:assay-run-name x )
+            :description (:description x )
+           :assay-type-id (Integer/parseInt (String. (:assay-type-id x)))
+           :plate-set-id (Integer/parseInt (String. (:plate-set-id x)))
+           :plate-layout-name-id (Integer/parseInt (String. (:plate-layout-name-id x)))
+           :lnsession-id (Integer/parseInt (String. (:lnsession-id x)))
+           }))
 
 
-(defn add-example-data
-  ;;
-  []
-  ;; order important!
-  (do
-    ;;(doall (map #(jdbc/db-do-commands cm/conn true  %) (map #(format  "TRUNCATE TABLE %s" %)  tables-to-truncate )))
-;;    (doall (map #(jdbc/db-do-commands cm/conn true  %) (map #(format  "TRUNCATE %s CASCADE" %)  tables-to-truncate )))
-  (jdbc/insert! cm/conn :lnsession {:lnuser_id 1})
-  (cm/set-session-id 1)  
-  (add-projects)
-  (add-plate-sets)
-  (load-assay-data)
-  (add-hit-lists)))
+(defn process-assay-run-data
+  "assay.id	PlateOrder	WellNum	Response	Bk_Sub	Norm	NormPos	pEnhanced"
+[x]
+ (into {} {:id (Integer/parseInt (String. (:assay.id x)))
+           :plate-order (Integer/parseInt (String. (:PlateOrder x)))
+           :well-num (Integer/parseInt (String. (:WellNum x)))
+           :response (Double/parseDouble (String. (:Response x)))
+           :bk-sub (Double/parseDouble (String. (:Bk_Sub x)))
+           :norm (Double/parseDouble (String. (:Norm x)))
+           :normpos (Double/parseDouble (String. (:NormPos x)))
+           :penhanced (Double/parseDouble (String. (:pEnhanced x)))
+           }))
 
-;;(add-example-data)
 
-(defn delete-example-data
-  []
-  ;;(jdbc/execute! cm/conn "TRUNCATE project, plate_set, plate, hit_sample, hit_list, assay_run, assay_result, sample, well, lnsession;"))
+(defn load-assay-run-data []
+  ;;add data to assay-run names using the key :pdata  (for processed data)
+  (let   [table (util/table-to-map "resources/data/assay-run.txt")
+          assay-names (into [] (map #(process-assay-run-names %) table))
+          table2 (util/table-to-map "resources/data/processed_data_for_import.txt")
+          assay-data (into [] (map #(process-assay-run-data %) table2))
+          result (map #(assoc % :pdata (dbi/extract-data-for-id (:id %)  assay-data)) assay-names)]
+         result))
 
-  (jdbc/execute! cm/conn "TRUNCATE project, plate_set, plate, hit_sample, hit_list, assay_run, assay_result, sample, well, lnsession RESTART IDENTITY CASCADE;"))
+;;(load-assay-run-data)
 
+;;plate_sys_name	plate_type_id	plate_layout_name_id	plate_set_name	descr	num_plates	plate_format_id	project_id	lnsession_id	plate_set_id	plate_id	plate_order
+
+
+(defn process-eg-plate-data
+"plate_sys_name	plate_type_id	plate_layout_name_id	plate_set_name	descr	num_plates	plate_format_id	project_id	lnsession_id	plate_set_id	id (this is the plate_id; must be :id)	plate_order"
+ [x]
+  (into {} {
+          ;;  :plate-sys-name (:plate-set_sys_name x )
+          ;;  :plate-type-id (Integer/parseInt (String. (:plate-type-id x)))
+          ;;  :plate-layout-name-id (Integer/parseInt (String. (:plate-layout-name-id x)))
+          ;;  :plate-set-name (:plate-set-name x ) 
+          ;;  :descr (:descr x )
+          ;;  :num-plates (Integer/parseInt (String. (:num-plates x)))
+          ;;  :plate-format-id (Integer/parseInt (String. (:plate-format-id x)))
+          ;;  :project-id (Integer/parseInt (String. (:project-id x)))
+          ;;  :lnsession-id (Integer/parseInt (String. (:lnsession-id x)))
+            :plate-set-id (Integer/parseInt (String. (:plate_set_id x)))
+            :id (Integer/parseInt (String. (:id x)))
+            :plate-order (Integer/parseInt (String. (:plate_order x)))
+            }))
+
+
+(defn load-eg-plate []
+         (let   [  table (util/table-to-map "resources/data/plates.txt")
+                 plates (into [] (map #(process-eg-plate-data %) table))]
+                ;; assay-data (load-assay-run-data)
+           ;;result (map #(assoc % :assay-runs (dbi/extract-data-for-id (:plate-set-id %)  plate-sets)) assay-data)]
+             plates))
+
+ (def table (util/table-to-map "resources/data/plates.txt"))
+                (def plates (into [] (map #(process-eg-plate-data %) table)))
+               
+(insp/inspect-tree plates)
+
+
+
+(defn process-eg-plate-set-data
+"id	plate-set-name	descr	plate-set-sys-name	num-plates	plate-format-id	plate-type-id	project-id	plate-layout-name-id	lnsession-id"
+ [x]
+  (into {} {:id (Integer/parseInt (String. (:id x)))
+            :plate-set-name (:plate-set-name x )
+            :descr (String.(:descr x) )
+            :plate-set-sys-name (:plate-set-sys-name x )
+            :num-plates (Integer/parseInt (String. (:num-plates x)))
+            :plate-format-id (Integer/parseInt (String. (:plate-format-id x)))
+            :plate-type-id (Integer/parseInt (String. (:plate-type-id x)))
+            :project-id (Integer/parseInt (String. (:project-id x)))
+            :plate-layout-name-id (Integer/parseInt (String. (:plate-layout-name-id x)))
+            :lnsession-id (Integer/parseInt (String. (:lnsession-id x))) }))
+
+
+(defn load-eg-plate-sets []
+         (let   [  table (util/table-to-map "resources/data/plate-set-names.txt")
+                 plate-sets (into [] (map #(process-eg-plate-set-data %) table))
+                 assay-data (load-assay-run-data)
+                 result1 (map #(assoc % :assay-runs (dbi/extract-data-for-id (:plate-set-id %)  plate-sets)) assay-data)
+                 plates (load-eg-plate)
+                 result2 (map #(assoc % :plates (dbi/extract-data-for-id (:plate-set-id %)  plate-sets)) plates)
+                 
+                 ]
+             (println  result2)))
+                     
+    (def table (util/table-to-map "resources/data/plate-set-names.txt"))
+               (def plate-sets (into [] (map #(process-eg-plate-set-data %) table)))
+
+(def plate-set-counter [1 2 3 4 5 6 7 8])
+(insp/inspect-tree plates)
+(insp/inspect-tree plate-sets)
+(insp/inspect-tree result2)
+
+(map #(conj [] %) (map #(extract-data-for-id (:id %)  plates :plate-set-id) plates))
+
+(get  (group-by  :plate-set-id plates) 1)
+(map #(assoc (:id (nth plate-sets %)) :plates  (get  (group-by  :plate-set-id plates) %)) plate-set-counter)
+
+(map #(assoc  (map #(filter (= (map #(:id %) plate-sets) 1)   plate-sets) plate-set-counter)   :plates  (get  (group-by  :plate-set-id plates) %)) plate-set-counter)
+
+(assoc  (map #(filter (= (map (:id ({:plate-format-id 96, :plate-set-sys-name PS-1, :id 1, :descr with AR (low values), HL, :lnsession-id 1, :plate-type-id 1, :num-plates 2, :project-id 1, :plate-set-name 2 96 well plates, :plate-layout-name-id 1})) plate-sets) 1)   plate-sets) plate-set-counter)   :plates  (get  (group-by  :plate-set-id plates) 1))
+
+
+
+(map #(filter (= (map #(:id %) plate-sets) 1)   plate-sets) plate-set-counter)
+
+ (def result2 (map #(conj plate-sets  (extract-data-for-id (:id %)  plates :plate-set-id)) plate-sets))
+
+(println (first plate-sets))
+(:id plate-sets)
+
+(def x :id)
+(def coll plates)
+(def k :plate-set-id)
+
+(defn extract-data-for-id
+  ;;get the data for a single id; remove the id from the collection
+  ;;x the id
+  ;;coll the collection;; its id must be :id
+  ;;k: key-to-remove
+  [x coll k]
+  (map #(dissoc % k) (filter #(= (:id %) x) coll ) ))
+
+
+
+;;((dbi/extract-data-for-id (:id (first plate-sets))
+
+(defn process-eg-prj-data
+  "id 	project-sys-name	description	name	lnsession-id"
+  [x]
+  (into {} {;; :id (Integer/parseInt (String. (:id x)))
+            :project-sys-name (:project-sys-name x )
+            :description (:description x )
+            :name (:name x )
+            :lnsession-id (Integer/parseInt (String. (:lnsession-id x)))
+            :id (Integer/parseInt (String. (:id x)))
+            }))
+
+
+(defn load-eg-projects []
+         (let   [  table (util/table-to-map "resources/data/projects.txt")
+                 proj-data (into [] (map #(process-eg-prj-data %) table))
+                 ps (load-eg-plate-sets)
+                 result2 (map #(assoc % :plate-sets (dbi/extract-data-for-id (:project-id %)  ps)) proj-data)                 
+                 hl hitlists
+                 result3 (map #(assoc % :hit-lists (dbi/extract-data-for-id (:prj-id %)  hl)) result2)
+                 ]
+            (println result3)))
+
+(require '[clojure.inspector :as insp])
+(insp/inspect-tree proj-data)
+(insp/inspect-tree proj-data)
+
+
+ (def table (util/table-to-map "resources/data/projects.txt"))
+ (def proj-data (into [] (map #(process-eg-prj-data %) table)))
+(def ps (load-eg-plate-sets))
+(clojure.inspector/inspect ps)
+(def result2 (map #(assoc % :plate-sets (dbi/extract-data-for-id (:project-id %)  ps)) proj-data))
+
+
+
+
+                 hl hitlists
+                 result3 (map #(assoc % :hit-lists (dbi/extract-data-for-id (:prj-id %)  hl)) result2)
+
+
+;; select * from plate, plate_set, plate_plate_set where plate_plate_set.plate_set_id = plate_set.id and plate_plate_set.plate_id = plate.id;
+
+;; \copy (select * from plate, plate_set, plate_plate_set where plate_plate_set.plate_set_id = plate_set.id and plate_plate_set.plate_id = plate.id) To '/home/mbc/projects/lnrocks/resources/data/plates.csv' With CSV
+
+
+
+;;Number of IDs needed for example data set
+;; project 10
+;; plate-set 8
+;; plate 29
+;; sample 4648

@@ -1,0 +1,30 @@
+plate_sys_name	plate_type_id	plate_layout_name_id	plate_set_name	descr	num_plates	plate_format_id	project_id	lnsession_id	plate_set_id	id	plate_order
+PLT-1	1	1	2 96 well plates	with AR (low values), HL	2	96	1	1	1	1	1
+PLT-2	1	1	2 96 well plates	with AR (low values), HL	2	96	1	1	1	2	2
+PLT-3	1	1	2 96 well plates	with AR (low values), HL	2	96	1	1	2	3	1
+PLT-4	1	1	2 96 well plates	with AR (low values), HL	2	96	1	1	2	4	2
+PLT-5	1	1	2 96 well plates	with AR (high values), HL	2	96	1	1	3	5	1
+PLT-6	1	1	2 96 well plates	with AR (high values), HL	2	96	1	1	3	6	2
+PLT-7	1	13	2 384 well plates	with AR (low values), HL	2	384	2	1	4	7	1
+PLT-8	1	13	2 384 well plates	with AR (low values), HL	2	384	2	1	4	8	2
+PLT-9	1	37	1 1536 well plate	with AR (low values), HL	1	1536	3	1	5	9	1
+PLT-10	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	6	10	1
+PLT-11	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	6	11	2
+PLT-12	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	6	12	3
+PLT-13	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	6	13	4
+PLT-14	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	6	14	5
+PLT-15	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	6	15	6
+PLT-16	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	6	16	7
+PLT-17	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	6	17	8
+PLT-18	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	6	18	9
+PLT-19	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	6	19	10
+PLT-20	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	7	20	1
+PLT-21	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	7	21	2
+PLT-22	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	7	22	3
+PLT-23	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	7	23	4
+PLT-24	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	7	24	5
+PLT-25	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	7	25	6
+PLT-26	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	7	26	7
+PLT-27	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	7	27	8
+PLT-28	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	7	28	9
+PLT-29	1	1	Plates only	using LYT-1/96/4in12	10	96	10	1	7	29	10
