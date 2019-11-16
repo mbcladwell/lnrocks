@@ -50,6 +50,12 @@
   [node x]
   (filter #(= (:id %) x) (:plate-layout  (crux/entity (crux/db node ) :plate-layout))))
 
+(defn get-well-numbers
+  ;;x: 96, 384, or 1536
+  [node x]
+  (filter #(= (:format %) x) (:well-numbers  (crux/entity (crux/db node ) :well-numbers))))
+
+;;(get-well-numbers 96)  
 
 
 ;;     (defn get-help-url-prefix []

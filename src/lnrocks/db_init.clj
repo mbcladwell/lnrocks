@@ -6,7 +6,8 @@
    [lnrocks.core :as core]
    [lnrocks.db-inserter :as dbi]
    [lnrocks.db-retriever :as dbr]
-    [lnrocks.util :as util])
+   [lnrocks.util :as util]
+   [clojure.inspector :as insp])
   (:import [crux.api ICruxAPI])
   (:gen-class))
 
@@ -67,34 +68,6 @@
 
 ;; (easy-ingest core/node helpers)
 
-(defn get-well-numbers
-  ;;x: 96, 384, or 1536
-  [node x]
-  (filter #(= (:format %) x) (:well-numbers  (crux/entity (crux/db node ) :well-numbers))))
-
-;;(get-well-numbers 96)
-
-
-  
-
-;;     [(jdbc/create-table-ddl :hit_list
-;;                           [[:id "INT(20) NOT NULL PRIMARY KEY AUTO_INCREMENT"]
-;;                            [:hitlist_sys_name "varchar(30)"]
-;;                            [:hitlist_name "varchar(250)"]
-;;                            [:descr "varchar(250)"]
-;;                             [:n :int]
-;;                            [:lnsession_id :int]
-;;                            [:assay_run_id :int]
-;;                             [:updated  :timestamp ]               
-;;                            ["FOREIGN KEY (lnsession_id) REFERENCES lnsession(id)"]
-;;                            ["FOREIGN KEY (assay_run_id) REFERENCES assay_run(id)"]
-;; 		           ])]
-;;   [(jdbc/create-table-ddl :hit_sample
-;;                            [[:hitlist_id :int "NOT NULL"]
-;;                             [:sample_id :int "NOT NULL"]
-;;                             ["FOREIGN KEY (hitlist_id) REFERENCES hit_list(id)  ON DELETE cascade"]
-;;                             ["FOREIGN KEY (sample_id) REFERENCES sample(id)  ON DELETE cascade"]
-;;                             ])]
 
      
      
@@ -154,29 +127,35 @@ because some are strings, all imported as string
 {:name "hit list 1"
  :description "descr1"
  :hits [87 39 51 59 16 49 53 73 65 43]
- :prj-id 1}
+ :prj-id 1
+ :id 1}
 {:name "hit list 2"
  :description "descr2"
  :hits  [154, 182, 124, 172, 171, 164, 133, 155, 152, 160, 118, 93, 123, 142, 183, 145, 95, 120, 158, 131]
- :prj-id 1}
+ :prj-id 1
+ :id 2}
                ;;for project2
 {:name "hit list 3"
  :description "descr3"
  :hits [216, 193, 221, 269, 244, 252, 251, 204, 217, 256]
- :prj-id 2}
+ :prj-id 2
+ :id 3}
 {:name "hit list 4"
  :description "descr4"
  :hits [311, 277, 357, 314, 327, 303, 354, 279, 346, 318, 344, 299, 355, 300, 325, 290, 278, 326, 282, 334]
- :prj-id 2}
+ :prj-id 2
+ :id 4}
                ;;for project3
 {:name "hit list 5"
  :description "descr5"
  :hits [410, 412, 393, 397, 442, 447, 428, 374, 411, 437]
- :prj-id 3}
+ :prj-id 3
+ :id 5}
 {:name "hit list 6"
  :description "descr6"
  :hits [545, 514, 479, 516, 528, 544, 501, 472, 463, 494, 531, 482, 513, 468, 465, 510, 535, 478, 502, 488]
- :prj-id 3}])
+ :prj-id 3
+ :id 6}])
 
 (defn process-assay-run-names
   "id	assay-run-sys-name	assay-run-name	description	assay-type-id	plate-set-id	plate-layout-name-id	lnsession-id"
@@ -349,7 +328,7 @@ because some are strings, all imported as string
                  ps (load-eg-plate-sets)
                  result2  (loop [counter 1
                                 new-ps []]
-                           (if (> counter (count ps))
+                           (if (> counter 10)
                              new-ps
                              (recur
                               (+ counter 1)
@@ -358,34 +337,53 @@ because some are strings, all imported as string
                  hl hitlists
                  result3 (loop [counter 1
                                 new-hit-lists []]
-                           (if (> counter (count hitlists))
+                           (if (> counter 10)
                              new-hit-lists
                              (recur
                               (+ counter 1)
-                              (conj new-hit-lists (assoc (first (filter #(= (:id %) counter)  proj-data)) :hit-lists (map #(dissoc % :project-id) (filter #(= (:prj-id %) counter) hitlists)))))
+                              (conj new-hit-lists (assoc (first (filter #(= (:id %) counter)  result2)) :hit-lists (map #(dissoc % :prj-id) (filter #(= (:prj-id %) counter) hitlists)))))
                              ))
 
                  ]
              result3))
 
-(require '[clojure.inspector :as insp])
-(insp/inspect-tree (load-eg-projects))
-(insp/inspect-tree (load-eg-plate-sets))
 
-(insp/inspect-tree proj-data)
+(defn load-eg-data
+  "Loads all example data"
+  []
+  (def  projects (load-eg-projects))
+  (loop [counter 1
+         the-map nil
+         ]
+    (if (> counter 10)
+      (println "Example data loaded!")
+      (recure
+       (+ counter 1)
+       )
+        )
+
+    ))
+
+
+(def  projects (load-eg-projects))
+(map #(dissoc % :id) (filter #(= (:id %) counter) projects))
+
+
+
+(require '[clojure.inspector :as insp])
+;;(insp/inspect-tree projects)
+;;(insp/inspect-tree (load-eg-plate-sets))
+
+;;(insp/inspect-tree (load-eg-projects))
 
 
  (def table (util/table-to-map "resources/data/projects.txt"))
  (def proj-data (into [] (map #(process-eg-prj-data %) table)))
 (def ps (load-eg-plate-sets))
-(clojure.inspector/inspect ps)
+;;(insp/inspect-tree projects)
 (def result2 (map #(assoc % :plate-sets (dbi/extract-data-for-id (:project-id %)  ps)) proj-data))
 
 
-
-
-                 hl hitlists
-                 result3 (map #(assoc % :hit-lists (dbi/extract-data-for-id (:prj-id %)  hl)) result2)
 
 
 ;; select * from plate, plate_set, plate_plate_set where plate_plate_set.plate_set_id = plate_set.id and plate_plate_set.plate_id = plate.id;
