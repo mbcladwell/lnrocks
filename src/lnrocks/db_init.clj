@@ -218,21 +218,43 @@ because some are strings, all imported as string
 ;;(load-assay-run-data)
 
 ;;plate_sys_name	plate_type_id	plate_layout_name_id	plate_set_name	descr	num_plates	plate_format_id	project_id	lnsession_id	plate_set_id	plate_id	plate_order
+(defn process-sample-file
+ [x]
+  (into {} {
+            :id (Integer/parseInt (String. (:id x)))
+            :format (Integer/parseInt (String. (:format x)))
+            :layout (Integer/parseInt (String. (:layout x)))
+            :samples (Integer/parseInt (String. (:samples x)))
+            :id-start (Integer/parseInt (String. (:id-start x)))
+            }))
+
+
+(defn load-well-vector []
+  (let   [table (util/table-to-map "resources/data/samples.txt")
+          samples (into [] (map #(process-sample-file %) table))
+          well-vector  (loop [counter 1
+                              w-vec-pre []
+                              ]
+                          (if (> counter (count samples))
+                             w-vec-pre
+                         (recur
+                          (+ counter 1)
+                          (conj w-vec-pre (assoc (first (filter #(= (:id %) counter)  samples)) :wells
+                                                 (case (:format (first (filter #(= (:id %) counter)  samples)))
+                                                                96 (util/fill-wells util/map96wells (:id-start (first (filter #(= (:id %) counter)  samples))) (:samples (first (filter #(= (:id %) counter)  samples))))
+                                                                384 (util/fill-wells util/map384wells (:id-start (first (filter #(= (:id %) counter)  samples))) (:samples (first (filter #(= (:id %) counter)  samples))))
+                                                                1536 (util/fill-wells util/map1536wells (:id-start (first (filter #(= (:id %) counter)  samples))) (:samples (first (filter #(= (:id %) counter)  samples))))
+                                                                ))))   ))]                   
+             well-vector))
+
+
+;;(insp/inspect-tree (load-well-vector))
 
 
 (defn process-eg-plate-data
 "plate_sys_name	plate_type_id	plate_layout_name_id	plate_set_name	descr	num_plates	plate_format_id	project_id	lnsession_id	plate_set_id	id (this is the plate_id; must be :id)	plate_order"
  [x]
   (into {} {
-          ;;  :plate-sys-name (:plate-set_sys_name x )
-          ;;  :plate-type-id (Integer/parseInt (String. (:plate-type-id x)))
-          ;;  :plate-layout-name-id (Integer/parseInt (String. (:plate-layout-name-id x)))
-          ;;  :plate-set-name (:plate-set-name x ) 
-          ;;  :descr (:descr x )
-          ;;  :num-plates (Integer/parseInt (String. (:num-plates x)))
-          ;;  :plate-format-id (Integer/parseInt (String. (:plate-format-id x)))
-          ;;  :project-id (Integer/parseInt (String. (:project-id x)))
-          ;;  :lnsession-id (Integer/parseInt (String. (:lnsession-id x)))
             :plate-set-id (Integer/parseInt (String. (:plate_set_id x)))
             :id (Integer/parseInt (String. (:id x)))
             :plate-order (Integer/parseInt (String. (:plate_order x)))
@@ -241,16 +263,21 @@ because some are strings, all imported as string
 
 (defn load-eg-plate []
          (let   [  table (util/table-to-map "resources/data/plates.txt")
-                 plates (into [] (map #(process-eg-plate-data %) table))]
-                ;; assay-data (load-assay-run-data)
-           ;;result (map #(assoc % :assay-runs (dbi/extract-data-for-id (:plate-set-id %)  plate-sets)) assay-data)]
-             plates))
+                 plates (into [] (map #(process-eg-plate-data %) table))
+                 wells-vec (load-well-vector)
+                 plates2 (loop [counter 1
+                                new-plates []]
+                           (if (> counter (count plates))
+                             new-plates
+                             (recur
+                              (+ counter 1)
+                              (conj new-plates (assoc (first (filter #(= (:id %) counter)  plates))
+                                                      :wells  (:wells (first (filter #(= (:id %) counter)  wells-vec)))))
+                              )))]
+             plates2))
 
- (def table (util/table-to-map "resources/data/plates.txt"))
-                (def plates (into [] (map #(process-eg-plate-data %) table)))
-               
-(insp/inspect-tree plates)
 
+;;(insp/inspect-tree (load-eg-plate))
 
 
 (defn process-eg-plate-set-data
@@ -272,42 +299,27 @@ because some are strings, all imported as string
          (let   [  table (util/table-to-map "resources/data/plate-set-names.txt")
                  plate-sets (into [] (map #(process-eg-plate-set-data %) table))
                  assay-data (load-assay-run-data)
-                 result1 (map #(assoc % :assay-runs (dbi/extract-data-for-id (:plate-set-id %)  plate-sets)) assay-data)
+                 result1 (loop [counter 1
+                                new-plate-set []]
+                           (if (> counter (count plate-sets))
+                             new-plate-set
+                             (recur
+                              (+ counter 1)
+                              (conj new-plate-set (assoc (first (filter #(= (:id %) counter)  plate-sets)) :assay-runs (map #(dissoc % :plate-set-id) (filter #(= (:plate-set-id %) counter) assay-data)))))
+                             ))
                  plates (load-eg-plate)
-                 result2 (map #(assoc % :plates (dbi/extract-data-for-id (:plate-set-id %)  plate-sets)) plates)
+                 result2 (loop [counter 1
+                                new-plate-set []]
+                           (if (> counter (count plate-sets))
+                             new-plate-set
+                             (recur
+                              (+ counter 1)
+                              (conj new-plate-set (assoc (first (filter #(= (:id %) counter)  result1)) :plates (map #(dissoc % :plate-set-id) (filter #(= (:plate-set-id %) counter) plates)))))
+                             ))
                  
                  ]
-             (println  result2)))
+             result2))
                      
-    (def table (util/table-to-map "resources/data/plate-set-names.txt"))
-               (def plate-sets (into [] (map #(process-eg-plate-set-data %) table)))
-
-(def plate-set-counter [1 2 3 4 5 6 7 8])
-(insp/inspect-tree plates)
-(insp/inspect-tree plate-sets)
-(insp/inspect-tree result2)
-
-(map #(conj [] %) (map #(extract-data-for-id (:id %)  plates :plate-set-id) plates))
-
-(get  (group-by  :plate-set-id plates) 1)
-(map #(assoc (:id (nth plate-sets %)) :plates  (get  (group-by  :plate-set-id plates) %)) plate-set-counter)
-
-(map #(assoc  (map #(filter (= (map #(:id %) plate-sets) 1)   plate-sets) plate-set-counter)   :plates  (get  (group-by  :plate-set-id plates) %)) plate-set-counter)
-
-(assoc  (map #(filter (= (map (:id ({:plate-format-id 96, :plate-set-sys-name PS-1, :id 1, :descr with AR (low values), HL, :lnsession-id 1, :plate-type-id 1, :num-plates 2, :project-id 1, :plate-set-name 2 96 well plates, :plate-layout-name-id 1})) plate-sets) 1)   plate-sets) plate-set-counter)   :plates  (get  (group-by  :plate-set-id plates) 1))
-
-
-
-(map #(filter (= (map #(:id %) plate-sets) 1)   plate-sets) plate-set-counter)
-
- (def result2 (map #(conj plate-sets  (extract-data-for-id (:id %)  plates :plate-set-id)) plate-sets))
-
-(println (first plate-sets))
-(:id plate-sets)
-
-(def x :id)
-(def coll plates)
-(def k :plate-set-id)
 
 (defn extract-data-for-id
   ;;get the data for a single id; remove the id from the collection
@@ -316,8 +328,6 @@ because some are strings, all imported as string
   ;;k: key-to-remove
   [x coll k]
   (map #(dissoc % k) (filter #(= (:id %) x) coll ) ))
-
-
 
 ;;((dbi/extract-data-for-id (:id (first plate-sets))
 
@@ -337,14 +347,31 @@ because some are strings, all imported as string
          (let   [  table (util/table-to-map "resources/data/projects.txt")
                  proj-data (into [] (map #(process-eg-prj-data %) table))
                  ps (load-eg-plate-sets)
-                 result2 (map #(assoc % :plate-sets (dbi/extract-data-for-id (:project-id %)  ps)) proj-data)                 
+                 result2  (loop [counter 1
+                                new-ps []]
+                           (if (> counter (count ps))
+                             new-ps
+                             (recur
+                              (+ counter 1)
+                              (conj new-ps (assoc (first (filter #(= (:id %) counter)  proj-data)) :plate-sets (map #(dissoc % :project-id) (filter #(= (:project-id %) counter) ps)))))
+                             ))             
                  hl hitlists
-                 result3 (map #(assoc % :hit-lists (dbi/extract-data-for-id (:prj-id %)  hl)) result2)
+                 result3 (loop [counter 1
+                                new-hit-lists []]
+                           (if (> counter (count hitlists))
+                             new-hit-lists
+                             (recur
+                              (+ counter 1)
+                              (conj new-hit-lists (assoc (first (filter #(= (:id %) counter)  proj-data)) :hit-lists (map #(dissoc % :project-id) (filter #(= (:prj-id %) counter) hitlists)))))
+                             ))
+
                  ]
-            (println result3)))
+             result3))
 
 (require '[clojure.inspector :as insp])
-(insp/inspect-tree proj-data)
+(insp/inspect-tree (load-eg-projects))
+(insp/inspect-tree (load-eg-plate-sets))
+
 (insp/inspect-tree proj-data)
 
 

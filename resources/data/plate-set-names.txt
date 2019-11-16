@@ -6,4 +6,4 @@ id	plate-set-name	descr	plate-set-sys-name	num-plates	plate-format-id	plate-type
 5	1 1536 well plate	with AR (low values), HL	PS-5	1	1536	1	3	37	1
 6	Plates only	using LYT-1/96/4in12	PS-6	10	96	1	10	1	1
 7	Plates only	using LYT-1/96/4in12	PS-7	10	96	1	10	1	1
-8	testgroup1	d1	PS-8	3	96	1	10	1	1
+
