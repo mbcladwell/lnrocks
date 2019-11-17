@@ -4,6 +4,7 @@
             [lnrocks.db-retriever :as dbr]
             [lnrocks.db-inserter :as dbi]
             [lnrocks.db-init :as init]
+            [clojure.inspector :as insp]
           [clojure.java.io :as io]
               )
   (:import [crux.api ICruxAPI])
@@ -56,8 +57,8 @@
     (crux/submit-tx node [[:crux.tx/put doc]] )
   prj-id))
 
-(new-project "MyNewProj" "a test of function" 1)
-(crux/entity (crux/db node) :prj-1)
+;;(new-project "MyNewProj" "a test of function" 1)
+;;(crux/entity (crux/db node) :prj-1)
 
 
 
@@ -130,7 +131,7 @@
 
 ;;(count (get-plates-in-project 2))
 
-(init/load-eg-projects node)
+;;(init/load-eg-projects node)
 
 
 ;;I will load projects with plate-set-names (no plates)
@@ -154,6 +155,34 @@
     ))
 
 
+(defn load-eg-data
+  "Loads all example data"
+  []
+  (def  projects (init/load-eg-projects))
+  (loop [counter 1
+         the-doc (filter #(= (:id %) counter) projects)
+         dummy nil]
+    (if (> counter 10)
+      (println "Example data loaded!")
+      (recur
+       (+ counter 1)
+       (filter #(= (:id %) counter) projects)
+       (crux/submit-tx node [[:crux.tx/put the-doc]] ))
+        )
+
+    ))
+
+
+(def b {:crux.db/id :b :test "test" :test2 "test2"})
+;;(crux/submit-tx node [[:crux.tx/put b]] )
+
+;;   (load-eg-data)
+;;(:id prjs 1)
+
+;;(def a (filter #(= (:id %) 1) projects))
+;;(insp/inspect-tree a)
+;;(count prj1)
+;;(crux/submit-tx node [[:crux.tx/put a]] )
 
 
 

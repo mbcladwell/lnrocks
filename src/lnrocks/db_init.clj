@@ -314,6 +314,7 @@ because some are strings, all imported as string
   "id 	project-sys-name	description	name	lnsession-id"
   [x]
   (into {} {;; :id (Integer/parseInt (String. (:id x)))
+            :crux.db/id (keyword (str "prj"(:id x )))
             :project-sys-name (:project-sys-name x )
             :description (:description x )
             :name (:name x )
@@ -348,27 +349,6 @@ because some are strings, all imported as string
              result3))
 
 
-(defn load-eg-data
-  "Loads all example data"
-  []
-  (def  projects (load-eg-projects))
-  (loop [counter 1
-         the-map nil
-         ]
-    (if (> counter 10)
-      (println "Example data loaded!")
-      (recure
-       (+ counter 1)
-       )
-        )
-
-    ))
-
-
-(def  projects (load-eg-projects))
-(map #(dissoc % :id) (filter #(= (:id %) counter) projects))
-
-
 
 (require '[clojure.inspector :as insp])
 ;;(insp/inspect-tree projects)
@@ -380,7 +360,7 @@ because some are strings, all imported as string
  (def table (util/table-to-map "resources/data/projects.txt"))
  (def proj-data (into [] (map #(process-eg-prj-data %) table)))
 (def ps (load-eg-plate-sets))
-;;(insp/inspect-tree projects)
+;;(insp/inspect-tree proj-data)
 (def result2 (map #(assoc % :plate-sets (dbi/extract-data-for-id (:project-id %)  ps)) proj-data))
 
 
