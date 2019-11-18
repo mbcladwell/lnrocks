@@ -124,38 +124,47 @@ because some are strings, all imported as string
 
 (def hitlists [
                ;;for project1
-{:name "hit list 1"
- :description "descr1"
- :hits [87 39 51 59 16 49 53 73 65 43]
- :prj-id 1
- :id 1}
-{:name "hit list 2"
- :description "descr2"
- :hits  [154, 182, 124, 172, 171, 164, 133, 155, 152, 160, 118, 93, 123, 142, 183, 145, 95, 120, 158, 131]
- :prj-id 1
- :id 2}
+               {:name "hit list 1"
+                :crux.db/id (keyword (str "hl1"))
+           
+                :description "descr1"
+                :hits [87 39 51 59 16 49 53 73 65 43]
+                :prj-id 1
+                :id 1}
+               {:name "hit list 2"
+                :crux.db/id (keyword (str "hl2"))
+                :description "descr2"
+                :hits  [154, 182, 124, 172, 171, 164, 133, 155, 152, 160, 118, 93, 123, 142, 183, 145, 95, 120, 158, 131]
+                :prj-id 1
+                :id 2}
                ;;for project2
-{:name "hit list 3"
- :description "descr3"
- :hits [216, 193, 221, 269, 244, 252, 251, 204, 217, 256]
- :prj-id 2
- :id 3}
-{:name "hit list 4"
- :description "descr4"
- :hits [311, 277, 357, 314, 327, 303, 354, 279, 346, 318, 344, 299, 355, 300, 325, 290, 278, 326, 282, 334]
- :prj-id 2
- :id 4}
+               {:name "hit list 3"
+                :crux.db/id (keyword (str "hl3"))
+                
+                :description "descr3"
+                :hits [216, 193, 221, 269, 244, 252, 251, 204, 217, 256]
+                :prj-id 2
+                :id 3}
+               {:name "hit list 4"
+                :crux.db/id (keyword (str "hl4"))
+                :description "descr4"
+                :hits [311, 277, 357, 314, 327, 303, 354, 279, 346, 318, 344, 299, 355, 300, 325, 290, 278, 326, 282, 334]
+                :prj-id 2
+                :id 4}
                ;;for project3
-{:name "hit list 5"
- :description "descr5"
- :hits [410, 412, 393, 397, 442, 447, 428, 374, 411, 437]
- :prj-id 3
- :id 5}
-{:name "hit list 6"
- :description "descr6"
- :hits [545, 514, 479, 516, 528, 544, 501, 472, 463, 494, 531, 482, 513, 468, 465, 510, 535, 478, 502, 488]
- :prj-id 3
- :id 6}])
+               {:name "hit list 5"
+                :crux.db/id (keyword (str "hl5"))
+                
+                :description "descr5"
+                :hits [410, 412, 393, 397, 442, 447, 428, 374, 411, 437]
+                :prj-id 3
+                :id 5}
+               {:name "hit list 6"
+                :crux.db/id (keyword (str "hl6"))
+                :description "descr6"
+                :hits [545, 514, 479, 516, 528, 544, 501, 472, 463, 494, 531, 482, 513, 468, 465, 510, 535, 478, 502, 488]
+                :prj-id 3
+                :id 6}])
 
 (defn process-assay-run-names
   "id	assay-run-sys-name	assay-run-name	description	assay-type-id	plate-set-id	plate-layout-name-id	lnsession-id"
@@ -163,7 +172,8 @@ because some are strings, all imported as string
  (into {} {:id (Integer/parseInt (String. (:id x)))
             :assay-run-sys-name (:assay-run-sys-name x )
             :assay-run-name (:assay-run-name x )
-            :description (:description x )
+           :crux.db/id (keyword (str "ar"(:id x )))
+           :description (:description x )
            :assay-type-id (Integer/parseInt (String. (:assay-type-id x)))
            :plate-set-id (Integer/parseInt (String. (:plate-set-id x)))
            :plate-layout-name-id (Integer/parseInt (String. (:plate-layout-name-id x)))
@@ -236,6 +246,7 @@ because some are strings, all imported as string
   (into {} {
             :plate-set-id (Integer/parseInt (String. (:plate_set_id x)))
             :id (Integer/parseInt (String. (:id x)))
+            :crux.db/id (keyword (str "plt"(:id x )))
             :plate-order (Integer/parseInt (String. (:plate_order x)))
             }))
 
@@ -263,6 +274,7 @@ because some are strings, all imported as string
 "id	plate-set-name	descr	plate-set-sys-name	num-plates	plate-format-id	plate-type-id	project-id	plate-layout-name-id	lnsession-id"
  [x]
   (into {} {:id (Integer/parseInt (String. (:id x)))
+            :crux.db/id (keyword (str "ps"(:id x )))
             :plate-set-name (:plate-set-name x )
             :descr (String.(:descr x) )
             :plate-set-sys-name (:plate-set-sys-name x )

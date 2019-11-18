@@ -160,30 +160,41 @@
   []
   (def  projects (init/load-eg-projects))
   (loop [counter 1
-         the-doc (filter #(= (:id %) counter) projects)
+         the-doc (first (filter #(= (:id %) counter) projects))
          dummy nil]
-    (if (> counter 10)
+    (if (> counter 11)
       (println "Example data loaded!")
       (recur
        (+ counter 1)
-       (filter #(= (:id %) counter) projects)
-       (crux/submit-tx node [[:crux.tx/put the-doc]] ))
-        )
-
-    ))
+       (first (filter #(= (:id %) counter) projects))
+       (crux/submit-tx node [[:crux.tx/put the-doc]] )))))
 
 
-(def b {:crux.db/id :b :test "test" :test2 "test2"})
+(def b {:crux.db/id :b :test "test" :test2 "test2" :myinsert {:a 1 :b 2 :c 3 :d {:embedded 2 :d 3 :e 4 :g {:h 1 :k {:m 1 :n 2}}} :f [1 -2 3 -0.004] }})
 ;;(crux/submit-tx node [[:crux.tx/put b]] )
 
 ;;   (load-eg-data)
 ;;(:id prjs 1)
 
-;;(def a (filter #(= (:id %) 1) projects))
+;;(def a (first (filter #(= (:id %) 1) projects)))
 ;;(insp/inspect-tree a)
 ;;(count prj1)
 ;;(crux/submit-tx node [[:crux.tx/put a]] )
 
+;;(:plates (first(:plate-sets (crux/entity (crux/db node) :plt1))))
+
+{:find '[n]
+  :where '[[(re-find #"I" n)]
+           [(= l "Ivanov")]]
+  :args [{'n "Ivan" 'l "Ivanov"}
+         {'n "Petr" 'l "Petrov"}]}
+
+(crux/q (crux/db node)
+       
+{'[:find ?attr
+ :where 
+ [?p :person/name]
+ [?p ?attr]]})
 
 
 (defn -main
