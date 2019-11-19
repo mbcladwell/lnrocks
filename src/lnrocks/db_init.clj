@@ -347,18 +347,18 @@ because some are strings, all imported as string
                               (+ counter 1)
                               (conj new-ps (assoc (first (filter #(= (:id %) counter)  proj-data)) :plate-sets (map #(dissoc % :project-id) (filter #(= (:project-id %) counter) ps)))))
                              ))             
-                 hl hitlists
-                 result3 (loop [counter 1
-                                new-hit-lists []]
-                           (if (> counter 10)
-                             new-hit-lists
-                             (recur
-                              (+ counter 1)
-                              (conj new-hit-lists (assoc (first (filter #(= (:id %) counter)  result2)) :hit-lists (map #(dissoc % :prj-id) (filter #(= (:prj-id %) counter) hitlists)))))
-                             ))
+                 ;; hl hitlists
+                 ;; result3 (loop [counter 1
+                 ;;                new-hit-lists []]
+                 ;;           (if (> counter 10)
+                 ;;             new-hit-lists
+                 ;;             (recur
+                 ;;              (+ counter 1)
+                 ;;              (conj new-hit-lists (assoc (first (filter #(= (:id %) counter)  result2)) :hit-lists (map #(dissoc % :prj-id) (filter #(= (:prj-id %) counter) hitlists)))))
+                        ;;     ))
 
                  ]
-             result3))
+             result2))
 
 
 

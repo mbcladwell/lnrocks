@@ -170,31 +170,50 @@
        (crux/submit-tx node [[:crux.tx/put the-doc]] )))))
 
 
-(def b {:crux.db/id :b :test "test" :test2 "test2" :myinsert {:a 1 :b 2 :c 3 :d {:embedded 2 :d 3 :e 4 :g {:h 1 :k {:m 1 :n 2}}} :f [1 -2 3 -0.004] }})
-;;(crux/submit-tx node [[:crux.tx/put b]] )
+init/hitlists
+
+(loop [counter 1
+       hlist (first (filter #(= (:id %) counter)  init/hitlists))
+       dummy (crux/submit-tx node [[:crux.tx/put hlist]])] 
+       (if (> counter (count init/hitlists))
+         (println "finished loading hit lists")
+                  (recur
+                   (+ counter 1)
+                   (first (filter #(= (:id %) counter)  init/hitlists))
+                   (crux/submit-tx node [[:crux.tx/put hlist]])
+                   )))
+             
+(pprint (crux/entity (crux/db node) :hl5))
+
+
+
+
+ (let [prj1 (crux/entity (crux/db node ) :prj1)]
+     [:crux.tx/put
+      (update prj1
+              ; Crux is schemaless, so we can use :person/has however we like
+              :hit-lists
+              (comp set conj)
+              ; ...such as storing a set of references to other entity ids
+              :hl1
+              :hl2)
+      ])
 
 ;;   (load-eg-data)
-;;(:id prjs 1)
 
 ;;(def a (first (filter #(= (:id %) 1) projects)))
 ;;(insp/inspect-tree a)
+
+
 ;;(count prj1)
 ;;(crux/submit-tx node [[:crux.tx/put a]] )
 
-;;(:plates (first(:plate-sets (crux/entity (crux/db node) :plt1))))
 
-{:find '[n]
-  :where '[[(re-find #"I" n)]
-           [(= l "Ivanov")]]
-  :args [{'n "Ivan" 'l "Ivanov"}
-         {'n "Petr" 'l "Petrov"}]}
 
-(crux/q (crux/db node)
-       
-{'[:find ?attr
- :where 
- [?p :person/name]
- [?p ?attr]]})
+
+
+(pprint (crux/entity (crux/db node) :plt2))
+
 
 
 (defn -main
