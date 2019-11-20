@@ -36,16 +36,15 @@
  (define-db-var)
  (do
    (define-db-var)
+   (init/initialize-db node)
    
    ))
 
 
 
-(init/initialize-db node)
 
   
-;;(crux/entity (crux/db node) :props)
-()
+;;(crux/entity (crux/db node) :counter)
 ;;(counter :sample 368)
 
 
@@ -142,27 +141,27 @@
 ;;also assay run names and data
 ;;also hit lists
 ;;Use algorithm to generate plates/wells/samples and copy to plate-set
-(defn load-example-data []
-  ;; (new-plate-set  plate-set-name description num-plates plate-format-id plate-type-id
-  ;;  project-id plate-layout-name-id lnsession-id with-samples)
-  (let [all-projects (init/load-eg-projects)
-        ps1-dummy (new-plate-set "dummy" "dummy" 2 96 1 1 1 1 true )
-        ps2-dummy (new-plate-set "dummy" "dummy" 2 96 1 1 1 1 true )
-        ps3-dummy (new-plate-set "dummy" "dummy" 2 96 1 1 1 1 true )
-        ps4-dummy (new-plate-set "dummy" "dummy" 2 384 1 1 2 13 true )
-        ps5-dummy (new-plate-set "dummy" "dummy" 1 1536 1 1 3 37 true )
-        ps6-dummy (new-plate-set "dummy" "dummy" 10 96 1 1 10 1 true )
-        ps7-dummy (new-plate-set "dummy" "dummy" 10 96 1 1 10 1 true )
-        ps8-dummy (new-plate-set "dummy" "dummy" 3 96 1 1 10 1 true )
+;; (defn load-example-data []
+;;   ;; (new-plate-set  plate-set-name description num-plates plate-format-id plate-type-id
+;;   ;;  project-id plate-layout-name-id lnsession-id with-samples)
+;;   (let [all-projects (init/load-eg-projects)
+;;         ps1-dummy (new-plate-set "dummy" "dummy" 2 96 1 1 1 1 true )
+;;         ps2-dummy (new-plate-set "dummy" "dummy" 2 96 1 1 1 1 true )
+;;         ps3-dummy (new-plate-set "dummy" "dummy" 2 96 1 1 1 1 true )
+;;         ps4-dummy (new-plate-set "dummy" "dummy" 2 384 1 1 2 13 true )
+;;         ps5-dummy (new-plate-set "dummy" "dummy" 1 1536 1 1 3 37 true )
+;;         ps6-dummy (new-plate-set "dummy" "dummy" 10 96 1 1 10 1 true )
+;;         ps7-dummy (new-plate-set "dummy" "dummy" 10 96 1 1 10 1 true )
+;;         ps8-dummy (new-plate-set "dummy" "dummy" 3 96 1 1 10 1 true )
 
-        ]
-    ))
+;;         ]
+;;     ))
 
 
 (defn load-eg-data
   "Loads all example data"
   []
-  (def  projects (init/load-eg-projects))
+  (def  projects (egd/load-eg-projects))
   (loop [counter 1
          the-doc (first (filter #(= (:id %) counter) projects))
          dummy nil]
@@ -176,48 +175,20 @@
 
 ;;init/hitlists
 
-(loop [counter 1
-       hlist (first (filter #(= (:id %) counter)  init/hitlists))
-       dummy (crux/submit-tx node [[:crux.tx/put hlist]])] 
-       (if (> counter (count init/hitlists))
-         (println "finished loading hit lists")
-                  (recur
-                   (+ counter 1)
-                   (first (filter #(= (:id %) counter)  init/hitlists))
-                   (crux/submit-tx node [[:crux.tx/put hlist]])
-                   )))
-             
-(pprint (crux/entity (crux/db node) :hl5))
 
 
-
-
- (let [prj1 (crux/entity (crux/db node ) :prj1)]
-     [:crux.tx/cas prj1
-      (update prj1
-              ; Crux is schemaless, so we can use :person/has however we like
-              :hit-lists
-              (comp set conj)
-              ; ...such as storing a set of references to other entity ids
-              (crux/entity (crux/db node) :hl1)
-              (crux/entity (crux/db node) :hl2))
-      ]
-     (crux/cas (crux/db node ) prj1 new-prj1))
-
-
-
-(let [prj1 (crux/entity (crux/db node ) :prj1)
-     new-prj1 (update prj1 :hit-lists (comp set conj)
-                      (crux/entity (crux/db node) :hl1)
-                      (crux/entity (crux/db node) :hl2))
-      ]
-   (crux/submit-tx node [[:crux.tx/cas prj1 new-prj1]]))
+;; (let [prj1 (crux/entity (crux/db node ) :prj1)
+;;      new-prj1 (update prj1 :hit-lists (comp set conj)
+;;                       (crux/entity (crux/db node) :hl1)
+;;                       (crux/entity (crux/db node) :hl2))
+;;       ]
+;;    (crux/submit-tx node [[:crux.tx/cas prj1 new-prj1]]))
 
 
 
 
 
-  (load-eg-data)
+;;  (load-eg-data)
 
 ;;  (def  projects (init/load-eg-projects))
 
@@ -232,73 +203,13 @@
 
 
 
-(pprint (crux/entity (crux/db node) :plt2))
-
-(defn extract-data-for-id
-  ;;get the data for a single id; remove the id from the collection
-  ;;x the id
-  ;;coll the collection;; its id must be :id
-  [x coll]
-  (map #(dissoc % :id) (filter #(= (:id %) x) coll ) ))
-
-
-(defn process-well-numbers-data
-  "processes that tab delimitted, R generated well_numbers for import
-because some are strings, all imported as string
-   order is important; must correlate with SQL statement order of ?'s"
-  [x]
-  (into {} {:format (Integer/parseInt (String. (:format x)))
-            :wellname (:wellname x )
-            :row (:row x )
-            :rownum (Integer/parseInt (String. (:rownum x )))
-            :col (Integer/parseInt (String. (:col x )))
-            :totcolcount (Integer/parseInt (String. (:totcolcount x)))
-            :byrow (Integer/parseInt (String. (:byrow x )))
-            :bycol (Integer/parseInt (String. (:bycol x )))
-            :quad (Integer/parseInt (String. (:quad x )))
-            :parentwell (Integer/parseInt (String. (:parentwell x )))
-            }))
-
-
-
-(defn load-well-numbers []
-  (let   [table (util/table-to-map "resources/data/well_numbers_for_import.txt")
-          content (into [] (map #(process-well-numbers-data %) table))
-          formats [96 384 1538]
-          ]
-         (loop [counter 0
-                new-wn (map #(dissoc  % :format) (filter #(= (:format %) (get formats counter)) content))
-                
-                new-wn2 {:crux.db/id (keyword (str "wn" (get formats counter))) :format (get formats counter) :well-nums new-wn }
-                dummy    (crux/submit-tx node [[:crux.tx/put new-wn2]] )]
-           (if (> counter 2)
-             (println "Well numbers loaded!")
-             (recur
-              (+ counter 0)
-              (map #(dissoc  % :format) (filter #(= (:format %) (get formats counter)) content))
-               {:crux.db/id (keyword (str "wn" (get formats counter))) :format (get formats counter) :well-nums new-wn }
-              (crux/submit-tx node [[:crux.tx/put new-wn2]] )
-              )))))
-
-(def table (util/table-to-map "resources/data/well_numbers_for_import.txt"))
-     (def     content (into [] (map #(process-well-numbers-data %) table)))
-         (def formats [96 384 1538])
-(def counter 0)
-(def  new-wn (dissoc  (first (filter #(= (:format (first content)) (get formats counter)) content)) :format))
-     (def            new-wn2 [{:crux.db/id (keyword (str "wn" (get formats counter))) :format (get formats counter) new-wn }])
-          (def       dummy    (crux/submit-tx node [[:crux.tx/put (first new-wn2)]] ))
-
-
-(def formats2 [96 384 1538])
-(get formats2 0)
-
 
 ;;(insp/inspect-tree (load-well-numbers))
 
 
 ;;(load-plate-layouts)
 ;;(def a (first (filter #(= (:id %) 1) (load-plate-layouts))))
-;;(insp/inspect-tree (crux/entity (crux/db node) :lyt42))
+;;(insp/inspect-tree (crux/entity (crux/db node) :wn96))
 
 
 

@@ -15,6 +15,15 @@
 ;;;Optional example data
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn extract-data-for-id
+  ;;get the data for a single id; remove the id from the collection
+  ;;x the id
+  ;;coll the collection;; its id must be :id
+  ;;k: key-to-remove
+  [x coll k]
+  (map #(dissoc % k) (filter #(= (:id %) x) coll ) ))
+
+
 (def hitlists [
                ;;for project1
                {:name "hit list 1"
@@ -94,7 +103,7 @@
           assay-names (into [] (map #(process-assay-run-names %) table))
           table2 (util/table-to-map "resources/data/processed_data_for_import.txt")
           assay-data (into [] (map #(process-assay-run-data %) table2))
-          result (map #(assoc % :pdata (dbi/extract-data-for-id (:id %)  assay-data)) assay-names)]
+          result (map #(assoc % :pdata (extract-data-for-id (:id %)  assay-data)) assay-names)]
          result))
 
 ;;(load-assay-run-data)
@@ -205,13 +214,6 @@
              result2))
                      
 
-(defn extract-data-for-id
-  ;;get the data for a single id; remove the id from the collection
-  ;;x the id
-  ;;coll the collection;; its id must be :id
-  ;;k: key-to-remove
-  [x coll k]
-  (map #(dissoc % k) (filter #(= (:id %) x) coll ) ))
 
 ;;((dbi/extract-data-for-id (:id (first plate-sets))
 
@@ -260,21 +262,6 @@
 ;;(insp/inspect-tree (load-eg-plate-sets))
 
 ;;(insp/inspect-tree (load-eg-projects))
-
-
- (def table (util/table-to-map "resources/data/projects.txt"))
- (def proj-data (into [] (map #(process-eg-prj-data %) table)))
-(def ps (load-eg-plate-sets))
-;;(insp/inspect-tree proj-data)
-(def result2 (map #(assoc % :plate-sets (dbi/extract-data-for-id (:project-id %)  ps)) proj-data))
-
-
-
-
-;; select * from plate, plate_set, plate_plate_set where plate_plate_set.plate_set_id = plate_set.id and plate_plate_set.plate_id = plate.id;
-
-;; \copy (select * from plate, plate_set, plate_plate_set where plate_plate_set.plate_set_id = plate_set.id and plate_plate_set.plate_id = plate.id) To '/home/mbc/projects/lnrocks/resources/data/plates.csv' With CSV
-
 
 
 ;;Number of IDs needed for example data set

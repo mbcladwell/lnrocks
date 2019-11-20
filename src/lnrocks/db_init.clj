@@ -58,10 +58,10 @@
 (def helpers
   [{:crux.db/id :plate-formats :96 96 :384 384 :1536 1536}
    {:crux.db/id :plate-type 1 "assay" 2 "rearray" 3 "master" 4 "daughter" 5 "archive" 6 "replicate"}
-   {:crux.db/id :plate-layout :plate-layout (dbi/load-plate-layouts)}
+   ;;{:crux.db/id :plate-layout :plate-layout (load-plate-layouts)}
    {:crux.db/id :assay-type  1 "ELISA" 2 "Octet" 3 "SNP" 4 "HCS" 5 "HTRF" 6 "FACS"}
    {:crux.db/id :well-type  1 "unknown" 2 "positive" 3 "negative" 4 "blank" 5 "edge"}
-   {:crux.db/id :well-numbers :well-numbers (dbi/load-well-numbers) }
+  ;; {:crux.db/id :well-numbers :well-numbers (dbi/load-well-numbers) }
    {:crux.db/id :layout-src-dest :layout-src-dest   [{:source 1 :dest  2}{:source 1 :dest 3}{:source 1 :dest 4}{:source 1 :dest 5}{:source 1 :dest 6}{:source 7 :dest 8}{:source 7 :dest 9}{:source 7 :dest 10}{:source 7 :dest 11}{:source 7 :dest 12}{:source 13 :dest 14}{:source 13 :dest 15}{:source 13 :dest 16}{:source 13 :dest 17}{:source 13 :dest 18}{:source 19 :dest 20}{:source 19 :dest 21}{:source 19 :dest 22}{:source 19 :dest 23}{:source 19 :dest 24}{:source 25 :dest 26}{:source 25 :dest 27}{:source 25 :dest 28}{:source 25 :dest 29}{:source 25 :dest 30}{:source 31 :dest 32}{:source 31 :dest 33}{:source 31 :dest 34}{:source 31 :dest 35}{:source 31 :dest 36}{:source 37 :dest 41}{:source 38 :dest 41}{:source 39 :dest 41}{:source 40 :dest 41}]}
    ])
 
@@ -141,13 +141,14 @@
          )))))
 
 
+
+
 (defn process-well-numbers-data
   "processes that tab delimitted, R generated well_numbers for import
 because some are strings, all imported as string
    order is important; must correlate with SQL statement order of ?'s"
   [x]
   (into {} {:format (Integer/parseInt (String. (:format x)))
-            :crux.db/id (keyword (str "wnums"(:id x )))
             :wellname (:wellname x )
             :row (:row x )
             :rownum (Integer/parseInt (String. (:rownum x )))
@@ -156,14 +157,29 @@ because some are strings, all imported as string
             :byrow (Integer/parseInt (String. (:byrow x )))
             :bycol (Integer/parseInt (String. (:bycol x )))
             :quad (Integer/parseInt (String. (:quad x )))
-            :parentwell (Integer/parseInt (String. (:parentwell x ))) }))
+            :parentwell (Integer/parseInt (String. (:parentwell x )))
+            }))
 
 
 
-(defn load-well-numbers []
-         (let   [  table (util/table-to-map "resources/data/well_numbers_for_import.txt")
-               content (into [] (map #(process-well-numbers-data %) table))]
-         content))
+(defn load-well-numbers [node]
+  (let   [table (util/table-to-map "resources/data/well_numbers_for_import.txt")
+          content (into [] (map #(process-well-numbers-data %) table))
+          formats [96 384 1538]
+          ]
+         (loop [counter 0
+                new-wn (map #(dissoc  % :format) (filter #(= (:format %) (get formats counter)) content))
+                new-wn2 {:crux.db/id (keyword (str "wn" (get formats counter))) :format (get formats counter) :well-nums new-wn }
+                dummy    (crux/submit-tx node [[:crux.tx/put new-wn2]] )]
+           (if (> counter 2)
+             (println "Well numbers loaded!")
+             (recur
+              (+ counter 1)
+              (map #(dissoc  % :format) (filter #(= (:format %) (get formats counter)) content))
+               {:crux.db/id (keyword (str "wn" (get formats counter))) :format (get formats counter) :well-nums new-wn }
+              (crux/submit-tx node [[:crux.tx/put new-wn2]] )
+              )))))
+
 
 
 (defn initialize-db [node]
@@ -171,5 +187,5 @@ because some are strings, all imported as string
     (crux/submit-tx node [[:crux.tx/put counters]] )
     (crux/submit-tx node [[:crux.tx/put props]] )
     (easy-ingest node helpers)
-    (crux/submit-tx node [[:crux.tx/put (load-well-numbers)]] )
+    (load-well-numbers node)
     (load-plate-layouts node)))
