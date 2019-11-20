@@ -189,17 +189,33 @@ init/hitlists
 
 
  (let [prj1 (crux/entity (crux/db node ) :prj1)]
-     [:crux.tx/put
+     [:crux.tx/cas prj1
       (update prj1
               ; Crux is schemaless, so we can use :person/has however we like
               :hit-lists
               (comp set conj)
               ; ...such as storing a set of references to other entity ids
-              :hl1
-              :hl2)
-      ])
+              (crux/entity (crux/db node) :hl1)
+              (crux/entity (crux/db node) :hl2))
+      ]
+     (crux/cas (crux/db node ) prj1 new-prj1))
 
-;;   (load-eg-data)
+
+
+(let [prj1 (crux/entity (crux/db node ) :prj1)
+     new-prj1 (update prj1 :hit-lists (comp set conj)
+                      (crux/entity (crux/db node) :hl1)
+                      (crux/entity (crux/db node) :hl2))
+      ]
+   (crux/submit-tx node [[:crux.tx/cas prj1 new-prj1]]))
+
+
+
+
+
+  (load-eg-data)
+
+;;  (def  projects (init/load-eg-projects))
 
 ;;(def a (first (filter #(= (:id %) 1) projects)))
 ;;(insp/inspect-tree a)
@@ -208,7 +224,7 @@ init/hitlists
 ;;(count prj1)
 ;;(crux/submit-tx node [[:crux.tx/put a]] )
 
-
+;;(insp/inspect-tree (crux/entity (crux/db node) :hl1))
 
 
 
