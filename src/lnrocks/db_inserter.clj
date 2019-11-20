@@ -25,62 +25,6 @@
 
 
 
-(defn process-layout-data
-  "processes that tab delimitted, R generated layouts for import
-   order is important; must correlate with SQL statement order of ?'s"
-  [x]
-(into {} { :id (Integer/parseInt(:id x)) :well (Integer/parseInt(:well x )) :type  (Integer/parseInt(:type x )) :reps (Integer/parseInt(:reps x )) :target (Integer/parseInt(:target x ))}))
-
-(defn process-layout-names
-  "processes that tab delimitted, R generated layouts for import
-   order is important; must correlate with SQL statement order of ?'s"
-  [x]
-(into {} { :id (Integer/parseInt(:id x)) :sys-name (:sys-name x ) :name (:name x ) :description (:description x ) :plate-format-id (Integer/parseInt(:plate-format-id x ))  :replicates (Integer/parseInt(:replicates x)) :targets (Integer/parseInt(:targets x)) :use-edge (Integer/parseInt(:use-edge x)) :num-controls (Integer/parseInt(:num-controls x)) :unknown-n (Integer/parseInt(:unknown-n x)) :control-loc (:control-loc x) :source-dest (:source-dest x)  }))
-
-(defn extract-data-for-id
-  ;;get the data for a single id; remove the id from the collection
-  ;;x the id
-  ;;coll the collection;; its id must be :id
-  [x coll]
-  (map #(dissoc % :id) (filter #(= (:id %) x) coll ) ))
-
-
-(defn load-plate-layouts []
-  ;;add data to layout names using the key :layout
-  (let   [table (util/table-to-map "resources/data/plate_layouts_for_import.txt")
-          layout-data (into [] (map #(process-layout-data %) table))
-          table2 (util/table-to-map "resources/data/plate_layout_name.txt")
-          layout-names (into [] (map #(process-layout-names %) table2))
-          result (map #(assoc % :layout (extract-data-for-id (:id %)  layout-data)) layout-names)]
-         result))
-
-
-(defn process-well-numbers-data
-  "processes that tab delimitted, R generated well_numbers for import
-because some are strings, all imported as string
-   order is important; must correlate with SQL statement order of ?'s"
-  [x]
-  (into {} {:format (Integer/parseInt (String. (:format x)))
-            :wellname (:wellname x )
-            :row (:row x )
-            :rownum (Integer/parseInt (String. (:rownum x )))
-            :col (Integer/parseInt (String. (:col x )))
-            :totcolcount (Integer/parseInt (String. (:totcolcount x)))
-            :byrow (Integer/parseInt (String. (:byrow x )))
-            :bycol (Integer/parseInt (String. (:bycol x )))
-            :quad (Integer/parseInt (String. (:quad x )))
-            :parentwell (Integer/parseInt (String. (:parentwell x ))) }))
-
-
-
-(defn load-well-numbers []
-         (let   [  table (util/table-to-map "resources/data/well_numbers_for_import.txt")
-               content (into [] (map #(process-well-numbers-data %) table))]
-         content))
-
-
-
-
 
 
 ;; (defn import-barcode-ids [ plateset-id barcode-file]

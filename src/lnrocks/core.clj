@@ -4,6 +4,8 @@
             [lnrocks.db-retriever :as dbr]
             [lnrocks.db-inserter :as dbi]
             [lnrocks.db-init :as init]
+            [lnrocks.eg-data :as egd]
+            
             [clojure.inspector :as insp]
           [clojure.java.io :as io]
               )
@@ -16,6 +18,8 @@
 (load "db_inserter")
 (load "db_retriever")
 (load "db_init")
+(load "eg_data")
+
 
 
 (defn define-db-var []
@@ -37,11 +41,11 @@
 
 
 
-
+(init/initialize-db node)
 
   
-
-
+;;(crux/entity (crux/db node) :props)
+()
 ;;(counter :sample 368)
 
 
@@ -170,7 +174,7 @@
        (crux/submit-tx node [[:crux.tx/put the-doc]] )))))
 
 
-init/hitlists
+;;init/hitlists
 
 (loop [counter 1
        hlist (first (filter #(= (:id %) counter)  init/hitlists))
@@ -229,6 +233,72 @@ init/hitlists
 
 
 (pprint (crux/entity (crux/db node) :plt2))
+
+(defn extract-data-for-id
+  ;;get the data for a single id; remove the id from the collection
+  ;;x the id
+  ;;coll the collection;; its id must be :id
+  [x coll]
+  (map #(dissoc % :id) (filter #(= (:id %) x) coll ) ))
+
+
+(defn process-well-numbers-data
+  "processes that tab delimitted, R generated well_numbers for import
+because some are strings, all imported as string
+   order is important; must correlate with SQL statement order of ?'s"
+  [x]
+  (into {} {:format (Integer/parseInt (String. (:format x)))
+            :wellname (:wellname x )
+            :row (:row x )
+            :rownum (Integer/parseInt (String. (:rownum x )))
+            :col (Integer/parseInt (String. (:col x )))
+            :totcolcount (Integer/parseInt (String. (:totcolcount x)))
+            :byrow (Integer/parseInt (String. (:byrow x )))
+            :bycol (Integer/parseInt (String. (:bycol x )))
+            :quad (Integer/parseInt (String. (:quad x )))
+            :parentwell (Integer/parseInt (String. (:parentwell x )))
+            }))
+
+
+
+(defn load-well-numbers []
+  (let   [table (util/table-to-map "resources/data/well_numbers_for_import.txt")
+          content (into [] (map #(process-well-numbers-data %) table))
+          formats [96 384 1538]
+          ]
+         (loop [counter 0
+                new-wn (map #(dissoc  % :format) (filter #(= (:format %) (get formats counter)) content))
+                
+                new-wn2 {:crux.db/id (keyword (str "wn" (get formats counter))) :format (get formats counter) :well-nums new-wn }
+                dummy    (crux/submit-tx node [[:crux.tx/put new-wn2]] )]
+           (if (> counter 2)
+             (println "Well numbers loaded!")
+             (recur
+              (+ counter 0)
+              (map #(dissoc  % :format) (filter #(= (:format %) (get formats counter)) content))
+               {:crux.db/id (keyword (str "wn" (get formats counter))) :format (get formats counter) :well-nums new-wn }
+              (crux/submit-tx node [[:crux.tx/put new-wn2]] )
+              )))))
+
+(def table (util/table-to-map "resources/data/well_numbers_for_import.txt"))
+     (def     content (into [] (map #(process-well-numbers-data %) table)))
+         (def formats [96 384 1538])
+(def counter 0)
+(def  new-wn (dissoc  (first (filter #(= (:format (first content)) (get formats counter)) content)) :format))
+     (def            new-wn2 [{:crux.db/id (keyword (str "wn" (get formats counter))) :format (get formats counter) new-wn }])
+          (def       dummy    (crux/submit-tx node [[:crux.tx/put (first new-wn2)]] ))
+
+
+(def formats2 [96 384 1538])
+(get formats2 0)
+
+
+;;(insp/inspect-tree (load-well-numbers))
+
+
+;;(load-plate-layouts)
+;;(def a (first (filter #(= (:id %) 1) (load-plate-layouts))))
+;;(insp/inspect-tree (crux/entity (crux/db node) :lyt42))
 
 
 
