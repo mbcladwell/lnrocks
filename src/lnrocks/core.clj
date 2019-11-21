@@ -3,8 +3,8 @@
             [lnrocks.util :as util]
             [lnrocks.db-retriever :as dbr]
             [lnrocks.db-inserter :as dbi]
-            [lnrocks.db-init :as init]
-            [lnrocks.eg-data :as egd]
+         ;;   [lnrocks.db-init :as init]
+           ;; [lnrocks.eg-data :as egd]
             
             [clojure.inspector :as insp]
           [clojure.java.io :as io]
@@ -17,7 +17,6 @@
 (load "util")
 (load "db_inserter")
 (load "db_retriever")
-(load "db_init")
 (load "eg_data")
 
 
@@ -36,17 +35,17 @@
  (define-db-var)
  (do
    (define-db-var)
-   (init/initialize-db node)
-   
-   ))
-
-
-
-
+   (load "db_init")
+   (require 'lnrocks.db-init)
+   (lnrocks.db-init/initialize-db node)
+   (load "eg_data")
+   (require 'lnrocks.eg-data)
+   (lnrocks.eg-data/load-eg-data node)))
   
-;;(crux/entity (crux/db node) :counter)
+;;(crux/entity (crux/db node) :lyt40)
 ;;(counter :sample 368)
-
+;;(load-assay-run-data node)
+;;;;(lnrocks.eg-data/load-assay-run-data node)
 
 
 (defn new-project
@@ -61,9 +60,7 @@
   prj-id))
 
 ;;(new-project "MyNewProj" "a test of function" 1)
-;;(crux/entity (crux/db node) :prj-1)
-
-
+;;(crux/entity (crux/db node) :prj1)
 
 
 (defn new-plate
@@ -134,83 +131,16 @@
 
 ;;(count (get-plates-in-project 2))
 
-;;(init/load-eg-projects node)
+
+;;(insp/inspect-tree plate-sets)
 
 
-;;I will load projects with plate-set-names (no plates)
-;;also assay run names and data
-;;also hit lists
-;;Use algorithm to generate plates/wells/samples and copy to plate-set
-;; (defn load-example-data []
-;;   ;; (new-plate-set  plate-set-name description num-plates plate-format-id plate-type-id
-;;   ;;  project-id plate-layout-name-id lnsession-id with-samples)
-;;   (let [all-projects (init/load-eg-projects)
-;;         ps1-dummy (new-plate-set "dummy" "dummy" 2 96 1 1 1 1 true )
-;;         ps2-dummy (new-plate-set "dummy" "dummy" 2 96 1 1 1 1 true )
-;;         ps3-dummy (new-plate-set "dummy" "dummy" 2 96 1 1 1 1 true )
-;;         ps4-dummy (new-plate-set "dummy" "dummy" 2 384 1 1 2 13 true )
-;;         ps5-dummy (new-plate-set "dummy" "dummy" 1 1536 1 1 3 37 true )
-;;         ps6-dummy (new-plate-set "dummy" "dummy" 10 96 1 1 10 1 true )
-;;         ps7-dummy (new-plate-set "dummy" "dummy" 10 96 1 1 10 1 true )
-;;         ps8-dummy (new-plate-set "dummy" "dummy" 3 96 1 1 10 1 true )
-
-;;         ]
-;;     ))
-
-
-(defn load-eg-data
-  "Loads all example data"
-  []
-  (def  projects (egd/load-eg-projects))
-  (loop [counter 1
-         the-doc (first (filter #(= (:id %) counter) projects))
-         dummy nil]
-    (if (> counter 11)
-      (println "Example data loaded!")
-      (recur
-       (+ counter 1)
-       (first (filter #(= (:id %) counter) projects))
-       (crux/submit-tx node [[:crux.tx/put the-doc]] )))))
-
-
-;;init/hitlists
-
-
-
-;; (let [prj1 (crux/entity (crux/db node ) :prj1)
-;;      new-prj1 (update prj1 :hit-lists (comp set conj)
-;;                       (crux/entity (crux/db node) :hl1)
-;;                       (crux/entity (crux/db node) :hl2))
-;;       ]
-;;    (crux/submit-tx node [[:crux.tx/cas prj1 new-prj1]]))
-
-
-
-
-
-;;  (load-eg-data)
-
-;;  (def  projects (init/load-eg-projects))
-
-;;(def a (first (filter #(= (:id %) 1) projects)))
-;;(insp/inspect-tree a)
-
-
+;;(insp/inspect-tree (crux/entity (crux/db node) :prj1))
+           
 ;;(count prj1)
 ;;(crux/submit-tx node [[:crux.tx/put a]] )
 
 ;;(insp/inspect-tree (crux/entity (crux/db node) :hl1))
-
-
-
-
-;;(insp/inspect-tree (load-well-numbers))
-
-
-;;(load-plate-layouts)
-;;(def a (first (filter #(= (:id %) 1) (load-plate-layouts))))
-;;(insp/inspect-tree (crux/entity (crux/db node) :wn96))
-
 
 
 (defn -main

@@ -57,10 +57,10 @@
 
 (def helpers
   [{:crux.db/id :plate-formats :96 96 :384 384 :1536 1536}
-   {:crux.db/id :plate-type 1 "assay" 2 "rearray" 3 "master" 4 "daughter" 5 "archive" 6 "replicate"}
+   {:crux.db/id :plate-type :1 "assay" :2 "rearray" :3 "master" :4 "daughter" :5 "archive" :6 "replicate"}
    ;;{:crux.db/id :plate-layout :plate-layout (load-plate-layouts)}
-   {:crux.db/id :assay-type  1 "ELISA" 2 "Octet" 3 "SNP" 4 "HCS" 5 "HTRF" 6 "FACS"}
-   {:crux.db/id :well-type  1 "unknown" 2 "positive" 3 "negative" 4 "blank" 5 "edge"}
+   {:crux.db/id :assay-type  :1 "ELISA" :2 "Octet" :3 "SNP" :4 "HCS" :5 "HTRF" :6 "FACS"}
+   {:crux.db/id :well-type  :1 "unknown" :2 "positive" :3 "negative" :4 "blank" :5 "edge"}
   ;; {:crux.db/id :well-numbers :well-numbers (dbi/load-well-numbers) }
    {:crux.db/id :layout-src-dest :layout-src-dest   [{:source 1 :dest  2}{:source 1 :dest 3}{:source 1 :dest 4}{:source 1 :dest 5}{:source 1 :dest 6}{:source 7 :dest 8}{:source 7 :dest 9}{:source 7 :dest 10}{:source 7 :dest 11}{:source 7 :dest 12}{:source 13 :dest 14}{:source 13 :dest 15}{:source 13 :dest 16}{:source 13 :dest 17}{:source 13 :dest 18}{:source 19 :dest 20}{:source 19 :dest 21}{:source 19 :dest 22}{:source 19 :dest 23}{:source 19 :dest 24}{:source 25 :dest 26}{:source 25 :dest 27}{:source 25 :dest 28}{:source 25 :dest 29}{:source 25 :dest 30}{:source 31 :dest 32}{:source 31 :dest 33}{:source 31 :dest 34}{:source 31 :dest 35}{:source 31 :dest 36}{:source 37 :dest 41}{:source 38 :dest 41}{:source 39 :dest 41}{:source 40 :dest 41}]}
    ])

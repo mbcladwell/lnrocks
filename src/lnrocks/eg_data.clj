@@ -3,7 +3,6 @@
    ;;[clojure.data.csv :as csv]
    [clojure.java.io :as io]
    [crux.api :as crux]
-   [lnrocks.core :as core]
    [lnrocks.db-inserter :as dbi]
    [lnrocks.db-retriever :as dbr]
    [lnrocks.util :as util]
@@ -68,6 +67,22 @@
                 :prj-id 3
                 :id 6}])
 
+(defn load-hit-lists [node]
+  (let   [hl hitlists]
+         (loop [counter 1
+                hl-single  (first (filter #(= (:id %) counter) hl))
+                dummy    (crux/submit-tx node [[:crux.tx/put hl-single]] )]
+           (if (> counter (+ 1 (count hl)))
+             (println "Hit lists loaded!")
+             (recur
+              (+ counter 1)
+              (first (filter #(= (:id %) counter) hl))
+              (crux/submit-tx node [[:crux.tx/put hl-single]] )
+              )))))
+
+
+
+
 (defn process-assay-run-names
   "id	assay-run-sys-name	assay-run-name	description	assay-type-id	plate-set-id	plate-layout-name-id	lnsession-id"
 [x]
@@ -97,16 +112,25 @@
            }))
 
 
-(defn load-assay-run-data []
+(defn load-assay-run-data [node]
   ;;add data to assay-run names using the key :pdata  (for processed data)
   (let   [table (util/table-to-map "resources/data/assay-run.txt")
           assay-names (into [] (map #(process-assay-run-names %) table))
           table2 (util/table-to-map "resources/data/processed_data_for_import.txt")
           assay-data (into [] (map #(process-assay-run-data %) table2))
-          result (map #(assoc % :pdata (extract-data-for-id (:id %)  assay-data)) assay-names)]
-         result))
+          result (map #(assoc % :pdata (extract-data-for-id (:id %)  assay-data :id)) assay-names)]
+    (loop [counter 1
+           an-ar  (first (filter #(= (:id %) counter) result))
+           dummy    (crux/submit-tx node [[:crux.tx/put an-ar]] )]
+      (if (> counter (+ 1 (count result)))
+        (println "Assay runs loaded!")
+        (recur
+         (+ counter 1)
+         (first (filter #(= (:id %) counter) result))
+         (crux/submit-tx node [[:crux.tx/put an-ar]] )
+         )))))
 
-;;(load-assay-run-data)
+;;(lnrocks.eg-data/load-assay-run-data node)
 
 ;;plate_sys_name	plate_type_id	plate_layout_name_id	plate_set_name	descr	num_plates	plate_format_id	project_id	lnsession_id	plate_set_id	plate_id	plate_order
 (defn process-sample-file
@@ -153,8 +177,8 @@
             }))
 
 
-(defn load-eg-plate []
-         (let   [  table (util/table-to-map "resources/data/plates.txt")
+(defn load-eg-plate [node]
+         (let   [table (util/table-to-map "resources/data/plates.txt")
                  plates (into [] (map #(process-eg-plate-data %) table))
                  wells-vec (load-well-vector)
                  plates2 (loop [counter 1
@@ -166,10 +190,16 @@
                               (conj new-plates (assoc (first (filter #(= (:id %) counter)  plates))
                                                       :wells  (:wells (first (filter #(= (:id %) counter)  wells-vec)))))
                               )))]
-             plates2))
+           (loop [counter 1
+                  a-plate  (first (filter #(= (:id %) counter) plates2))
+                  dummy    (crux/submit-tx node [[:crux.tx/put a-plate]] )]
+             (if (> counter (+ 1 (count plates2)))
+               (println "Plates loaded!")
+               (recur
+                (+ counter 1)
+                (first (filter #(= (:id %) counter) plates2))
+                (crux/submit-tx node [[:crux.tx/put a-plate]] ))))))
 
-
-;;(insp/inspect-tree (load-eg-plate))
 
 
 (defn process-eg-plate-set-data
@@ -188,31 +218,44 @@
             :lnsession-id (Integer/parseInt (String. (:lnsession-id x))) }))
 
 
-(defn load-eg-plate-sets []
+(defn load-eg-plate-sets
+"plate-sets 1 through 5 have assay-runs 1 through 5"
+  [node]
          (let   [  table (util/table-to-map "resources/data/plate-set-names.txt")
                  plate-sets (into [] (map #(process-eg-plate-set-data %) table))
-                 assay-data (load-assay-run-data)
-                 result1 (loop [counter 1
-                                new-plate-set []]
-                           (if (> counter (count plate-sets))
-                             new-plate-set
-                             (recur
-                              (+ counter 1)
-                              (conj new-plate-set (assoc (first (filter #(= (:id %) counter)  plate-sets)) :assay-runs (map #(dissoc % :plate-set-id) (filter #(= (:plate-set-id %) counter) assay-data)))))
-                             ))
-                 plates (load-eg-plate)
-                 result2 (loop [counter 1
-                                new-plate-set []]
-                           (if (> counter (count plate-sets))
-                             new-plate-set
-                             (recur
-                              (+ counter 1)
-                              (conj new-plate-set (assoc (first (filter #(= (:id %) counter)  result1)) :plates (map #(dissoc % :plate-set-id) (filter #(= (:plate-set-id %) counter) plates)))))
-                             ))
-                 
-                 ]
-             result2))
-                     
+                 dummy  (loop [counter 1
+                               a-plate-set  (first (filter #(= (:id %) counter) plate-sets))
+                               dummy    (crux/submit-tx node [[:crux.tx/put a-plate-set]] )]
+                          (if (> counter (+ 1 (count plate-sets)))
+                            (println "Plate-Sets loaded!")
+                            (recur
+                             (+ counter 1)
+                             (first (filter #(= (:id %) counter) plate-sets))
+                             (crux/submit-tx node [[:crux.tx/put a-plate-set]] ))))
+
+                 ps1 (crux/entity (crux/db node ) :ps1)
+                 new-ps1 (update ps1 :assay-runs (comp set conj)
+                                 (crux/entity (crux/db node) :ar1))
+        
+                 ps2 (crux/entity (crux/db node ) :ps2)
+                 new-ps2 (update ps2 :assay-runs (comp set conj)
+                                 (crux/entity (crux/db node) :ar2))
+
+                 ps3 (crux/entity (crux/db node ) :ps3)
+                 new-ps3 (update ps3 :assay-runs (comp set conj)
+                                 (crux/entity (crux/db node) :ar3))
+                 ps4 (crux/entity (crux/db node ) :ps4)
+                 new-ps4 (update ps4 :assay-runs (comp set conj)
+                                 (crux/entity (crux/db node) :ar4))
+                 ps5 (crux/entity (crux/db node ) :ps5)
+                 new-ps5 (update ps5 :assay-runs (comp set conj)
+                                 (crux/entity (crux/db node) :ar5))]
+
+           (crux/submit-tx node [[:crux.tx/cas ps1 new-ps1]])
+           (crux/submit-tx node [[:crux.tx/cas ps2 new-ps2]])
+           (crux/submit-tx node [[:crux.tx/cas ps3 new-ps3]])
+           (crux/submit-tx node [[:crux.tx/cas ps4 new-ps4]])
+           (crux/submit-tx node [[:crux.tx/cas ps5 new-ps5]])))
 
 
 ;;((dbi/extract-data-for-id (:id (first plate-sets))
@@ -230,30 +273,52 @@
             }))
 
 
-(defn load-eg-projects []
-         (let   [  table (util/table-to-map "resources/data/projects.txt")
-                 proj-data (into [] (map #(process-eg-prj-data %) table))
-                 ps (load-eg-plate-sets)
-                 result2  (loop [counter 1
-                                new-ps []]
-                           (if (> counter 10)
-                             new-ps
-                             (recur
-                              (+ counter 1)
-                              (conj new-ps (assoc (first (filter #(= (:id %) counter)  proj-data)) :plate-sets (map #(dissoc % :project-id) (filter #(= (:project-id %) counter) ps)))))
-                             ))             
-                 ;; hl hitlists
-                 ;; result3 (loop [counter 1
-                 ;;                new-hit-lists []]
-                 ;;           (if (> counter 10)
-                 ;;             new-hit-lists
-                 ;;             (recur
-                 ;;              (+ counter 1)
-                 ;;              (conj new-hit-lists (assoc (first (filter #(= (:id %) counter)  result2)) :hit-lists (map #(dissoc % :prj-id) (filter #(= (:prj-id %) counter) hitlists)))))
-                        ;;     ))
+(defn load-eg-projects [node]
+  (let   [table (util/table-to-map "resources/data/projects.txt")
+          proj-data (into [] (map #(process-eg-prj-data %) table))
+          dummy (loop [counter 1
+                       a-proj  (first (filter #(= (:id %) counter) proj-data))
+                       dummy    (crux/submit-tx node [[:crux.tx/put a-proj]] )]
+                  (if (> counter (+ 1 (count proj-data)))
+                    (println "Projects loaded!")
+                    (recur
+                     (+ counter 1)
+                     (first (filter #(= (:id %) counter) proj-data))
+                     (crux/submit-tx node [[:crux.tx/put a-proj]] ))))
+          prj1 (crux/entity (crux/db node ) :prj1)
+          new1-prj1 (update prj1 :hit-lists (comp set conj)
+                           (crux/entity (crux/db node) :hl1)
+                           (crux/entity (crux/db node) :hl2))
+          new2-prj1 (update new1-prj1 :plate-sets (comp set conj)
+                           (crux/entity (crux/db node) :ps1)
+                           (crux/entity (crux/db node) :ps2)
+                           (crux/entity (crux/db node) :ps3))
+          prj2 (crux/entity (crux/db node ) :prj2)
+          new1-prj2 (update prj2 :hit-lists (comp set conj)
+                           (crux/entity (crux/db node) :hl3)
+                           (crux/entity (crux/db node) :hl4))
 
-                 ]
-             result2))
+          new2-prj2 (update new1-prj2 :plate-sets (comp set conj)
+                           (crux/entity (crux/db node) :ps4))
+          
+          prj3 (crux/entity (crux/db node ) :prj3)
+          new1-prj3 (update prj3 :hit-lists (comp set conj)
+                           (crux/entity (crux/db node) :hl5)
+                           (crux/entity (crux/db node) :hl6))
+          new2-prj3 (update new1-prj3 :plate-sets (comp set conj)
+                            (crux/entity (crux/db node) :ps5))
+      
+          prj10 (crux/entity (crux/db node ) :prj10)
+          new-prj10 (update prj10 :plate-sets (comp set conj)
+                           (crux/entity (crux/db node) :ps6)
+                           (crux/entity (crux/db node) :ps7)
+                           (crux/entity (crux/db node) :ps8))]
+
+    (crux/submit-tx node [[:crux.tx/cas prj1 new2-prj1]])
+    (crux/submit-tx node [[:crux.tx/cas prj2 new2-prj2]])
+    (crux/submit-tx node [[:crux.tx/cas prj3 new2-prj3]])
+    (crux/submit-tx node [[:crux.tx/cas prj10 new-prj10]])))
+
 
 
 
@@ -269,3 +334,15 @@
 ;; plate-set 8
 ;; plate 29
 ;; sample 4648
+;; assay-run 5
+
+(defn load-eg-data [node]
+  (do
+    (load-hit-lists node)
+    (load-assay-run-data node)
+    (load-eg-plate node)
+    (load-eg-plate-sets node)
+    (load-eg-projects node)
+
+    
+))
