@@ -1,0 +1,83 @@
+(ns lnrocks.core
+  (:require [crux.api :as crux]
+            [lnrocks.util :as util]
+            [lnrocks.db-retriever :as dbr]
+            [lnrocks.db-inserter :as dbi]
+           [lnrocks.db-init :as init]
+           [lnrocks.eg-data :as egd]
+            
+            [clojure.inspector :as insp]
+          [clojure.java.io :as io]
+              )
+  (:import [crux.api ICruxAPI ])
+  (:gen-class))
+
+;;https://juxt.pro/blog/posts/crux-tutorial-datalog.html
+
+;; (load "util")
+;; (load "db_inserter")
+;; (load "db_retriever")
+;; (load "eg_data")
+
+
+
+(defn define-db-var []
+  
+   (def ^crux.api.ICruxAPI node
+     (crux/start-node
+      {:crux.node/topology :crux.standalone/topology
+       :crux.node/kv-store "crux.kv.rocksdb/kv"
+       :crux.standalone/event-log-dir "data/eventlog-1"
+       :crux.kv/db-dir "data/db-dir1"
+       :crux.standalone/event-log-kv-store "crux.kv.rocksdb/kv"})))
+
+
+(if (.exists (io/as-file "data"))
+  (do
+    (define-db-var)
+    (println "db already exists"))
+ (do
+   (println "initializing database at startup.")
+   (define-db-var)
+   (init/initialize-db node)
+   (egd/load-eg-data node)))
+  
+;;(crux/entity (crux/db node) :counters)
+;;(counter :sample 368)
+;;(load-assay-run-data node)
+;;;;(lnrocks.eg-data/load-assay-run-data node)
+
+
+;;(new-project "MyNewProj" "a test of function" 1)
+;;(crux/entity (crux/db node) :prj1)
+
+
+
+
+;;(new-plate-set "my set 1" "desc" 3 96 1 1 1 2 true)
+;;(:plates (crux/entity (crux/db node ) :PS-13))
+;;(crux/entity (crux/db node ) :counters)
+(defn get-plates-in-project [x]
+  (crux/q (crux/db node)
+          '{:find [e p  ]
+            :where [[e :ps-name p]]}))
+                    
+  ;;(count (get-plates-in-project 2))
+
+;;(insp/inspect-tree plate-sets)
+
+;;(insp/inspect-tree (crux/entity (crux/db node) :prj1))
+           
+;;(count prj1)
+;;(crux/submit-tx node [[:crux.tx/put a]] )
+
+;;(insp/inspect-tree (crux/entity (crux/db node) :hl1))
+
+
+(defn -main
+  "I don't do a whole lot ... yet."
+  [& args]
+
+(println "In main"))
+
+

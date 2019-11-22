@@ -1,57 +1,29 @@
-(ns lnrocks.core
-  (:require [crux.api :as crux]
+(ns lnrocks.db-inserter
+  (:require [clojure.string :only [split split-lines trim]]
+            [crux.api :as crux]
+            [clojure.set :as s]
             [lnrocks.util :as util]
-            [lnrocks.db-retriever :as dbr]
-            [lnrocks.db-inserter :as dbi]
-         ;;   [lnrocks.db-init :as init]
-           ;; [lnrocks.eg-data :as egd]
-            
-            [clojure.inspector :as insp]
-          [clojure.java.io :as io]
-              )
-  (:import [crux.api ICruxAPI])
-  (:gen-class))
+         ;;    [ln.db-manager :as dbm])
+         ;;   [clojure.data.csv :as csv]
+            [clojure.java.io :as io])
+           )
 
-;;https://juxt.pro/blog/posts/crux-tutorial-datalog.html
+;; \copy (Select * From assay_run) To '/home/mbc/projects/lnrocks/resources/data/assay-run.csv' With CSV
 
-(load "util")
-(load "db_inserter")
-(load "db_retriever")
-(load "eg_data")
+(defn easy-ingest
+  "Uses Crux put transaction to add a vector of documents to a specified
+  node"
+  [node docs]
+  (crux/submit-tx node
+                  (vec (for [doc docs]
+                         [:crux.tx/put doc]))))
 
-
-
-(defn define-db-var []
- (def ^crux.api.ICruxAPI node
-    (crux/start-node
-       {:crux.node/topology :crux.standalone/topology
-        :crux.node/kv-store "crux.kv.rocksdb/kv"
-        :crux.standalone/event-log-dir "data/eventlog-1"
-        :crux.kv/db-dir "data/db-dir1"
-        :crux.standalone/event-log-kv-store "crux.kv.rocksdb/kv"}))
-  )
-
-(if (.exists (io/as-file "data"))
- (define-db-var)
- (do
-   (define-db-var)
-   (load "db_init")
-   (require 'lnrocks.db-init)
-   (lnrocks.db-init/initialize-db node)
-   (load "eg_data")
-   (require 'lnrocks.eg-data)
-   (lnrocks.eg-data/load-eg-data node)))
-  
-;;(crux/entity (crux/db node) :lyt40)
-;;(counter :sample 368)
-;;(load-assay-run-data node)
-;;;;(lnrocks.eg-data/load-assay-run-data node)
 
 
 (defn new-project
-  [ name description session-id]
+  [ node name description session-id]
   (let [ prj-id (:start (dbr/counter node :project 1))
-        doc  {:crux.db/id (keyword (str "prj-" prj-id))
+        doc  {:crux.db/id (keyword (str "prj" prj-id))
               :ln-entity "project"
                 :prj-name name
                 :description description
@@ -59,13 +31,9 @@
     (crux/submit-tx node [[:crux.tx/put doc]] )
   prj-id))
 
-;;(new-project "MyNewProj" "a test of function" 1)
-;;(crux/entity (crux/db node) :prj1)
-
-
 (defn new-plate
   ;;with-samples: boolean
-  [ project-id plate-set-id plate-id plate-format-id plate-type-id plate-layout-name-id with-samples sample-id-start unk-per-plate-needed]
+  [ node project-id plate-set-id plate-id plate-format-id plate-type-id plate-layout-name-id with-samples sample-id-start unk-per-plate-needed]
   (let [wells (case plate-format-id
                 96 util/map96wells
                 384 util/map384wells
@@ -84,7 +52,7 @@
 
 (defn new-plate-set
   ;;with-samples: boolean
-  [ plate-set-name description num-plates plate-format-id plate-type-id
+  [ node plate-set-name description num-plates plate-format-id plate-type-id
    project-id plate-layout-name-id lnsession-id with-samples] 
   (let [unk-per-plate-needed (:unknown-n (first (dbr/get-plate-layout node plate-layout-name-id)))
         start-ids (dbr/get-ps-plt-spl-ids node 1 num-plates (* num-plates unk-per-plate-needed) )
@@ -117,36 +85,32 @@
     ps-id))
 
 
-;;(new-plate-set "my set 1" "desc" 3 96 1 1 1 2 true)
-;;(:plates (crux/entity (crux/db node ) :PS-13))
-;;(crux/entity (crux/db node ) :counters)
-(defn get-plates-in-project [x]
-  (crux/q (crux/db node)
-          '{:find [e p  ]
-            :where [[e :ps-name p]]}))
-                    
-         ;;    :args [{ 'p "PS-12"  }
-                   
-           ;;        ]}))
-
-;;(count (get-plates-in-project 2))
 
 
-;;(insp/inspect-tree plate-sets)
 
+;; (defn import-barcode-ids [ plateset-id barcode-file]
 
-;;(insp/inspect-tree (crux/entity (crux/db node) :prj1))
-           
-;;(count prj1)
-;;(crux/submit-tx node [[:crux.tx/put a]] )
+;;    " Loads table and make the association
+;;       barcodess looks like:
 
-;;(insp/inspect-tree (crux/entity (crux/db node) :hl1))
+;;       plate 	barcode.id
+;;       1     	AMRVK5473H
+;;       1      	KMNCX9294W
+;;       1      	EHRXZ2102Z
+;;       1      	COZHR7852Q
+;;       1      	FJVNR6433Q"
+    
+;;   (let [ col1name (first (util/get-col-names barcode-file))
+;;         col2name (first (rest (util/get-col-names barcode-file)))
+;;         table (util/table-to-map barcode-file)
+;;         sql-statement (str "UPDATE plate SET barcode = ? WHERE plate.ID IN ( SELECT plate.id FROM plate_set, plate_plate_set, plate  WHERE plate_plate_set.plate_set_id=" (str plateset-id) " AND plate_plate_set.plate_id=plate.id AND plate_plate_set.plate_order=? )")
+;;         content (into [] (zipmap (map #(:barcode.id %) table) (map #(Integer. (:plate %)) table)))
+;;         ]
+;;     (if (and (= col1name "plate")(= col2name "barcode.id"))
+;;       (with-open [con (j/get-connection cm/conn)
+;;                   ps  (j/prepare con [sql-statement])]
+;;         (p/execute-batch! ps content))    
+;;       (javax.swing.JOptionPane/showMessageDialog nil  (str "Expecting the headers \"plate\", and \"barcode.id\", but found\n" col1name  ", and " col2name  "."  )))))
 
-
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-
-(println "In main"))
 
 
