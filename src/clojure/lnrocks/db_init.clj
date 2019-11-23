@@ -165,13 +165,13 @@ because some are strings, all imported as string
 (defn load-well-numbers [node]
   (let   [table (util/table-to-map "resources/data/well_numbers_for_import.txt")
           content (into [] (map #(process-well-numbers-data %) table))
-          formats [96 384 1538]
+          formats [96 384 1536]
           ]
          (loop [counter 0
                 new-wn (map #(dissoc  % :format) (filter #(= (:format %) (get formats counter)) content))
                 new-wn2 {:crux.db/id (keyword (str "wn" (get formats counter))) :format (get formats counter) :well-nums new-wn }
                 dummy    (crux/submit-tx node [[:crux.tx/put new-wn2]] )]
-           (if (> counter 2)
+           (if (> counter 3)
              (println "Well numbers loaded!")
              (recur
               (+ counter 1)

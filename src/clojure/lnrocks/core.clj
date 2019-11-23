@@ -33,9 +33,9 @@
  (do
    (println "initializing database at startup.")
    (define-db-var)
-   ))
-;;   (init/initialize-db node)
-;;   (egd/load-eg-data node)))
+   (init/initialize-db node)
+   (egd/load-eg-data node)))
+   
   
 (defn extract-data-for-id
   ;;get the data for a single id; remove the id from the collection
@@ -45,70 +45,14 @@
   (map #(dissoc % :id) (filter #(= (:id %) x) coll ) ))
 
 
-;;(crux/entity (crux/db node) :counters)
+;;(crux/entity (crux/db node) :ps7)
 ;;(counter :sample 368)
 ;;(load-assay-run-data node)
 ;;;;(lnrocks.eg-data/load-assay-run-data node)
 
+;;(init/load-well-numbers node)
 
 
-
-(defn process-layout-data
-  "processes that tab delimitted, R generated layouts for import
-   order is important; must correlate with SQL statement order of ?'s"
-  [x]
-  (into {} { :id (Integer/parseInt(:id x))
-            :well (Integer/parseInt(:well x ))
-            :type  (Integer/parseInt(:type x ))
-            :reps (Integer/parseInt(:reps x ))
-            :target (Integer/parseInt(:target x ))}))
-
-(defn process-layout-names
-  "processes that tab delimitted, R generated layouts for import
-   order is important; must correlate with SQL statement order of ?'s"
-  [x]
-  (into {} { :id (Integer/parseInt(:id x))
-            :crux.db/id (keyword (str "lyt"(:id x )))
-            :sys-name (:sys-name x )
-            :name (:name x )
-            :description (:description x )
-            :plate-format-id (Integer/parseInt(:plate-format-id x ))
-            :replicates (Integer/parseInt(:replicates x))
-            :targets (Integer/parseInt(:targets x))
-            :use-edge (Integer/parseInt(:use-edge x))
-            :num-controls (Integer/parseInt(:num-controls x))
-            :unknown-n (Integer/parseInt(:unknown-n x))
-            :control-loc (:control-loc x)
-            :source-dest (:source-dest x)  }))
-
-
-
-(defn load-plate-layouts []
-  ;;add data to layout names using the key :layout
-  (let   [table (util/table-to-map "resources/data/plate_layouts_for_import.txt")
-          layout-data (into [] (map #(process-layout-data %) table))
-          table2 (util/table-to-map "resources/data/plate_layout_name.txt")
-          layout-names (into [] (map #(process-layout-names %) table2))
-          result (map #(assoc % :layout (extract-data-for-id (:id %)  layout-data)) layout-names)]         
-    (loop [counter 1
-           new-pl  (first (filter #(= (:id %) counter) result))
-           dummy    (crux/submit-tx node [[:crux.tx/put new-pl]] )]
-      (if (> counter (+ 1 (count result)))
-        (println "Plate layouts loaded!")
-        (recur
-         (+ counter 1)
-         (first (filter #(= (:id %) counter) result))
-          (crux/submit-tx node [[:crux.tx/put new-pl]] )
-         )))))
-
-
-(def table (util/table-to-map "resources/data/plate_layouts_for_import.txt"))
-     (def      layout-data (into [] (map #(process-layout-data %) table)))
-       (def    table2 (util/table-to-map "resources/data/plate_layout_name.txt"))
-        (def   layout-names (into [] (map #(process-layout-names %) table2)))
-       (def    result (map #(assoc % :layout (extract-data-for-id (:id %)  layout-data)) layout-names))
-(def  new-pl  (first (filter #(= (:id %) 1) result)))
-  (def  dummy    (crux/submit-tx node [[:crux.tx/put new-pl]] ))
 
 
 ;;(load-plate-layouts)
@@ -142,7 +86,7 @@
 ))
 
 
-;;(insp/inspect-tree plate-sets)
+;;(insp/inspect-tree :ps3)
 
 ;;(insp/inspect-tree (crux/entity (crux/db node) :prj1))
            
