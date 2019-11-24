@@ -24,6 +24,7 @@
   :plate 0
   :sample 0
   :hit-list 0
+  :assay-run 0
   :work-list 0}
   )
 
@@ -186,6 +187,22 @@ because some are strings, all imported as string
   (do
     (crux/submit-tx node [[:crux.tx/put counters]] )
     (crux/submit-tx node [[:crux.tx/put props]] )
+    (delay 2000)
     (easy-ingest node helpers)
+    (delay 2000)
     (load-well-numbers node)
+    (delay 2000)
     (load-plate-layouts node)))
+
+(defn diag-init [node]
+  (do
+(println ":lyt1 --  " (first (crux/entity (crux/db node) :lyt1)) )
+(println ":lyt41 --  " (first (crux/entity (crux/db node) :lyt41)) )
+(println ":counters --  " (crux/entity (crux/db node) :counters) )
+(println ":props --  " (crux/entity (crux/db node) :props) )
+(println ":plate-formats --  " (first (crux/entity (crux/db node) :plate-formats)) )
+(println ":layout-src-dest --  " (first (crux/entity (crux/db node) :layout-src-dest)) )
+(println ":wn96 --  " (first (crux/entity (crux/db node) :wn96)) )
+(println ":wn1536 --  " (first (crux/entity (crux/db node) :wn1536)) )
+
+    ))

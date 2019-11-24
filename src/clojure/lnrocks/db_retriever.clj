@@ -42,6 +42,39 @@
     (crux/submit-tx node [[:crux.tx/cas orig-counters new3]])
     {:plate-set ps :plate plt :sample spl}))
 
+
+;;Number of IDs needed for example data set
+;; project 10
+;; plate-set 8
+;; plate 29
+;; sample 4648
+;; assay-run 5
+
+(defn update-counters-post-eg-data [node]
+ (let [orig-counters (crux/entity (crux/db node) :counters)
+       new-counters (assoc orig-counters
+                           :project 10
+                           :plate-set 8
+                           :plate 29
+                           :sample 4648
+                           ::assay-run 5
+                           :hit-list 6
+                           :work-list 0)]
+
+   (crux/submit-tx node [[:crux.tx/cas orig-counters new-counters]])
+   (println "")
+   (println "====updated counters=====")
+     (println "project:   10" )
+     (println "plate-set: 8" )
+     (println "plate:     29" )
+     (println "sample:    4648" )
+     (println "assay-run: 5" )
+     (println "hit-list:  6" )
+     (println "work-list: 0" )
+ 
+
+   ))
+ 
 ;;(crux/entity (crux/db node ) :counters)
 ;;(get-ps-plt-spl-ids 1 2 3)
 
