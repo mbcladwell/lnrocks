@@ -25,7 +25,8 @@
   :sample 0
   :hit-list 0
   :assay-run 0
-  :work-list 0}
+  :work-list 0
+  :session-id 1}
   )
 
 

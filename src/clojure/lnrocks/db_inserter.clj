@@ -24,32 +24,47 @@
                          [:crux.tx/put doc]))))
 
 
+(defn import-barcode-ids [ plateset-id barcode-file]
+   " Loads table and make the association
+      barcodess looks like:
 
-
-
-;; (defn import-barcode-ids [ plateset-id barcode-file]
-
-;;    " Loads table and make the association
-;;       barcodess looks like:
-
-;;       plate 	barcode.id
-;;       1     	AMRVK5473H
-;;       1      	KMNCX9294W
-;;       1      	EHRXZ2102Z
-;;       1      	COZHR7852Q
-;;       1      	FJVNR6433Q"
+      plate 	barcode.id
+      1     	AMRVK5473H
+      1      	KMNCX9294W
+      1      	EHRXZ2102Z
+      1      	COZHR7852Q
+      1      	FJVNR6433Q"
     
-;;   (let [ col1name (first (util/get-col-names barcode-file))
-;;         col2name (first (rest (util/get-col-names barcode-file)))
-;;         table (util/table-to-map barcode-file)
-;;         sql-statement (str "UPDATE plate SET barcode = ? WHERE plate.ID IN ( SELECT plate.id FROM plate_set, plate_plate_set, plate  WHERE plate_plate_set.plate_set_id=" (str plateset-id) " AND plate_plate_set.plate_id=plate.id AND plate_plate_set.plate_order=? )")
-;;         content (into [] (zipmap (map #(:barcode.id %) table) (map #(Integer. (:plate %)) table)))
-;;         ]
-;;     (if (and (= col1name "plate")(= col2name "barcode.id"))
-;;       (with-open [con (j/get-connection cm/conn)
-;;                   ps  (j/prepare con [sql-statement])]
-;;         (p/execute-batch! ps content))    
-;;       (javax.swing.JOptionPane/showMessageDialog nil  (str "Expecting the headers \"plate\", and \"barcode.id\", but found\n" col1name  ", and " col2name  "."  )))))
+  (let [col1name (first (util/get-col-names barcode-file))
+        col2name (first (rest (util/get-col-names barcode-file)))
+        table (util/table-to-map barcode-file)
+        processed-table (into [] (map #(process-barcode-file %) table))
+        old-ps (crux/entity (crux/db node) plateset-id)
+        old-ps-plates (:plates old-ps)
+        new-ps-plates #{}
+        ]
+    (loop [counter 1
+           a-plate  (first (filter #(= (:plate-order %) counter) old-ps-plates))
+           new-plate    (assoc a-plate :barcode (:barcode (first (filter #(= (:id %) counter) processed-table))))
+           new-ps-plates (conj new-ps-plates new-plate ) ]          
+      (if (> counter (+ 1 (count processed-table)))
+        (crux/submit-tx node [[:crux.tx/cas old-ps (assoc old-ps :plates new-ps-plates)]])
+        (recur
+         (+ counter 1)
+         (first (filter #(= (:plate-order %) counter) old-ps-plates))
+         ;;(crux/submit-tx node [[:crux.tx/put a-proj]] )
+         (assoc a-plate :barcode (:barcode (first (filter #(= (:id %) counter) processed-table))))
+         (conj new-ps-plates new-plate ) 
+         )))
+    ))
+
+
+    ;;(javax.swing.JOptionPane/showMessageDialog nil  (str "Expecting the headers \"plate\", and \"barcode.id\", but found\n" col1name  ", and " col2name  "."  )))))
+;;(import-barcode-ids :ps7 "/home/mbc/projects/lnrocks/egdata/barcodes/barcodes.txt") 
+
+
+
+
 
 
 
