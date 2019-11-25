@@ -23,8 +23,33 @@
                   (vec (for [doc docs]
                          [:crux.tx/put doc]))))
 
+(defn process-barcode-file
+"plate barcode.id;  plate is actually plate order"
+ [x]
+  (into {} {:id (Integer/parseInt (String. (:plate x)))     
+            :barcode (String.(:barcode.id x) )}))
 
-(defn import-barcode-ids [ plateset-id barcode-file]
+
+
+(defn new-project [ node prj-name desc user-id]
+  (let [prj-id (:start (dbr/counter node :project 1))
+        session-id (:session-id (crux/entity (crux/db node) :props)
+        doc {:crux.db/id (keyword (str "prj" prj-id))
+             :project-sys-name (str "PRJ-" prj-id)
+             :name prj-name
+             :description desc
+             :lnsession-id session-id
+             :id prj-id
+             :plate-sets #{}
+             :hit-lists #{}
+             }       ]
+    (crux/submit-tx node [[:crux.tx/put doc]] )
+    prj-id))
+
+
+
+
+(defn import-barcode-ids [ node plateset-id barcode-file]
    " Loads table and make the association
       barcodess looks like:
 

@@ -52,6 +52,7 @@
    :help-url-prefix "http://labsolns.com/software/"
    :session-id 1
    :project-id 1
+   :user-id 1
    :project-sys-name "PRJ-1"
    :plate-set-sys-name "PS-1"
    :plate-set-id 1})

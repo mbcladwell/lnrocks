@@ -50,14 +50,13 @@
 
 (defn fill-wells
   ;;wells: the map of wells
-  ;;ids: a map {:start nn :end nn}
   [wells id-start unk-needed]
   (let [      
         wells-vector (case (count wells)
                        96 vec96wells
                        384 vec384wells
                        1536 vec1536wells)  ]
-    (loop [id-counter id-start  ;;counts through the ids by id number
+    (loop [id-counter id-start  ;;counts through the sample-ids by id number
            vec-counter 0
            filled-wells wells]
       (if (= id-counter (+ id-start unk-needed))
