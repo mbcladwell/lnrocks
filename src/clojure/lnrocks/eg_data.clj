@@ -165,6 +165,13 @@
 
 ;;(insp/inspect-tree (load-well-vector))
 
+(defn persist-samples [node]
+  (dotimes [ x 4648 ]
+    (crux/submit-tx node [[:crux.tx/put { :crux.db/id (keyword (str "spl" (+ x 1)))
+                                         :sample-sys-name (str "SPL-" (+ x 1))
+                                         :id (+ x 1)
+                                         :accession nil }]] )))
+
 
 (defn process-eg-plate-data
 "plate_sys_name	plate_type_id	plate_layout_name_id	plate_set_name	descr	num_plates	plate_format_id	project_id	lnsession_id	plate_set_id	id (this is the plate_id; must be :id)	plate_order"
@@ -419,7 +426,7 @@
 (defn load-eg-data
   [node]
   (do
-                                        ;(delay 2000)
+    (persist-samples node)                                ;(delay 2000)
     (load-eg-plate-sets node)
     (load-eg-projects node)
     (load-assay-run-data node)

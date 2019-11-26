@@ -3,6 +3,7 @@
             [crux.api :as crux]
             [clojure.set :as s]
             [lnrocks.util :as util]
+            [lnrocks.db-retriever :as dbr]
          ;;    [ln.db-manager :as dbm])
          ;;   [clojure.data.csv :as csv]
             [clojure.java.io :as io])
@@ -33,7 +34,7 @@
 
 (defn new-project [ node prj-name desc user-id]
   (let [prj-id (:start (dbr/counter node :project 1))
-        session-id (:session-id (crux/entity (crux/db node) :props)
+        session-id (:session-id (crux/entity (crux/db node) :props))
         doc {:crux.db/id (keyword (str "prj" prj-id))
              :project-sys-name (str "PRJ-" prj-id)
              :name prj-name

@@ -56,7 +56,12 @@
 
 
 (defn new-plate-set [ node ps-name desc plate-format-id plate-type-id  plate-layout-name-id num-plates project-id user-id]
-  (let [ps-id (:start (dbr/counter node :plate-set 1))
+  (let [
+        layout (crux/entity (crux/db node) plate-layout-name-id)
+        plate-format-id (:format-id layout)
+        unknown-n (:unknown-n layout)    
+        all-ids (dbr/get-ps-plt-spl-ids node  1 num-plates (* num-plates unknown-n) )
+        ps-id (:plate-set all-ids)
         session-id (:session-id (crux/entity (crux/db node) :props))
         doc {:crux.db/id (keyword (str "ps" ps-id))
              :plate-set-sys-name (str "PS-" ps-id)
@@ -69,39 +74,68 @@
              :user-id (:user-id (crux/entity (crux/db node) :props))
              :num-plates num-plates
              :project-id project-id
-             :plates #{}
+             :plates (new-plates node all-ids layout num-plates)
              :plate-layout-name-id plate-layout-name-id
              }       ]
     (crux/submit-tx node [[:crux.tx/put doc]] )
     ps-id))
 
-(defn new-plates [ node ps-id  plate-layout-name-id num-plates ]
-  (let [layout (crux/entity (crux/db node) plate-layout-name-id)
-        plate-format-id (:format-id layout)
+(defn new-plates
+"return a vector of the new plate ids"
+  [ node all-ids layout num-plates]
+  (let [
         unknown-n (:unknown-n layout)
-        plt-ids (dbr/counter node :plate num-plates)
-        plt-id-start (:start plt-ids)
-        plt-id-end (:end plt-ids)
-        sample-ids (dbr/counter node :sample-ids (* unknown-n num-plates))
-
+        ps-id (:plate-set all-ids)
+        plt-id-start (:plate all-ids)
+        spl-id-start (:sample all-ids)
+        user-id (:user-id (crux/entity (crux/db node) :props))
         ]
-    (loop [counter 1
+    (loop [
+           counter 1
+           plt-id plt-id-start 
+           doc   {:crux.db/id (keyword (str "plt" plt-id))
+                :plate-sys-name (str "PLT-" plt-id)
+                :plate-set-id ps-id
+                :id plt-id
+                :user-id user-id
+                :wells #{}
+                :plate-order counter
+            }
 
-           ])
-        
-        doc {:crux.db/id (keyword (str "plt" plt-id))
-             :plate-sys-name (str "PLT-" plt-id)
-             :plate-set-id ps-id
-             :id plt-id
-             :user-id (:user-id (crux/entity (crux/db node) :props))
-             :wells #{}
-             :plate-order
-             }       ]
-    (crux/submit-tx node [[:crux.tx/put doc]] )
-    plt-id))
+           new-plate-ids []
+           dummy (crux/submit-tx node [[:crux.tx/put doc]])]
+           
+          ;; dummy (crux/submit-tx node [[:crux.tx/put doc]])]
+      (if (> counter  num-plates)
+        (println (str num-plates " plates created. " new-plate-ids))
+        (recur
+         (+ counter 1)
+         (+ plt-id 1)
+         {:crux.db/id (keyword (str "plt" plt-id))
+                :plate-sys-name (str "PLT-" plt-id)
+                :plate-set-id ps-id
+                :id plt-id
+                :user-id user-id
+                :wells #{}
+                :plate-order counter
+          }
+         (conj new-plate-ids plt-id)
+         (crux/submit-tx node [[:crux.tx/put doc]])))
+    )))
 
 
-;; (crux/entity (crux/db node) :lyt1)
+(defn new-wells
+  "format: 96, 384, 1535"
+  [node format unknown-n]
+
+  )
+
+;;(def  all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
+;;(new-plates node {:plate-set 11, :plate 54, :sample 5201}  :lyt1 3 )
+
+;; (new-plate-set node "ps-name" "desc" 96 1  :lyt1 3 1 1)
+  
+;; (crux/entity (crux/db node) :plt55)
 ;;(new-plate-set node "MyNewPs" "a test of function" 96 1 1 2 1 1)
 ;;(:plates (crux/entity (crux/db node) :ps2))
                   ;;      (crux/entity (crux/db node ) :plt20)
@@ -112,9 +146,7 @@
             
 
 
-
-
-;;(crux/entity (crux/db node ) :plt9))
+;;(crux/entity (crux/db node ) :spl4649)
 
 ;;(insp/inspect-tree (crux/entity (crux/db node ) :ps1))
 
