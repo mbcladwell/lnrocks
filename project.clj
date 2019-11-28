@@ -9,7 +9,16 @@
   :javac-options     ["-target" "1.8" "-source" "1.8"]
  :dependencies [[org.clojure/clojure "1.10.0"]
                  [juxt/crux-core "RELEASE"]
-                 [juxt/crux-rocksdb "19.09-1.5.0-alpha"]]
+                [juxt/crux-rocksdb "19.09-1.5.0-alpha"]
+                 [com.google.guava/guava "23.0"]
+                 [org.apache/poi "4.0.1"]
+                 [org.apache/poi-ooxml "4.0.1"]
+                 [org.apache.xmlbeans/xmlbeans "3.1.0"]
+                 [org.apache.commons/commons-collections4 "4.2"]
+                 [org.apache.commons/commons-compress"1.18"]
+                 [org.apache.poi/ooxml-schemas "1.4"]
+
+                ]
 :repl-options {:nrepl-middleware
                  [cider.nrepl.middleware.apropos/wrap-apropos
                   cider.nrepl.middleware.classpath/wrap-classpath

@@ -3,7 +3,6 @@
    ;;[clojure.data.csv :as csv]
    [clojure.java.io :as io]
    [crux.api :as crux]
-   [lnrocks.core :as core]
    [lnrocks.db-inserter :as dbi]
    [lnrocks.db-retriever :as dbr]
    [lnrocks.util :as util]
@@ -26,7 +25,8 @@
   :hit-list 0
   :assay-run 0
   :work-list 0
-  :session-id 1}
+  :session-id 1
+  :layout 0}
   )
 
 
@@ -55,7 +55,9 @@
    :user-id 1
    :project-sys-name "PRJ-1"
    :plate-set-sys-name "PS-1"
-   :plate-set-id 1})
+   :plate-set-id 1
+   :plate-id 1
+   :plate-sys-name "PLT-1"})
   
 
 (def helpers

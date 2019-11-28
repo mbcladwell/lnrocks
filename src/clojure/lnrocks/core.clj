@@ -54,120 +54,41 @@
   (map #(dissoc % :id) (filter #(= (:id %) x) coll ) ))
 
 
-(defn new-wells
-  "format: 96, 384, 1535"
-  [node format unknown-n sample-start-id]
-  (let [ 
-        empty-wells (case format
-                      96 util/map96wells
-                      384 util/map384wells
-                      1536 util/map1536wells)
-        well-vec util/ve]
-    
-    (loop [ counter 1
-           spl-id sample-start-id
-           dummy (crux/submit-tx node [[:crux.tx/put {:crux.db/id (keyword (str "spl"  spl-id))
-                                                      :sample-sys-name (str "SPL-"  spl-id )
-                                                      :id  spl-id
-                                                      :accession nil}]])
-           (if (> counter unknown-n )
-             )
-           (recur
-            (+ spl-id 1)
-            (crux/submit-tx node [[:crux.tx/put {:crux.db/id (keyword (str "spl"  spl-id))
-                                                      :sample-sys-name (str "SPL-"  spl-id )
-                                                      :id  spl-id
-                                                      :accession nil}]])
-     )
-    )
-  )
+(defn process-layout-file
+  "processes a user supplied layout file"
+  [x]
+  (into {} { 
+            :well (Integer/parseInt(:well x ))
+            :type  (Integer/parseInt(:type x ))
+           }))
 
 
-(defn new-plates
-"return a vector of the new plate ids"
-  [ node all-ids layout num-plates]
-  (let [
-        unknown-n (:unknown-n layout)
-        ps-id (:plate-set all-ids)
-        plt-id-start (:plate all-ids)
-        spl-id-start (:sample all-ids)
-        user-id (:user-id (crux/entity (crux/db node) :props))
-        ]
-    (loop [
-           counter 1
-           plt-id plt-id-start 
-           doc   {:crux.db/id (keyword (str "plt" plt-id))
-                :plate-sys-name (str "PLT-" plt-id)
-                :plate-set-id ps-id
-                :id plt-id
-                :user-id user-id
-                :wells #{}
-                :plate-order counter
-            }
 
-           new-plate-ids []
-           dummy (crux/submit-tx node [[:crux.tx/put doc]])]
-           
-          ;; dummy (crux/submit-tx node [[:crux.tx/put doc]])]
-      (if (> counter  num-plates)
-        (println (str num-plates " plates created. " new-plate-ids))
+
+(defn new-plate-layout [ plate-layout-name, descr, plate-format-id]
+  (let   [table (util/table-to-map "resources/data/plate_layouts_for_import.txt")
+          layout-data nil ;;(into [] (map #(process-layout-data %) table))
+          table2 (util/table-to-map "resources/data/plate_layout_name.txt")
+          layout-names nil ;;(into [] (map #(process-layout-names %) table2))
+          result (map #(assoc % :layout (extract-data-for-id (:id %)  layout-data)) layout-names)]         
+    (loop [counter 1
+           new-pl  (first (filter #(= (:id %) counter) result))]
+         ;;  dummy    (crux/submit-tx node [[:crux.tx/put new-pl]] )]
+      (if (> counter (+ 1 (count result)))
+        (println "Plate layouts loaded!")
         (recur
          (+ counter 1)
-         (+ plt-id 1)
-         {:crux.db/id (keyword (str "plt" plt-id))
-                :plate-sys-name (str "PLT-" plt-id)
-                :plate-set-id ps-id
-                :id plt-id
-                :user-id user-id
-                :wells #{}
-                :plate-order counter
-          }
-         (conj new-plate-ids plt-id)
-         (crux/submit-tx node [[:crux.tx/put doc]])))
-    )))
+         (first (filter #(= (:id %) counter) result))
+        ;;  (crux/submit-tx node [[:crux.tx/put new-pl]] )
+         )))))
 
-
-(defn new-plate-set [ node ps-name desc plate-format-id plate-type-id  plate-layout-name-id num-plates project-id user-id]
-  (let [
-        layout (crux/entity (crux/db node) plate-layout-name-id)
-        plate-format-id (:format-id layout)
-        unknown-n (:unknown-n layout)    
-        all-ids (dbr/get-ps-plt-spl-ids node  1 num-plates (* num-plates unknown-n) )
-        ps-id (:plate-set all-ids)
-        session-id (:session-id (crux/entity (crux/db node) :props))
-        doc {:crux.db/id (keyword (str "ps" ps-id))
-             :plate-set-sys-name (str "PS-" ps-id)
-             :plate-set-name ps-name
-             :description desc
-             :lnsession-id session-id
-             :plate-format-id plate-format-id
-             :plate-type-id plate-type-id
-             :id ps-id
-             :user-id (:user-id (crux/entity (crux/db node) :props))
-             :num-plates num-plates
-             :project-id project-id
-             :plates (new-plates node all-ids layout num-plates)
-             :plate-layout-name-id plate-layout-name-id
-             }       ]
-    (crux/submit-tx node [[:crux.tx/put doc]] )
-    ps-id))
-
-
+  
 
 ;;(def  all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
-;;(new-plates node {:plate-set 11, :plate 54, :sample 5201}  :lyt1 3 )
+;;(new-plates node {:plate-set 11, :plate 54, :sample 5201}  1 3 true)
 
-;; (new-plate-set node "ps-name" "desc" 96 1  :lyt1 3 1 1)
+;; (new-plate-set node "ps-name" "desc" 96 1  :lyt1 3 1 1 true)
   
-;; (crux/entity (crux/db node) :plt55)
-;;(new-plate-set node "MyNewPs" "a test of function" 96 1 1 2 1 1)
-;;(:plates (crux/entity (crux/db node) :ps2))
-                  ;;      (crux/entity (crux/db node ) :plt20)
-
-;;(def barcode-file "/home/mbc/projects/lnrocks/egdata/barcodes/barcodes.txt")
-;; ps7 has 10 plates
-
-            
 
 
 ;;(crux/entity (crux/db node ) :spl4649)

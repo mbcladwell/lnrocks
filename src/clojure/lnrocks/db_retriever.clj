@@ -1,6 +1,7 @@
 (ns lnrocks.db-retriever
   (:require [clojure.set :as s]
-            [crux.api :as crux])
+            [crux.api :as crux]
+            [clojure.java.browse :as browse])
             ;;   [clojure.data.csv :as csv]
           ;;  [clojure.java.io :as io])            
  ;; (:import [javax.swing.JOptionPane])
@@ -61,7 +62,8 @@
                            :sample 4648
                            ::assay-run 5
                            :hit-list 6
-                           :work-list 0)]
+                           :work-list 0
+                           :layout 42)]
 
    (crux/submit-tx node [[:crux.tx/cas orig-counters new-counters]])
    (println "")
@@ -92,6 +94,16 @@
 
 ;;(get-well-numbers 96)  
 
+(defn get-num-samples-for-plate-set-id
+"subtract nil count from format"
+  [ node n ]
+  (let [
+        ps (crux/entity (crux/db node ) (keyword (str "ps" n)))
+        format (:plate-format-id ps)
+        list-of-well-maps (map #(:wells %) (:plates ps))
+        count-of-nils (reduce + (map #(count %) (map #(filter  (comp nil? last) %) list-of-well-maps)))
+        ]
+    (- (* format (count (:plates ps))) count-of-nils)))
 
 ;;(new-plate-set "my set 1" "desc" 3 96 1 1 1 2 true)
 ;;(:plates (crux/entity (crux/db node ) :PS-13))
@@ -104,84 +116,114 @@
   ;;(count (get-plates-in-project 2))
 
 
+(defn register-session [ node ]
+  (let [
+        old-props (crux/entity (crux/db node ) :props)
+        session-id (counter node :session 1)
+        new-props (assoc old-props :session session-id)
+        dummy   (crux/submit-tx node [[:crux.tx/cas old-props new-props]])
+ 
+        ]
+  session-id
+))
 
 
+(defn get-help-url-prefix [ node ]
+  (:help-url-prefix (crux/entity (crux/db node ) :props)))
 
 
-
-
-;;     (defn get-help-url-prefix []
-;;           (c/get-at! props [:assets :conn :help-url-prefix ]))
-
-
-;; (defn open-help-page [s]
-;;   (browse/browse-url (str (cm/get-help-url-prefix) s)))
+ (defn open-help-page [s]
+   (browse/browse-url (str (get-help-url-prefix) s)))
 
 ;; (defn get-all-data-for-assay-run
 ;;   "provides a map"
 ;;   [ assay-run-id ]
 ;;      )
 
-;; (defn set-project-id [i]
-;;   (c/with-write-transaction [props tx]
-;;     (c/assoc-at tx  [:assets :session :project-id] i)))
+ (defn set-project-id [ node i]
+   (let [
+        old-props (crux/entity (crux/db node ) :props)
+        new-props (assoc old-props :project-id i)
+        dummy   (crux/submit-tx node [[:crux.tx/cas old-props new-props]]) 
+         ]
+    ))
 
-;; ;;https://stackoverflow.com/questions/9457537/why-does-int-10-produce-a-long-instance
-;; ;; dont cast to int, gets promoted to Long upon java interop
-;; (defn get-project-id ^Integer []
-;;   (c/get-at! props [:assets :session :project-id ]))
+;;https://stackoverflow.com/questions/9457537/why-does-int-10-produce-a-long-instance
+;; dont cast to int, gets promoted to Long upon java interop
+(defn get-project-id ^Integer []
+  (:project-id (crux/entity (crux/db node ) :props)))
 
-;; (defn set-project-sys-name [s]
-;;     (c/with-write-transaction [props tx]
-;;         (c/assoc-at tx  [:assets :session :project-sys-name] s)))
-;; ;;(set-project-sys-name "PRJ-??")
-;;   ;;(print-ap)
-
-
-;; (defn get-project-sys-name []
-;;     (c/get-at! props [:assets :session :project-sys-name ]))
-
-;;   (defn set-plate-set-sys-name [s]
-;;       (c/with-write-transaction [props tx]
-
-;;         (c/assoc-at tx  [:assets :session :plate-set-sys-name] s)))
-
-;; (defn get-plate-set-sys-name []
-;;   (c/get-at! props [:assets :session :plate-set-sys-name ]))
-
-;;   (defn set-plate-set-id [i]
-;;       (c/with-write-transaction [props tx]
-
-;;         (c/assoc-at tx  [:assets :session :plate-set-id ] i)))
-
-;; (defn get-plate-set-id []
-;;   (c/get-at! props [:assets :session :plate-set-id ]))
+(defn set-project-sys-name [ node s ]
+   (let [
+        old-props (crux/entity (crux/db node ) :props)
+        new-props (assoc old-props :project-sys-name s)
+        dummy   (crux/submit-tx node [[:crux.tx/cas old-props new-props]]) 
+         ]
+    ))
 
 
-;; (defn set-plate-id [i]
-;;    (c/with-write-transaction [props tx]
-;;         (c/assoc-at tx  [:assets :session :plate-id ] i)))
+ (defn get-project-sys-name [node]
+  (:project-sys-name (crux/entity (crux/db node ) :props)))
 
-;; (defn get-plate-id []
-;;   (c/get-at! props [:assets :session :plate-id ]))
+  (defn set-plate-set-sys-name [ node s]
+    (let [
+        old-props (crux/entity (crux/db node ) :props)
+        new-props (assoc old-props :plate-set-sys-name s)
+        dummy   (crux/submit-tx node [[:crux.tx/cas old-props new-props]]) 
+         ]
+    ))
 
 
-;; (defn get-session-id ^Integer []
-;;   (c/get-at! props [:assets :session :session-id ]))
+  (defn get-plate-set-sys-name [node]
+ (:plate-set-sys-name (crux/entity (crux/db node ) :props)))
 
-;; ;;(get-session-id)
 
-;; (defn set-session-id [i]
-;;   (c/with-write-transaction [props tx]
-;;     (c/assoc-at tx  [:assets :session :session-id] i)))
+    
+  (defn set-plate-set-id [ node i]
+  (let [
+        old-props (crux/entity (crux/db node ) :props)
+        new-props (assoc old-props :plate-set-id i)
+        dummy   (crux/submit-tx node [[:crux.tx/cas old-props new-props]]) 
+         ]
+    ))
+   
+
+ (defn get-plate-set-id [ node ]
+ (:plate-set-id (crux/entity (crux/db node ) :props)))
+
+
+(defn set-plate-id [i]
+  (let [
+        old-props (crux/entity (crux/db node ) :props)
+        new-props (assoc old-props :plate-id i)
+        dummy   (crux/submit-tx node [[:crux.tx/cas old-props new-props]]) 
+         ]
+    ))
+
+ (defn get-plate-id [ node ]
+ (:plate-id (crux/entity (crux/db node ) :props)))
+
+ (defn get-session-id ^Integer [ node ]
+ (:session-id (crux/entity (crux/db node ) :props)))
+
+
+   (defn set-session-id [node i]
+  (let [
+        old-props (crux/entity (crux/db node ) :props)
+        new-props (assoc old-props :session-id i)
+        dummy   (crux/submit-tx node [[:crux.tx/cas old-props new-props]]) 
+         ]
+    ))
+
+
+     
+(defn get-home-dir []
+   (java.lang.System/getProperty "user.home"))
   
-;; (defn get-home-dir []
-;;    (java.lang.System/getProperty "user.home"))
-  
-;; (defn get-temp-dir []
-;;    (java.lang.System/getProperty "java.io.tmpdir"))
+(defn get-temp-dir []
+   (java.lang.System/getProperty "java.io.tmpdir"))
              
   
-;; (defn get-working-dir []
-;;    (java.lang.System/getProperty "user.dir"))
+(defn get-working-dir []
+   (java.lang.System/getProperty "user.dir"))
 
