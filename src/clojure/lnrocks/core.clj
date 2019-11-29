@@ -84,6 +84,21 @@
 
   
 
+(defn get-all-projects [node]
+	(crux/q (crux/db node)
+	        '{:find [n s1 s2 s3]
+	          :where [[e :id n]
+                          [e :project-sys-name s1]
+                          [e :name s2]
+                          [e :description s3]]
+                  :order-by [[n :desc]]})
+
+  )
+
+(get-all-projects node)
+
+;;(crux/entity (crux/db node ) :prj1)
+
 ;;(def  all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
 ;;(new-plates node {:plate-set 11, :plate 54, :sample 5201}  1 3 true)
 
@@ -91,7 +106,6 @@
   
 
 
-;;(crux/entity (crux/db node ) :spl4649)
 
 ;;(insp/inspect-tree (crux/entity (crux/db node ) :ps1))
 

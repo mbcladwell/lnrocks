@@ -150,7 +150,7 @@
 
 ;;https://stackoverflow.com/questions/9457537/why-does-int-10-produce-a-long-instance
 ;; dont cast to int, gets promoted to Long upon java interop
-(defn get-project-id ^Integer []
+(defn get-project-id ^Integer [node]
   (:project-id (crux/entity (crux/db node ) :props)))
 
 (defn set-project-sys-name [ node s ]
@@ -192,7 +192,7 @@
  (:plate-set-id (crux/entity (crux/db node ) :props)))
 
 
-(defn set-plate-id [i]
+(defn set-plate-id [node i]
   (let [
         old-props (crux/entity (crux/db node ) :props)
         new-props (assoc old-props :plate-id i)
@@ -214,8 +214,6 @@
         dummy   (crux/submit-tx node [[:crux.tx/cas old-props new-props]]) 
          ]
     ))
-
-
      
 (defn get-home-dir []
    (java.lang.System/getProperty "user.home"))
