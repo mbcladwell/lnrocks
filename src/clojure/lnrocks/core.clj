@@ -85,15 +85,15 @@
   
 
 (defn get-all-projects [node]
-	(crux/q (crux/db node)
-	        '{:find [n s1 s2 s3]
-	          :where [[e :id n]
-                          [e :project-sys-name s1]
-                          [e :name s2]
-                          [e :description s3]]
-                  :order-by [[n :desc]]})
-
-  )
+(let [data (crux/q (crux/db node)
+	           '{:find [n s1 s2 s3]
+	             :where [[e :id n]
+                             [e :project-sys-name s1]
+                             [e :name s2]
+                             [e :description s3]]
+                     :order-by [[n :desc]]})
+      colnames ["ID" "Sys ID" "Name" "Description"]]
+  (into [] (cons colnames data ))))
 
 (get-all-projects node)
 

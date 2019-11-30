@@ -17,7 +17,8 @@
                  [org.apache.commons/commons-collections4 "4.2"]
                  [org.apache.commons/commons-compress"1.18"]
                  [org.apache.poi/ooxml-schemas "1.4"]
-
+               ;; [incanter/incanter-core "1.9.4"]
+     
                 ]
 :repl-options {:nrepl-middleware
                  [cider.nrepl.middleware.apropos/wrap-apropos

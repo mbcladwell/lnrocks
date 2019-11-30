@@ -2,7 +2,8 @@
   (:require [clojure.string :only [split split-lines trim]]
             [crux.api :as crux]
             [clojure.set :as s]
-            [incanter.stats :as is]
+          ;;  [incanter.stats :as is]
+           
             [lnrocks.util :as util]
             [lnrocks.db-retriever :as dbr]
          ;;    [ln.db-manager :as dbm])
