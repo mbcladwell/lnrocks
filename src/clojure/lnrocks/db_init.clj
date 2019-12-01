@@ -146,7 +146,22 @@
          )))))
 
 
+(def lnusers
+  [{:crux.db/id :lnuser1
+    :id 1
+    :group "administrator"
+    :lnuser_name "ln_admin"
+    :tags #{["ln_admin@labsolns.com"]}
+    :password "welcome"}
 
+   {:crux.db/id :lnuser2
+    :id 2
+    :group "user"
+    :lnuser_name "ln_user"
+    :tags #{["ln_user@labsolns.com"]}
+    :password "welcome"}
+   ]
+  )
 
 (defn process-well-numbers-data
   "processes that tab delimitted, R generated well_numbers for import
@@ -187,12 +202,15 @@ because some are strings, all imported as string
 
 
 
+
+
 (defn initialize-db [node]
   (do
     (crux/submit-tx node [[:crux.tx/put counters]] )
     (crux/submit-tx node [[:crux.tx/put props]] )
     (delay 2000)
     (easy-ingest node helpers)
+    (easy-injest node lnusers)
     (delay 2000)
     (load-well-numbers node)
     (delay 2000)

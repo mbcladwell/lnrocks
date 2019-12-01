@@ -222,7 +222,8 @@
             :plate-type-id (Integer/parseInt (String. (:plate-type-id x)))
             :project-id (Integer/parseInt (String. (:project-id x)))
             :plate-layout-name-id (Integer/parseInt (String. (:plate-layout-name-id x)))
-            :lnsession-id (Integer/parseInt (String. (:lnsession-id x))) }))
+            :lnsession-id (Integer/parseInt (String. (:lnsession-id x)))
+            :owner "ln_admin"}))
 
 
 (defn load-eg-plate-sets
@@ -281,6 +282,7 @@
             :name (:name x )
             :lnsession-id (Integer/parseInt (String. (:lnsession-id x)))
             :id (Integer/parseInt (String. (:id x)))
+            :owner "ln_admin"
             }))
 
 

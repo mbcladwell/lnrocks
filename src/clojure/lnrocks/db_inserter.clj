@@ -201,6 +201,7 @@ here layout is the passed in map"
              :project-id project-id
              :plates (new-plates node all-ids layout num-plates with-samples)
              :plate-layout-name-id plate-layout-name-id
+             :worklists #{}
              }       ]
     (crux/submit-tx node [[:crux.tx/put doc]] )
     ps-id))

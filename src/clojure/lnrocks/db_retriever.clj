@@ -225,3 +225,16 @@
 (defn get-working-dir []
    (java.lang.System/getProperty "user.dir"))
 
+
+(defn get-all-projects [node]
+(let [data (crux/q (crux/db node)
+	           '{:find [n s1 s2 s3]
+	             :where [[e :id n]
+                             [e :project-sys-name s1]
+                             [e :name s2]
+                             [e :description s3]]
+                     :order-by [[n :desc]]})
+      colnames ["ID" "Sys ID" "Name" "Description"]]
+  (into [] (cons colnames data ))))
+
+

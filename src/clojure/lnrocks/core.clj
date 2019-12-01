@@ -84,20 +84,24 @@
 
   
 
-(defn get-all-projects [node]
+(defn get-all-plate-sets [node]
 (let [data (crux/q (crux/db node)
-	           '{:find [n s1 s2 s3]
+	           '{:find [n s1 s2 s3 s4 s5 s6]
 	             :where [[e :id n]
-                             [e :project-sys-name s1]
-                             [e :name s2]
-                             [e :description s3]]
+                             [e :plate-set-sys-name s1]
+                             [e :plate-set-name s2]
+                             [e :plate-format-id s3]
+                             [e :plate-type-id s4]
+                             [e :plate-layout-name-id s5]
+                             [e :descr s6]]
+                            ;; [e :worklist s7]]
                      :order-by [[n :desc]]})
-      colnames ["ID" "Sys ID" "Name" "Description"]]
+      colnames ["PlateSetID" "Name" "Format" "# plates" "Type" "Layout" "Description" "Worklist"]]
   (into [] (cons colnames data ))))
 
-(get-all-projects node)
+(get-all-plate-sets node)
 
-;;(crux/entity (crux/db node ) :prj1)
+;;(crux/entity (crux/db node ) :ps1)
 
 ;;(def  all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
 ;;(new-plates node {:plate-set 11, :plate 54, :sample 5201}  1 3 true)
