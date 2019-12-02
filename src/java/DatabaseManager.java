@@ -1,12 +1,5 @@
 package lnrocks;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,28 +38,28 @@ public class DatabaseManager {
   public DatabaseManager() {
       //LOGGER.info("in session: " + _s);
       IFn require = Clojure.var("clojure.core", "require");
-    require.invoke(Clojure.read("ln.codax-manager"));
-    IFn setUser = Clojure.var("ln.codax-manager", "set-user");
-    IFn setUserID = Clojure.var("ln.codax-manager", "set-user-id");
-    IFn getUserID = Clojure.var("ln.codax-manager", "get-user-id");
-    IFn setAuthenticated = Clojure.var("ln.codax-manager", "set-authenticated");
+    require.invoke(Clojure.read("lnrocks.db-retriever"));
+    IFn setUser = Clojure.var("lnrocks.db-retriever", "set-user");
+    IFn setUserID = Clojure.var("lnrocks.db-retriever", "set-user-id");
+    IFn getUserID = Clojure.var("lnrocks.db-retriever", "get-user-id");
+    IFn setAuthenticated = Clojure.var("lnrocks.db-retriever", "set-authenticated");
     
    
       Long insertKey = 0L;
       try {
-	  Class.forName("org.postgresql.Driver");
-	  IFn getSource = Clojure.var("ln.codax-manager", "get-source");
-	  IFn getDBuser = Clojure.var("ln.codax-manager", "get-db-user");
-	  IFn getDBpassword = Clojure.var("ln.codax-manager", "get-db-password");
-	  IFn getURL = Clojure.var("ln.codax-manager", "get-connection-string");
+	  //  Class.forName("org.postgresql.Driver");
+	  IFn getSource = Clojure.var("lnrocks.db-retriever", "get-source");
+	  IFn getDBuser = Clojure.var("lnrocks.db-retriever", "get-db-user");
+	  IFn getDBpassword = Clojure.var("lnrocks.db-retriever", "get-db-password");
+	  IFn getURL = Clojure.var("lnrocks.db-retriever", "get-connection-string");
    
 	  String target = (String)getSource.invoke();
 	  String url = (String)getURL.invoke(target);
 	  Properties props = new Properties();
-	  props.setProperty("user", (String)getDBuser.invoke());
-	  props.setProperty("password", (String)getDBpassword.invoke());
+	  //  props.setProperty("user", (String)getDBuser.invoke());
+	  //props.setProperty("password", (String)getDBpassword.invoke());
 
-	  conn = DriverManager.getConnection(url, props);	
+	  //conn = DriverManager.getConnection(url, props);	
       
 
       //This is the first initialization of  DatabaseRetriever, DatabaseInserter
@@ -75,8 +68,6 @@ public class DatabaseManager {
        dmf = new DialogMainFrame(this);
     } catch (ClassNotFoundException e) {
       LOGGER.severe("Class not found: " + e);
-    } catch (SQLException sqle) {
-      LOGGER.severe("SQL exception: " + sqle);
     }
   }
 
@@ -84,7 +75,7 @@ public class DatabaseManager {
   public void updateSessionWithProject(String _project_sys_name) {
     int results = 0;
     String project_sys_name = _project_sys_name;
-    IFn setProjectSysName = Clojure.var("ln.codax-manager", "set-project-sys-name");
+    IFn setProjectSysName = Clojure.var("lnrocks.db-retriever", "set-project-sys-name");
   
     setProjectSysName.invoke(project_sys_name);
     // LOGGER.info("Project sys name: " + project_sys_name);
@@ -98,58 +89,15 @@ public class DatabaseManager {
       rs.close();
       st.close();
       // LOGGER.info("projectID: " + results);
-      IFn setProjectID = Clojure.var("ln.codax-manager", "set-project-id");
+      IFn setProjectID = Clojure.var("lnrocks.db-retriever", "set-project-id");
       setProjectID.invoke(results);
 
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }
+    
   }
-    /*
-  public CustomTable getPlateTableData(String _plate_set_sys_name) {
-    try {
-      PreparedStatement pstmt =
-          conn.prepareStatement(
-              "SELECT plate.plate_sys_name AS \"PlateID\", plate_plate_set.plate_order AS \"Order\",  plate_type.plate_type_name As \"Type\", plate_format.format AS \"Format\" FROM plate_set, plate, plate_type, plate_format, plate_plate_set WHERE plate_plate_set.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate_plate_set.plate_id = plate.id AND plate_plate_set.plate_set_id = plate_set.id  AND plate_format.id = plate.plate_format_id ORDER BY plate_plate_set.plate_order DESC;");
-      pstmt.setString(1, _plate_set_sys_name);
-      LOGGER.info("statement: " + pstmt.toString());
-      ResultSet rs = pstmt.executeQuery();
-
-      CustomTable table = new CustomTable(dmf, buildTableModel(rs));
-      LOGGER.info("Got plate table " + table.getSelectedRowsAndHeaderAsStringArray().toString());
-      rs.close();
-      pstmt.close();
-      return table;
-
-    } catch (SQLException sqle) {
-	LOGGER.info("Exception in dbm.getPlateTableData: " + sqle);
-    }
-    return null;
-  }
-
-  public CustomTable getWellTableData(String _plate_sys_name) {
-    try {
-      PreparedStatement pstmt =
-          conn.prepareStatement(
-   
-      "SELECT plate.plate_sys_name AS \"PlateID\", well_numbers.well_name AS \"Well\", well.by_col AS \"Well_NUM\", sample.sample_sys_name AS \"Sample\", sample.accs_id as \"Accession\" FROM  plate, sample, well_sample, well JOIN well_numbers ON ( well.by_col= well_numbers.by_col)  WHERE plate.id = well.plate_id AND well_sample.well_id=well.id AND well_sample.sample_id=sample.id AND well.plate_id = (SELECT plate.id FROM plate WHERE plate.plate_sys_name = ?) AND  well_numbers.plate_format = (SELECT plate_format_id  FROM plate_set WHERE plate_set.ID =  (SELECT plate_set_id FROM plate_plate_set WHERE plate_id = plate.ID LIMIT 1) ) ORDER BY well.by_col DESC;");
-
-
-      
-      pstmt.setString(1, _plate_sys_name);
-      ResultSet rs = pstmt.executeQuery();
-
-      CustomTable table = new CustomTable(dmf, buildTableModel(rs));
-      rs.close();
-      pstmt.close();
-      return table;
-    } catch (SQLException sqle) {
-      LOGGER.severe("Failed to retrieve well data: " + sqle);
-    }
-    return null;
-  }
-*/
-
+ 
   public DefaultTableModel buildTableModel(ResultSet _rs) {
 
     try {

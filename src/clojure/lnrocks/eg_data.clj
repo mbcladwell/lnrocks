@@ -91,7 +91,7 @@
             :assay-run-name (:assay-run-name x )
            :crux.db/id (keyword (str "ar"(:id x )))
            :description (:description x )
-           :assay-type-id (Integer/parseInt (String. (:assay-type-id x)))
+           :assay-type  (case (Integer/parseInt (String.(:assay-type-id x))) 1  "ELISA" 2 "Octet" 3 "SNP" 4 "HCS" 5 "HTRF" 6 "FACS")
            :plate-set-id (Integer/parseInt (String. (:plate-set-id x)))
            :plate-layout-name-id (Integer/parseInt (String. (:plate-layout-name-id x)))
            :lnsession-id (Integer/parseInt (String. (:lnsession-id x)))
@@ -181,6 +181,7 @@
             :id (Integer/parseInt (String. (:id x)))
             :crux.db/id (keyword (str "plt"(:id x )))
             :plate-order (Integer/parseInt (String. (:plate_order x)))
+            :barcode nil
             }))
 
 
@@ -219,11 +220,12 @@
             :plate-set-sys-name (:plate-set-sys-name x )
             :num-plates (Integer/parseInt (String. (:num-plates x)))
             :plate-format-id (Integer/parseInt (String. (:plate-format-id x)))
-            :plate-type-id (Integer/parseInt (String. (:plate-type-id x)))
+            :plate-type (case (Integer/parseInt (String. (:plate-type-id x))) 1 "assay" 2 "rearray" 3 "master" 4 "daughter" 5 "archive" 6 "replicate")
             :project-id (Integer/parseInt (String. (:project-id x)))
             :plate-layout-name-id (Integer/parseInt (String. (:plate-layout-name-id x)))
             :lnsession-id (Integer/parseInt (String. (:lnsession-id x)))
-            :owner "ln_admin"}))
+            :owner "ln_admin"
+            :worklist nil}))
 
 
 (defn load-eg-plate-sets

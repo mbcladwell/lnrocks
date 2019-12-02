@@ -214,7 +214,27 @@
         dummy   (crux/submit-tx node [[:crux.tx/cas old-props new-props]]) 
          ]
     ))
-     
+
+(defn set-user []
+  )
+
+(defn set-user-id []
+  )
+
+(defn get-user-id []
+
+  )
+
+(defn set-authenticated []
+
+  )
+
+(defn get-source [])
+(defn get-db-user [])
+(defn get-db-password [])
+(defn get-connection-string [])
+
+
 (defn get-home-dir []
    (java.lang.System/getProperty "user.home"))
   
@@ -237,4 +257,18 @@
       colnames ["ID" "Sys ID" "Name" "Description"]]
   (into [] (cons colnames data ))))
 
+(defn get-all-plate-sets [node]
+(let [data (crux/q (crux/db node)
+	           '{:find [n s1 s2 s3 s4 s5 s6 ]
+	             :where [[e :id n]
+                             [e :plate-set-sys-name s1]
+                             [e :plate-set-name s2]
+                             [e :plate-format-id s3]
+                             [e :plate-type-id s4]
+                             [e :plate-layout-name-id s5]
+                             [e :descr s6]]
+                            ;; [e :worklist s7]]
+                     :order-by [[n :desc]]})
+      colnames ["PlateSetID" "Name" "Format" "# plates" "Type" "Layout" "Description" "Worklist"]]
+  (into [] (cons colnames data ))))
 

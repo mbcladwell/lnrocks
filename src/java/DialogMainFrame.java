@@ -4,7 +4,6 @@ package lnrocks;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Toolkit;
-import java.sql.SQLException;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -45,10 +44,9 @@ public class DialogMainFrame extends JFrame {
     public static final int ALLWELLS = 6; //Card with plates but all plates for project
 
  
-  public DialogMainFrame(DatabaseManager _dbm ) throws SQLException {
+  public DialogMainFrame(DatabaseManager _dbm ) {
       // session = _s;
       dbm = _dbm;
-      require.invoke(Clojure.read("ln.codax-manager"));
       utils = new Utilities(this);
       this.setTitle("LIMS*Nucleus");
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -84,47 +84,40 @@
 
   
 
-(defn get-all-plate-sets [node]
+(defn get-all-plates-for-ps [node ps-id]
 (let [data (crux/q (crux/db node)
-	           '{:find [n s1 s2 s3 s4 s5 s6]
+	           '{:find [n i i2 ]
 	             :where [[e :id n]
-                             [e :plate-set-sys-name s1]
-                             [e :plate-set-name s2]
-                             [e :plate-format-id s3]
-                             [e :plate-type-id s4]
-                             [e :plate-layout-name-id s5]
-                             [e :descr s6]]
-                            ;; [e :worklist s7]]
+                             [e :plate-order i]
+                             [e :plate-set-id i2]
+                             ]
                      :order-by [[n :desc]]})
-      colnames ["PlateSetID" "Name" "Format" "# plates" "Type" "Layout" "Description" "Worklist"]]
+      colnames ["PlateID" "Order" "Plate Set ID"]]
   (into [] (cons colnames data ))))
 
-(get-all-plate-sets node)
+(get-all-plates-for-ps node 1)
 
 ;;(crux/entity (crux/db node ) :ps1)
+;;(insp/inspect-tree (crux/entity (crux/db node ) :ps1))
 
 ;;(def  all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
 ;;(new-plates node {:plate-set 11, :plate 54, :sample 5201}  1 3 true)
 
 ;; (new-plate-set node "ps-name" "desc" 96 1  :lyt1 3 1 1 true)
   
-
-
-
-;;(insp/inspect-tree (crux/entity (crux/db node ) :ps1))
-
 ;;(insp/inspect-tree (crux/entity (crux/db node) :prj1))
            
 ;;(count prj1)
 ;;(crux/submit-tx node [[:crux.tx/put a]] )
 
-;;(insp/inspect-tree (crux/entity (crux/db node) :prj1))
+;;(insp/inspect-tree (crux/entity (crux/db node) :ar1))
 
+;;(insp/inspect-tree (lnrocks.eg-data/load-assay-run-data node))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-
-(println "In main"))
+  (println "In main")
+  (lnrocks.DatabaseManager. ))
 
 

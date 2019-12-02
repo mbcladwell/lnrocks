@@ -210,7 +210,7 @@ because some are strings, all imported as string
     (crux/submit-tx node [[:crux.tx/put props]] )
     (delay 2000)
     (easy-ingest node helpers)
-    (easy-injest node lnusers)
+    (easy-ingest node lnusers)
     (delay 2000)
     (load-well-numbers node)
     (delay 2000)
