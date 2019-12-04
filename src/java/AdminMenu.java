@@ -32,13 +32,13 @@ public class AdminMenu extends JMenu {
     
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  public AdminMenu(DatabaseManager _dbm, CustomTable _project_table) {
-      dbm = _dbm;
-      dmf = dbm.getDialogMainFrame();
+  public AdminMenu(DialogMainFrame _dmf, CustomTable _project_table) {
+      
+      dmf = _dmf;
       utils = new Utilities(dmf);
     project_table = _project_table;
     //session = dmf.getSession();
-    require.invoke(Clojure.read("ln.codax-manager"));
+    require.invoke(Clojure.read("lnrocks.core"));
     
     this.setText("Admin");
     this.setMnemonic(KeyEvent.VK_A);
@@ -111,7 +111,7 @@ public class AdminMenu extends JMenu {
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 	      try{
-		      IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+		      IFn getUser = Clojure.var("lnrocks.core", "get-user");
  
 		  int rowIndex = project_table.getSelectedRow();
 		  String projectid = project_table.getValueAt(rowIndex, 0).toString();
@@ -187,7 +187,7 @@ public class AdminMenu extends JMenu {
     menuItem.addActionListener(
 	   new ActionListener() {
 	       public void actionPerformed(ActionEvent e) {
-	       		      IFn getAllProps = Clojure.var("ln.codax-manager", "get-all-props");
+	       		      IFn getAllProps = Clojure.var("lnrocks.core", "get-all-props");
 
 			      new DialogPropertiesNotFound(getAllProps.invoke());
 		 		   	      

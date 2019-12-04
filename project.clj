@@ -11,6 +11,8 @@
                  [juxt/crux-core "RELEASE"]
                 [juxt/crux-rocksdb "19.09-1.5.0-alpha"]
                  [com.google.guava/guava "23.0"]
+          [javax.swing/jlfgr "1.0"]
+       
                  [org.apache/poi "4.0.1"]
                  [org.apache/poi-ooxml "4.0.1"]
                  [org.apache.xmlbeans/xmlbeans "3.1.0"]

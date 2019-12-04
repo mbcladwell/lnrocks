@@ -72,71 +72,71 @@ public class DatabaseManager {
   }
 
 
-  public void updateSessionWithProject(String _project_sys_name) {
-    int results = 0;
-    String project_sys_name = _project_sys_name;
-    IFn setProjectSysName = Clojure.var("lnrocks.db-retriever", "set-project-sys-name");
+  // public void updateSessionWithProject(String _project_sys_name) {
+  //   int results = 0;
+  //   String project_sys_name = _project_sys_name;
+  //   IFn setProjectSysName = Clojure.var("lnrocks.db-retriever", "set-project-sys-name");
   
-    setProjectSysName.invoke(project_sys_name);
-    // LOGGER.info("Project sys name: " + project_sys_name);
-    try {
-      String query =
-          new String("SELECT id FROM project WHERE project_sys_name = '" + project_sys_name + "';");
-      Statement st = conn.createStatement();
-      ResultSet rs = st.executeQuery(query);
-      rs.next();
-      results = rs.getInt("id");
-      rs.close();
-      st.close();
-      // LOGGER.info("projectID: " + results);
-      IFn setProjectID = Clojure.var("lnrocks.db-retriever", "set-project-id");
-      setProjectID.invoke(results);
+  //   setProjectSysName.invoke(project_sys_name);
+  //   // LOGGER.info("Project sys name: " + project_sys_name);
+  //   try {
+  //     String query =
+  //         new String("SELECT id FROM project WHERE project_sys_name = '" + project_sys_name + "';");
+  //     Statement st = conn.createStatement();
+  //     ResultSet rs = st.executeQuery(query);
+  //     rs.next();
+  //     results = rs.getInt("id");
+  //     rs.close();
+  //     st.close();
+  //     // LOGGER.info("projectID: " + results);
+  //     IFn setProjectID = Clojure.var("lnrocks.db-retriever", "set-project-id");
+  //     setProjectID.invoke(results);
 
-    } catch (SQLException sqle) {
-      LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
-    }
+  //   } catch (SQLException sqle) {
+  //     LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
+  //   }
     
-  }
+  // }
  
-  public DefaultTableModel buildTableModel(ResultSet _rs) {
+  // public DefaultTableModel buildTableModel(ResultSet _rs) {
 
-    try {
-      ResultSet rs = _rs;
-      ResultSetMetaData metaData = rs.getMetaData();
-      int columnCount = metaData.getColumnCount();
+  //   try {
+  //     ResultSet rs = _rs;
+  //     ResultSetMetaData metaData = rs.getMetaData();
+  //     int columnCount = metaData.getColumnCount();
 
-      Vector<Vector<Object>> data = new Vector<Vector<Object>>();
-      Vector<String> columnNames = new Vector<String>();
-      /*
-      String[] columnNames = new String[columnCount];
-      for (int column = 0; column < columnCount; column++) {
-        columnNames[column] = metaData.getColumnName(column + 1);
-      }
-      */
-      for (int column = 0; column < columnCount; column++) {
-        columnNames.addElement(metaData.getColumnName(column + 1));
-      }
+  //     Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+  //     Vector<String> columnNames = new Vector<String>();
+  //     /*
+  //     String[] columnNames = new String[columnCount];
+  //     for (int column = 0; column < columnCount; column++) {
+  //       columnNames[column] = metaData.getColumnName(column + 1);
+  //     }
+  //     */
+  //     for (int column = 0; column < columnCount; column++) {
+  //       columnNames.addElement(metaData.getColumnName(column + 1));
+  //     }
 
-      // data of the table
-      while (rs.next()) {
-        Vector<Object> vector = new Vector<Object>();
+  //     // data of the table
+  //     while (rs.next()) {
+  //       Vector<Object> vector = new Vector<Object>();
 
-        for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-          vector.add(rs.getObject(columnIndex + 1));
-        }
-        data.add(vector);
-      }
-      // LOGGER.info("data: " + data);
-      return new DefaultTableModel(data, columnNames);
+  //       for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+  //         vector.add(rs.getObject(columnIndex + 1));
+  //       }
+  //       data.add(vector);
+  //     }
+  //     // LOGGER.info("data: " + data);
+  //     return new DefaultTableModel(data, columnNames);
 
-      //          data.stream().map(List::toArray).toArray(Object[][]::new), columnNames);
+  //     //          data.stream().map(List::toArray).toArray(Object[][]::new), columnNames);
 
-    } catch (SQLException sqle) {
-      LOGGER.severe("SQLException in buildTableModel: " + sqle);
-    }
+  //   } catch (SQLException sqle) {
+  //     LOGGER.severe("SQLException in buildTableModel: " + sqle);
+  //   }
 
-    return null;
-  }
+  //   return null;
+  // }
 
   /**
    * ******************************************************************
@@ -306,61 +306,61 @@ public class DatabaseManager {
      * In DatabaseManager (instead of DatabaseRetriever) because this is an early query
      * prior to instantiation of DatabaseRetriever.
      */
-  public int getUserIDForUserName(String _user_name) {
-    String user_name = _user_name;
-    // int plate_set_id;
+  // public int getUserIDForUserName(String _user_name) {
+  //   String user_name = _user_name;
+  //   // int plate_set_id;
 
-    try {
-      PreparedStatement pstmt =
-          conn.prepareStatement(
-              "SELECT lnuser.id FROM lnuser WHERE lnuser_name = ?;");
+  //   try {
+  //     PreparedStatement pstmt =
+  //         conn.prepareStatement(
+  //             "SELECT lnuser.id FROM lnuser WHERE lnuser_name = ?;");
 
-      pstmt.setString(1, user_name);
-      ResultSet rs = pstmt.executeQuery();
-      rs.next();
-      int lnuser_id = Integer.valueOf(rs.getString("id"));
+  //     pstmt.setString(1, user_name);
+  //     ResultSet rs = pstmt.executeQuery();
+  //     rs.next();
+  //     int lnuser_id = Integer.valueOf(rs.getString("id"));
 
-      // LOGGER.info("result: " + plate_set_id);
-      rs.close();
-      pstmt.close();
-      return lnuser_id;
+  //     // LOGGER.info("result: " + plate_set_id);
+  //     rs.close();
+  //     pstmt.close();
+  //     return lnuser_id;
 
-    } catch (SQLException sqle) {
-      LOGGER.severe("SQL exception getting plateset_id: " + sqle);
-    }
-    int dummy = -1;
-    return dummy;
-  }
+  //   } catch (SQLException sqle) {
+  //     LOGGER.severe("SQL exception getting plateset_id: " + sqle);
+  //   }
+  //   int dummy = -1;
+  //   return dummy;
+  // }
 
         /**
      * In DatabaseManager (instead of DatabaseRetriever) because this is an early query
      * prior to instantiation of DatabaseRetriever.
      */
-  public String getUserGroupForUserName(String _user_name) {
-    String user_name = _user_name;
-    // int plate_set_id;
+  // public String getUserGroupForUserName(String _user_name) {
+  //   String user_name = _user_name;
+  //   // int plate_set_id;
 
-    try {
-      PreparedStatement pstmt =
-          conn.prepareStatement(
-              "SELECT lnuser_groups.usergroup FROM lnuser, lnuser_groups WHERE lnuser.lnuser_name = ? AND lnuser.usergroup=lnuser_groups.id;");
+  //   try {
+  //     PreparedStatement pstmt =
+  //         conn.prepareStatement(
+  //             "SELECT lnuser_groups.usergroup FROM lnuser, lnuser_groups WHERE lnuser.lnuser_name = ? AND lnuser.usergroup=lnuser_groups.id;");
 
-      pstmt.setString(1, user_name);
-      ResultSet rs = pstmt.executeQuery();
-      rs.next();
-      String usergroup = rs.getString("usergroup");
+  //     pstmt.setString(1, user_name);
+  //     ResultSet rs = pstmt.executeQuery();
+  //     rs.next();
+  //     String usergroup = rs.getString("usergroup");
 
-      // LOGGER.info("result: " + plate_set_id);
-      rs.close();
-      pstmt.close();
-      return usergroup;
+  //     // LOGGER.info("result: " + plate_set_id);
+  //     rs.close();
+  //     pstmt.close();
+  //     return usergroup;
 
-    } catch (SQLException sqle) {
-      LOGGER.severe("SQL exception getting plateset_id: " + sqle);
-    }
-    String dummy = "error";
-    return dummy;
-  }
+  //   } catch (SQLException sqle) {
+  //     LOGGER.severe("SQL exception getting plateset_id: " + sqle);
+  //   }
+  //   String dummy = "error";
+  //   return dummy;
+  // }
 
     public DialogMainFrame getDialogMainFrame(){
 	return this.dmf;

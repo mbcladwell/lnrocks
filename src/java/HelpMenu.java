@@ -28,7 +28,7 @@ public class HelpMenu extends JMenu {
 
   public HelpMenu( ) {
       //      session = _s;
-    require.invoke(Clojure.read("ln.codax-manager"));
+    require.invoke(Clojure.read("lnrocks.core"));
 
     this.setText("Help");
     this.setMnemonic(KeyEvent.VK_H);
@@ -38,10 +38,10 @@ public class HelpMenu extends JMenu {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	       IFn getHelpURLPrefix = Clojure.var("ln.codax-manager", "get-help-url-prefix");
+	       IFn getHelpURLPrefix = Clojure.var("lnrocks.core", "get-help-url-prefix");
 
 	      openWebpage(URI.create((String)getHelpURLPrefix.invoke() + "toc"));
-	      System.out.println((String)getHelpURLPrefix.invoke() + "toc");
+	      //System.out.println((String)getHelpURLPrefix.invoke() + "toc");
 	      //            new OpenHelpDialog();
           }
         });

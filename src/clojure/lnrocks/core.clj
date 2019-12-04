@@ -5,7 +5,8 @@
             [lnrocks.db-inserter :as dbi]
            [lnrocks.db-init :as init]
            [lnrocks.eg-data :as egd]
-            
+           [clojure.java.browse :as browse]
+
             [clojure.inspector :as insp]
             [clojure.java.io :as io]
             [clojure.set :as s]
@@ -97,6 +98,28 @@
 
 (get-all-plates-for-ps node 1)
 
+(defn get-all-projects []
+  (dbr/get-all-projects node))
+
+ (defn get-session-id ^Integer [ ]
+ (:session-id (crux/entity (crux/db node ) :props)))
+
+ (defn get-user-group [ ]
+ (:user-group (crux/entity (crux/db node ) :props)))
+
+(defn get-help-url-prefix [ ]
+  (:help-url-prefix (crux/entity (crux/db node ) :props)))
+
+ (defn open-help-page [s]
+   (browse/browse-url (str (get-help-url-prefix) s)))
+
+(defn get-project-sys-name [])
+
+(defn get-plate-set-sys-name [])
+
+(defn get-plate-sys-name [])
+
+
 ;;(crux/entity (crux/db node ) :ps1)
 ;;(insp/inspect-tree (crux/entity (crux/db node ) :ps1))
 
@@ -118,6 +141,6 @@
   "I don't do a whole lot ... yet."
   [& args]
   (println "In main")
-  (lnrocks.DatabaseManager. ))
+  (lnrocks.DialogMainFrame. ))
 
 

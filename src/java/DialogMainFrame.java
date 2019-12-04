@@ -5,13 +5,17 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Toolkit;
 import java.util.logging.Logger;
+import java.util.*;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
+import clojure.lang.PersistentVector;
 
 public class DialogMainFrame extends JFrame {
 
@@ -26,9 +30,11 @@ public class DialogMainFrame extends JFrame {
     private AllPlatesPanel all_plates_card; //plates in Project
   private WellPanel well_card;
   private AllWellsPanel all_wells_card;
-
+    private PersistentVector colnames;
+    private PersistentVector data;
+    
   private static Utilities utils;
-    private DatabaseManager dbm;
+//    private DatabaseManager dbm;
     //private DatabaseRetriever dbr;
     // private static Session session;
   private  IFn require = Clojure.var("clojure.core", "require");
@@ -44,22 +50,26 @@ public class DialogMainFrame extends JFrame {
     public static final int ALLWELLS = 6; //Card with plates but all plates for project
 
  
-  public DialogMainFrame(DatabaseManager _dbm ) {
+  public DialogMainFrame() {
       // session = _s;
-      dbm = _dbm;
+  //    dbm = _dbm;
       utils = new Utilities(this);
       this.setTitle("LIMS*Nucleus");
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       ImageIcon img = new ImageIcon(this.getClass().getResource("/images/mwplate.png"));
       this.setIconImage(img.getImage());
       //dbr = session.getDatabaseRetriever();
-   
+    require.invoke(Clojure.read("lnrocks.core"));
+    IFn getAllProjects = Clojure.var("lnrocks.core", "get-all-projects");
+
     /////////////////////////////////////////////
     // set up the project table
    
     cards = new JPanel(new CardLayout());
     card_layout = (CardLayout) cards.getLayout();
-    project_card = new ProjectPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(0, DialogMainFrame.PROJECT));
+    
+    CustomTable projectTable = new CustomTable(this, buildTableModel((Map)getAllProjects.invoke()));
+    project_card = new ProjectPanel(this, projectTable);
     cards.add(project_card, "ProjectPanel");
   
     
@@ -77,65 +87,68 @@ public class DialogMainFrame extends JFrame {
     return project_card;
   }
 
-      public PlateSetPanel getPlateSetPanel() {
-    return plate_set_card;
-  }
+//      public PlateSetPanel getPlateSetPanel() {
+ //   return plate_set_card;
+ // }
 
 
   public void showProjectTable() {
-    project_card = new ProjectPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(0, DialogMainFrame.PROJECT));
-    cards.add(project_card, "ProjectPanel");
-    card_layout.show(cards, "ProjectPanel");
+      IFn getAllProjects = Clojure.var("lnrocks.core", "get-all-projects");
+      
+      project_card = new ProjectPanel(this, (CustomTable)getAllProjects.invoke());
+      cards.add(project_card, "ProjectPanel");
+      card_layout.show(cards, "ProjectPanel");
   }
 
     
-  public void showPlateSetTable(String _project_sys_name) {
-      int project_id = Integer.parseInt(_project_sys_name.substring(4));
+ public void showPlateSetTable(String _project_sys_name) {
+     int project_id = Integer.parseInt(_project_sys_name.substring(4));
      
-      //  plate_set_card = new PlateSetPanel(dbm, dbm.getPlateSetTableData(_project_sys_name), _project_sys_name);
-      plate_set_card = new PlateSetPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.PLATESET), _project_sys_name);
+   //     plate_set_card = new PlateSetPanel(dbm, dbm.getPlateSetTableData(_project_sys_name), _project_sys_name);
+   //   plate_set_card = new PlateSetPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.PLATESET), _project_sys_name);
 
-    cards.add(plate_set_card, "PlateSetPanel");
-    card_layout.show(cards, "PlateSetPanel");
-  }
+   // cards.add(plate_set_card, "PlateSetPanel");
+   // card_layout.show(cards, "PlateSetPanel");
+
+ }
 
 
-  public void showPlateTable(String _plate_set_sys_name) {
+    public void showPlateTable(String _plate_set_sys_name) {
       
-      int plate_set_id = Integer.parseInt(_plate_set_sys_name.substring(3));
+     int plate_set_id = Integer.parseInt(_plate_set_sys_name.substring(3));
       
-      plate_card = new PlatePanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(plate_set_id, DialogMainFrame.PLATE), _plate_set_sys_name);
+   //   plate_card = new PlatePanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(plate_set_id, DialogMainFrame.PLATE), _plate_set_sys_name);
     
-    cards.add(plate_card, "PlatePanel");
-    card_layout.show(cards, "PlatePanel");
-  }
+   // cards.add(plate_card, "PlatePanel");
+   // card_layout.show(cards, "PlatePanel");
+ }
 
-      public void showAllPlatesTable(String _project_sys_name) {
+  //    public void showAllPlatesTable(String _project_sys_name) {
       
-      int project_id = Integer.parseInt(_project_sys_name.substring(4));
+    //  int project_id = Integer.parseInt(_project_sys_name.substring(4));
       
-      all_plates_card = new AllPlatesPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.ALLPLATES), _project_sys_name);
+  //    all_plates_card = new AllPlatesPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.ALLPLATES), _project_sys_name);
     
-    cards.add(all_plates_card, "AllPlatesPanel");
-    card_layout.show(cards, "AllPlatesPanel");
-  }
+  //  cards.add(all_plates_card, "AllPlatesPanel");
+  //  card_layout.show(cards, "AllPlatesPanel");
+ // }
 
 
-  public void showWellTable(String _plate_sys_name) {
-      int plate_id = Integer.parseInt(_plate_sys_name.substring(4));
-      System.out.println(plate_id);
-      well_card = new WellPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(plate_id, DialogMainFrame.WELL));
-      cards.add(well_card, "Well");
-      card_layout.show(cards, "Well");
-  }
+  // public void showWellTable(String _plate_sys_name) {
+  //     int plate_id = Integer.parseInt(_plate_sys_name.substring(4));
+  //     System.out.println(plate_id);
+  //     well_card = new WellPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(plate_id, DialogMainFrame.WELL));
+  //     cards.add(well_card, "Well");
+  //     card_layout.show(cards, "Well");
+  // }
 
-      public void showAllWellsTable(String _project_sys_name) {
-      int project_id = Integer.parseInt(_project_sys_name.substring(4));
+  //     public void showAllWellsTable(String _project_sys_name) {
+  //     int project_id = Integer.parseInt(_project_sys_name.substring(4));
       
-      all_wells_card = new AllWellsPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.ALLWELLS), _project_sys_name);
-      cards.add(all_wells_card, "AllWells");
-      card_layout.show(cards, "AllWells");
-  }
+  //     all_wells_card = new AllWellsPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.ALLWELLS), _project_sys_name);
+  //     cards.add(all_wells_card, "AllWells");
+  //     card_layout.show(cards, "AllWells");
+  // }
 
     /**
      * The "flip" methods are used with the up button to return to a previous card
@@ -145,23 +158,23 @@ public class DialogMainFrame extends JFrame {
     card_layout.show(cards, "ProjectPanel");
   }
     
-    public void flipToPlateSet() {
-    card_layout.show(cards, "PlateSetPanel");
-  }
+  //   public void flipToPlateSet() {
+  //   card_layout.show(cards, "PlateSetPanel");
+  // }
 
 
-  public void flipToPlate() {
-    card_layout.show(cards, "PlatePanel");
-  }
+  // public void flipToPlate() {
+  //   card_layout.show(cards, "PlatePanel");
+  // }
     
-  public void flipToWell() {
-    card_layout.show(cards, "Well");
-  }
+  // public void flipToWell() {
+  //   card_layout.show(cards, "Well");
+  // }
 
       
-  public DatabaseManager getDatabaseManager() {
-    return this.dbm;
-  }
+  // public DatabaseManager getDatabaseManager() {
+  //   return this.dbm;
+  // }
     
 
     
@@ -174,8 +187,39 @@ public class DialogMainFrame extends JFrame {
 	    this.setTitle("LIMS*Nucleus::" + s);}
     }
   public void updateProjectPanel() {
-
-
       
   }
+
+    public DefaultTableModel buildTableModel(Map<String, PersistentVector> hm) {
+	 
+	PersistentVector colnames = hm.get(":colnames");
+        PersistentVector predata = hm.get(":data");
+	int columnCount = colnames.count();
+	
+	Vector<String> columnNames = new Vector<String>();
+
+	for (int column = 0; column < columnCount; column++) {
+	  //	  System.out.println((colnames.get(column)).toString());
+	  columnNames.addElement(colnames.get(column).toString());
+      }
+    //   // data of the table
+      Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+ 	 int rowCount = predata.count();
+      for (int row = 0; row < rowCount; row++) {
+   
+        Vector<Object> vector = new Vector<Object>();
+
+         for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+	     vector.add(((PersistentVector)predata.get(row)).get(columnIndex).toString());
+	       //vector.add(rs.getObject(columnIndex));
+        }
+         data.add(vector);
+      }
+      // LOGGER.info("data: " + data);
+       return new DefaultTableModel(data, columnNames);
+
+    //   //          data.stream().map(List::toArray).toArray(Object[][]::new), columnNames);
+
+  }
+
 }

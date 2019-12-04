@@ -26,10 +26,9 @@ public class ProjectPanel extends JPanel {
   private CustomTable table;
   private JScrollPane scrollPane;
   private DialogMainFrame dmf;
-    private DatabaseManager dbm;
     private JPanel textPanel;
   private ListSelectionModel listSelectionModel;
-    // private Session session;
+    //     private Session session;
       // private SharedListSelectionHandler sharedListSelectionHandler;
   /**
    * To accomodate all components place panels within panels.
@@ -42,13 +41,15 @@ public class ProjectPanel extends JPanel {
    * NORTH: table<br>
    * SOUTH: filter<br>
    */
-  public ProjectPanel(DatabaseManager _dbm, CustomTable _table) {
+  public ProjectPanel(DialogMainFrame _dmf, CustomTable _table) {
     this.setLayout(new BorderLayout());
-    dbm = _dbm;
-    dmf = dbm.getDialogMainFrame();
-    // session = dmf.getSession();
+   
+    dmf = _dmf;
     table = _table;
-    require.invoke(Clojure.read("ln.codax-manager"));
+    require.invoke(Clojure.read("lnrocks.core"));
+       IFn getSessionID = Clojure.var("lnrocks.core", "get-session-id");
+       //session = (int)getSessionID.invoke();
+
     /*
         listSelectionModel = table.getSelectionModel();
         sharedListSelectionHandler = new SharedListSelectionHandler();
@@ -69,7 +70,7 @@ public class ProjectPanel extends JPanel {
 
     JPanel headerPanel = new JPanel();
     headerPanel.setLayout(new BorderLayout());
-    headerPanel.add(new MenuBarForProject(dbm, table), BorderLayout.NORTH);
+     headerPanel.add(new MenuBarForProject(dmf, table), BorderLayout.NORTH);
 
     textPanel = new JPanel();
     textPanel.setLayout(new GridBagLayout());
@@ -86,32 +87,32 @@ public class ProjectPanel extends JPanel {
     c.gridy = 1;
     textPanel.add(label, c);
 
-         IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+    //      IFn getUser = Clojure.var("lnrocks.core", "get-user");
 
-	 JLabel userLabel = new JLabel((String)getUser.invoke(), SwingConstants.LEFT);
-    c.gridx = 1;
-    c.gridy = 0;
-    // c.gridwidth = 3;
-    c.weightx = 0.9;
-    c.fill = GridBagConstraints.HORIZONTAL;
-    c.anchor = GridBagConstraints.LINE_START;
-    textPanel.add(userLabel, c);
+    // 	 JLabel userLabel = new JLabel((String)getUser.invoke(), SwingConstants.LEFT);
+    // c.gridx = 1;
+    // c.gridy = 0;
+    // // c.gridwidth = 3;
+    // c.weightx = 0.9;
+    // c.fill = GridBagConstraints.HORIZONTAL;
+    // c.anchor = GridBagConstraints.LINE_START;
+    // textPanel.add(userLabel, c);
 
-        IFn getUserGroup = Clojure.var("ln.codax-manager", "get-user-group");
+    //     IFn getUserGroup = Clojure.var("lnrocks.core", "get-user-group");
 
-	JLabel groupLabel = new JLabel((String)getUserGroup.invoke(), SwingConstants.LEFT);
-    c.gridx = 1;
-    c.gridy = 1;
-    textPanel.add(groupLabel, c);
-    headerPanel.add(textPanel, BorderLayout.CENTER);
+    // 	JLabel groupLabel = new JLabel((String)getUserGroup.invoke(), SwingConstants.LEFT);
+    // c.gridx = 1;
+    // c.gridy = 1;
+    // textPanel.add(groupLabel, c);
+    // headerPanel.add(textPanel, BorderLayout.CENTER);
 
     this.add(headerPanel, BorderLayout.NORTH);
 
     scrollPane = new JScrollPane(table);
     this.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
-    FilterPanel fp = new FilterPanel(dbm, table, 0, DialogMainFrame.PROJECT );
-    this.add(fp, BorderLayout.SOUTH);
+       FilterPanel fp = new FilterPanel(dmf, table, 0, DialogMainFrame.PROJECT );
+    // this.add(fp, BorderLayout.SOUTH);
   }
 
   public JTable getTable() {
@@ -119,8 +120,10 @@ public class ProjectPanel extends JPanel {
   }
 
   public void updatePanel() {
+        IFn getAllProjects = Clojure.var("lnrocks.core", "get-all-projects");
+
       //CustomTable table = session.getDatabaseManager().getProjectTableData();
-      CustomTable table = dbm.getDatabaseRetriever().getDMFTableData(0, DialogMainFrame.PROJECT);
+	CustomTable table = (CustomTable)getAllProjects.invoke();
     DefaultTableModel model = (DefaultTableModel) table.getModel();
     this.table.setModel(model);
   }

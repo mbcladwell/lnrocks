@@ -41,13 +41,13 @@ public class FilterPanel extends JPanel {
   /**
    * @param id the project/plateset/plate etc id for fetching the main table
  */
-    public FilterPanel(DatabaseManager _dbm, JTable _table, int _id, int _entity_type) {
+    public FilterPanel(DialogMainFrame _dmf, JTable _table, int _id, int _entity_type) {
 	
     this.setLayout(new GridBagLayout());
-    dbm = _dbm;
-    dmf = dbm.getDialogMainFrame();
+    
+    dmf = _dmf;
     //session = parent.getSession();
-    require.invoke(Clojure.read("ln.codax-manager"));
+    require.invoke(Clojure.read("lnrocks.core"));
    
     table = _table;
     id = _id;
@@ -76,15 +76,15 @@ public class FilterPanel extends JPanel {
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 	      System.out.println("entity: " + entity_type);
-	      IFn getProjectSysName = Clojure.var("ln.codax-manager", "get-project-sys-name");
-	      IFn getPlateSetSysName = Clojure.var("ln.codax-manager", "get-plate-set-sys-name");
-	      IFn getPlateSysName = Clojure.var("ln.codax-manager", "get-plate-sys-name");
+	      IFn getProjectSysName = Clojure.var("lnrocks.core", "get-project-sys-name");
+	      IFn getPlateSetSysName = Clojure.var("lnrocks.core", "get-plate-set-sys-name");
+	      IFn getPlateSysName = Clojure.var("lnrocks.core", "get-plate-sys-name");
 	      switch(entity_type){
-	      case DialogMainFrame.PROJECT: dbm.getDialogMainFrame().showProjectTable();
+	      case DialogMainFrame.PROJECT: dmf.showProjectTable();
 		  break;
-	      case DialogMainFrame.PLATESET: dbm.getDialogMainFrame().showPlateSetTable((String)getProjectSysName.invoke());
+	      case DialogMainFrame.PLATESET: dmf.showPlateSetTable((String)getProjectSysName.invoke());
 		  break;
-	      case DialogMainFrame.PLATE: dbm.getDialogMainFrame().showPlateTable((String)getPlateSetSysName.invoke());
+	      case DialogMainFrame.PLATE: dmf.showPlateTable((String)getPlateSetSysName.invoke());
 		  break;
 		  //      case DialogMainFrame.WELL: dbm.getDialogMainFrame().showWellTable();
 	      }

@@ -128,12 +128,8 @@
 ))
 
 
-(defn get-help-url-prefix [ node ]
-  (:help-url-prefix (crux/entity (crux/db node ) :props)))
 
 
- (defn open-help-page [s]
-   (browse/browse-url (str (get-help-url-prefix) s)))
 
 ;; (defn get-all-data-for-assay-run
 ;;   "provides a map"
@@ -203,8 +199,6 @@
  (defn get-plate-id [ node ]
  (:plate-id (crux/entity (crux/db node ) :props)))
 
- (defn get-session-id ^Integer [ node ]
- (:session-id (crux/entity (crux/db node ) :props)))
 
 
    (defn set-session-id [node i]
@@ -254,8 +248,12 @@
                              [e :name s2]
                              [e :description s3]]
                      :order-by [[n :desc]]})
-      colnames ["ID" "Sys ID" "Name" "Description"]]
-  (into [] (cons colnames data ))))
+      colnames ["ID" "Sys ID" "Name" "Description"] ]
+  (into {} (java.util.HashMap.
+            {":colnames" colnames
+             ":data" data}))))
+
+
 
 (defn get-all-plate-sets [node]
 (let [data (crux/q (crux/db node)

@@ -30,14 +30,14 @@ public class MenuBarForProject extends JMenuBar {
 
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  public MenuBarForProject(DatabaseManager _dbm, CustomTable _project_table) {
+  public MenuBarForProject(DialogMainFrame _dmf, CustomTable _project_table) {
 
-      dbm = _dbm;
-      dmf = dbm.getDialogMainFrame();
+      
+      dmf = _dmf;
     project_table = _project_table;
     //session = dbm.getDialogMainFrame().getSession();
      IFn require = Clojure.var("clojure.core", "require");
-    require.invoke(Clojure.read("ln.codax-manager"));
+    require.invoke(Clojure.read("lnrocks.core"));
 
     JMenu menu = new JMenu("Project");
     menu.setMnemonic(KeyEvent.VK_P);
@@ -91,13 +91,10 @@ public class MenuBarForProject extends JMenuBar {
 	      
 		 //LOGGER.info("down button results: " + results);
 		 //LOGGER.info("down button row results: " + results[1][0]);
-	      dbm.updateSessionWithProject(results[1][0]);
-	      dbm.getDialogMainFrame().setMainFrameTitle(results[1][0]);
-              dbm.getDialogMainFrame().showPlateSetTable(results[1][0]);
+		 //    dbm.updateSessionWithProject(results[1][0]);
+		 //dbm.getDialogMainFrame().setMainFrameTitle(results[1][0]);
+	      //      dbm.getDialogMainFrame().showPlateSetTable(results[1][0]);
 	     
-              //dbm.updateSessionWithProject(project_sys_name);
-	      //dbm.getDialogMainFrame().setMainFrameTitle(project_sys_name);
-              //dbm.getDialogMainFrame().showPlateSetTable(project_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
 		JOptionPane.showMessageDialog( dbm.getDialogMainFrame(),
 					      "Select a row!","Error",JOptionPane.ERROR_MESSAGE);
@@ -109,15 +106,15 @@ public class MenuBarForProject extends JMenuBar {
         });
     this.add(downbutton);
 
-    menu = new ViewerMenu(dbm);
+    menu = new ViewerMenu(dmf);
     this.add(menu);
 
-    IFn getUserGroupID = Clojure.var("ln.codax-manager", "get-user-group-id");
+    // IFn getUserGroup = Clojure.var("lnrocks.core", "get-user-group");
     
-    if(getUserGroupID.invoke().equals(1)){
-    menu = new AdminMenu(dbm, project_table);
-     this.add(menu);
-    }
+    // if(getUserGroup.invoke().equals("admin")){
+    // menu = new AdminMenu(dmf, project_table);
+    //  this.add(menu);
+    // }
     
      this.add(Box.createHorizontalGlue());
 
