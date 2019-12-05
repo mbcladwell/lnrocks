@@ -242,31 +242,55 @@
 
 (defn get-all-projects [node]
 (let [data (crux/q (crux/db node)
-	           '{:find [n s1 s2 s3]
+	           '{:find [n s1 s2 s3 s4]
 	             :where [[e :id n]
                              [e :project-sys-name s1]
                              [e :name s2]
-                             [e :description s3]]
+                             [e :owner s3]
+                             [e :description s4]]
                      :order-by [[n :desc]]})
-      colnames ["ID" "Sys ID" "Name" "Description"] ]
+      colnames ["ID" "ProjectID" "Name" "Owner" "Description"] ]
   (into {} (java.util.HashMap.
             {":colnames" colnames
              ":data" data}))))
 
 
 
-(defn get-all-plate-sets [node]
+(defn get-plate-sets-for-project [node prj-id]
 (let [data (crux/q (crux/db node)
-	           '{:find [n s1 s2 s3 s4 s5 s6 ]
+	           '{:find [n s1 s2 s3 s4 s5 s6 s7]
 	             :where [[e :id n]
                              [e :plate-set-sys-name s1]
                              [e :plate-set-name s2]
                              [e :plate-format-id s3]
-                             [e :plate-type-id s4]
+                             [e :plate-type s4]
                              [e :plate-layout-name-id s5]
-                             [e :descr s6]]
-                            ;; [e :worklist s7]]
+                             [e :descr s6]
+                             [e :worklist s7]
+                             [e :project-id n2]
+                             [(= n2 prj-id)]]
+                     ;;:args [{'n2 }]
                      :order-by [[n :desc]]})
       colnames ["PlateSetID" "Name" "Format" "# plates" "Type" "Layout" "Description" "Worklist"]]
-  (into [] (cons colnames data ))))
+  (into {} (java.util.HashMap.
+            {":colnames" colnames
+             ":data" data} ))))
 
+(defn get-plates-for-plate-set-id
+  [node psid]
+  (let [
+        data (crux/q (crux/db node)
+	             {:find '[n1 n2 n3 s1  ]
+	               :where '[[e :plate-set-id n1]
+                               [e :id n2]
+                               ;;  [e :plate-format n4]
+                               [e :plate-order n3]
+                               [e :barcode s1]
+                               ;;[('= n1 psid)]
+                               ]
+                       :args [{'n1 psid}]
+                       :order-by [['n2 :desc]]})
+      colnames ["PlateSetID" "PlateID"  "Order" "Format" "Type" "Barcode"]]
+    (into {} (java.util.HashMap.
+              {":colnames" colnames
+               ":data" data} ))))

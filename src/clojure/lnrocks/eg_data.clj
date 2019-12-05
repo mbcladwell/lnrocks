@@ -219,7 +219,7 @@
             :descr (String.(:descr x) )
             :plate-set-sys-name (:plate-set-sys-name x )
             :num-plates (Integer/parseInt (String. (:num-plates x)))
-            :plate-format-id (Integer/parseInt (String. (:plate-format-id x)))
+            :plate-format (Integer/parseInt (String. (:plate-format-id x)))
             :plate-type (case (Integer/parseInt (String. (:plate-type-id x))) 1 "assay" 2 "rearray" 3 "master" 4 "daughter" 5 "archive" 6 "replicate")
             :project-id (Integer/parseInt (String. (:project-id x)))
             :plate-layout-name-id (Integer/parseInt (String. (:plate-layout-name-id x)))
@@ -402,13 +402,13 @@
                         (crux/entity (crux/db node ) :plt28)
                         (crux/entity (crux/db node ) :plt29))]
     (do
-      (crux/submit-tx node [[:crux.tx/cas ps1 new-ps1]])
-      (crux/submit-tx node [[:crux.tx/cas ps2 new-ps2]])
-      (crux/submit-tx node [[:crux.tx/cas ps3 new-ps3]])
-      (crux/submit-tx node [[:crux.tx/cas ps4 new-ps4]])
-      (crux/submit-tx node [[:crux.tx/cas ps5 new-ps5]])
-      (crux/submit-tx node [[:crux.tx/cas ps6 new-ps6]])
-      (crux/submit-tx node [[:crux.tx/cas ps7 new-ps7]])
+      (crux/submit-tx node [[:crux.tx/cas :ps1 new-ps1]])
+      (crux/submit-tx node [[:crux.tx/cas :ps2 new-ps2]])
+      (crux/submit-tx node [[:crux.tx/cas :ps3 new-ps3]])
+      (crux/submit-tx node [[:crux.tx/cas :ps4 new-ps4]])
+      (crux/submit-tx node [[:crux.tx/cas :ps5 new-ps5]])
+      (crux/submit-tx node [[:crux.tx/cas :ps6 new-ps6]])
+      (crux/submit-tx node [[:crux.tx/cas :ps7 new-ps7]])
       (println "Plates associated with plate-sets."))))
 
 

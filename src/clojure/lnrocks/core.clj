@@ -85,21 +85,28 @@
 
   
 
-(defn get-all-plates-for-ps [node ps-id]
-(let [data (crux/q (crux/db node)
-	           '{:find [n i i2 ]
-	             :where [[e :id n]
-                             [e :plate-order i]
-                             [e :plate-set-id i2]
-                             ]
-                     :order-by [[n :desc]]})
-      colnames ["PlateID" "Order" "Plate Set ID"]]
-  (into [] (cons colnames data ))))
 
-(get-all-plates-for-ps node 1)
+;;(dbr/get-plates-for-plate-set-id node 1)
 
 (defn get-all-projects []
   (dbr/get-all-projects node))
+
+;;(get-all-projects)
+
+(defn get-plate-sets-for-project [ prj-id]
+  (dbr/get-plate-sets-for-project node prj-id))
+
+;;(get-plate-sets-for-project 1)
+;;(insp/inspect-tree (crux/entity (crux/db node) :ps1))
+;;(insp/inspect-tree  new-ps1)
+;;    (egd/assoc-plt-with-ps node)
+
+;; (def      ps1 (crux/entity (crux/db node ) :ps1))
+  ;;   (def  new-ps1  (update ps1 :plates (comp set conj)
+    ;;                    (crux/entity (crux/db node ) :plt1)
+      ;;                  (crux/entity (crux/db node ) :plt2)))       
+
+
 
  (defn get-session-id ^Integer [ ]
  (:session-id (crux/entity (crux/db node ) :props)))
@@ -141,6 +148,9 @@
   "I don't do a whole lot ... yet."
   [& args]
   (println "In main")
-  (lnrocks.DialogMainFrame. ))
+  ;;(lnrocks.DialogMainFrame. )
+  )
+
+(-main)
 
 
