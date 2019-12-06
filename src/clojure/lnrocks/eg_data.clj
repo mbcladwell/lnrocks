@@ -402,13 +402,13 @@
                         (crux/entity (crux/db node ) :plt28)
                         (crux/entity (crux/db node ) :plt29))]
     (do
-      (crux/submit-tx node [[:crux.tx/cas :ps1 new-ps1]])
-      (crux/submit-tx node [[:crux.tx/cas :ps2 new-ps2]])
-      (crux/submit-tx node [[:crux.tx/cas :ps3 new-ps3]])
-      (crux/submit-tx node [[:crux.tx/cas :ps4 new-ps4]])
-      (crux/submit-tx node [[:crux.tx/cas :ps5 new-ps5]])
-      (crux/submit-tx node [[:crux.tx/cas :ps6 new-ps6]])
-      (crux/submit-tx node [[:crux.tx/cas :ps7 new-ps7]])
+      (crux/submit-tx node [[:crux.tx/cas ps1 new-ps1]])
+      (crux/submit-tx node [[:crux.tx/cas ps2 new-ps2]])
+      (crux/submit-tx node [[:crux.tx/cas ps3 new-ps3]])
+      (crux/submit-tx node [[:crux.tx/cas ps4 new-ps4]])
+      (crux/submit-tx node [[:crux.tx/cas ps5 new-ps5]])
+      (crux/submit-tx node [[:crux.tx/cas ps6 new-ps6]])
+      (crux/submit-tx node [[:crux.tx/cas ps7 new-ps7]])
       (println "Plates associated with plate-sets."))))
 
 

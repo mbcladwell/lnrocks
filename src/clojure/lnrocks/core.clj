@@ -97,7 +97,20 @@
   (dbr/get-plate-sets-for-project node prj-id))
 
 ;;(get-plate-sets-for-project 1)
-;;(insp/inspect-tree (crux/entity (crux/db node) :ps1))
+;;(dbr/get-plates-for-plate-set-id node 1)
+
+;;(pprint  (dbr/get-wells-for-plate-id node 1))
+
+(def a (:wells (crux/entity (crux/db node) :plt1)))
+(count a )
+(:H12 a)
+(case 96 96 util/vec96wells 384 util/vec384wells 1536 util/vec1536wells)
+
+((get util/vec96wells 0) a)
+ (:accession (crux/entity (crux/db node) (keyword (str "spl" 1)))) 
+
+
+;;(insp/inspect-tree (crux/entity (crux/db node) :spl1))
 ;;(insp/inspect-tree  new-ps1)
 ;;    (egd/assoc-plt-with-ps node)
 
