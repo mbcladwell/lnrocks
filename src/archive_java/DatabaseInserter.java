@@ -39,15 +39,15 @@ public class DatabaseInserter {
     private IFn require = Clojure.var("clojure.core", "require");
 
   /** */
-  public DatabaseInserter(DatabaseManager _dbm) {
+  public DatabaseInserter(DialogMainFrame dmf) {
     this.dbm = _dbm;
     this.conn = dbm.getConnection();
     // this.dbr = dbm.getDatabaseRetriever();
     //session = dbm.getSession();
-    this.dmf = dbm.getDialogMainFrame();
+    this.dmf = dmf;
     require.invoke(Clojure.read("ln.db-inserter"));
-    require.invoke(Clojure.read("ln.codax-manager"));
-    IFn getSessionID = Clojure.var("ln.codax-manager", "get-session-id");
+    require.invoke(Clojure.read("lnrocks.core"));
+    IFn getSessionID = Clojure.var("lnrocks.core", "get-session-id");
     require.invoke(Clojure.read("ln.db-retriever"));
     
     session_id = ((Long)getSessionID.invoke()).intValue();
@@ -284,7 +284,7 @@ public int insertPlateSet(
     Integer[] plate_ids =
         dbm.getDatabaseRetriever()
             .getIDsForSysNames(
-			       dbm.getDialogMainFrame().getUtilities().getStringArrayForStringSet(new HashSet<String>(plate_sys_names)),
+			       dmf.getUtilities().getStringArrayForStringSet(new HashSet<String>(plate_sys_names)),
                 "plate",
                 "plate_sys_name");
 
@@ -337,9 +337,9 @@ public int insertPlateSet(
     LOGGER.info("keys: " + plate_ids);
 
     this.associatePlateIDsWithPlateSetID(all_plate_ids, new_plate_set_id);
-     IFn getProjectSysName = Clojure.var("ln.codax-manager", "get-project-sys-name");
+     IFn getProjectSysName = Clojure.var("lnrocks.core", "get-project-sys-name");
    
-     dbm.getDialogMainFrame().showPlateSetTable((String)getProjectSysName.invoke());
+     dmf.showPlateSetTable((String)getProjectSysName.invoke());
   }
 
   /** Called from DialogGroupPlates from the plate panel/menubar */
@@ -403,16 +403,16 @@ public int insertPlateSet(
    System.out.println("finished dbi.groupPlatesIntoPlateSet;  keys: " + plate_ids);
 
     this.associatePlateIDsWithPlateSetID(plate_ids, new_plate_set_id);
-     IFn getProjectSysName = Clojure.var("ln.codax-manager", "get-project-sys-name");
+     IFn getProjectSysName = Clojure.var("lnrocks.core", "get-project-sys-name");
    
-    dbm.getDialogMainFrame().showPlateSetTable((String)getProjectSysName.invoke());
+    dmf.showPlateSetTable((String)getProjectSysName.invoke());
   }
 
   public void associatePlateIDsWithPlateSetID(Set<Integer> _plateIDs, int _plate_set_id) {
     Set<Integer> plateIDs = _plateIDs;
     int plate_set_id = _plate_set_id;
     Integer[] plate_ids =
-        Arrays.stream(dbm.getDialogMainFrame().getUtilities().getIntArrayForIntegerSet(plateIDs))
+        Arrays.stream(dmf.getUtilities().getIntArrayForIntegerSet(plateIDs))
             .boxed()
             .toArray(Integer[]::new);
 
@@ -476,7 +476,7 @@ Integer[] plate_set_id =
  int num_of_plate_ids = dbm.getDatabaseRetriever().getAllPlateIDsForPlateSetID(plate_set_id[0]).size();
 //check that there are the correct number of rows in the table
 if(num_of_plate_ids*format_id!=table.size()-1){
-    	JOptionPane.showMessageDialog(dbm.getDialogMainFrame(), new String("Expecting " + String.valueOf(num_of_plate_ids*format_id) + " rows but found " + (table.size()-1) + " rows." ), "Import Error", JOptionPane.ERROR_MESSAGE);
+    	JOptionPane.showMessageDialog(dmf, new String("Expecting " + String.valueOf(num_of_plate_ids*format_id) + " rows but found " + (table.size()-1) + " rows." ), "Import Error", JOptionPane.ERROR_MESSAGE);
 	return;
 }
 
@@ -516,7 +516,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
       JOptionPane.showMessageDialog(
-          dbm.getDialogMainFrame(), "Problems parsing data file!.", "Error", JOptionPane.ERROR_MESSAGE);
+          dmf, "Problems parsing data file!.", "Error", JOptionPane.ERROR_MESSAGE);
       return;
     }
 
@@ -663,7 +663,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }
-    dbm.getDialogMainFrame().showProjectTable();
+    dmf.showProjectTable();
   }
 
 
@@ -684,7 +684,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 	int n_reps_source = _n_reps_source;
        
 	int dest_plate_num = (int)Math.ceil(source_plate_num*n_reps_source/4.0);
-	IFn getProjectID = Clojure.var("ln.codax-manager", "get-project-id");
+	IFn getProjectID = Clojure.var("lnrocks.core", "get-project-id");
    	int project_id = ((Long)getProjectID.invoke()).intValue();
 	int dest_plate_set_id=0;
 
@@ -714,9 +714,9 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       ResultSet resultSet = insertPs.getResultSet();
       resultSet.next();
       dest_plate_set_id = resultSet.getInt("reformat_plate_set");
-       IFn getProjectSysName = Clojure.var("ln.codax-manager", "get-project-sys-name");
+       IFn getProjectSysName = Clojure.var("lnrocks.core", "get-project-sys-name");
    
-      dbm.getDialogMainFrame().showPlateSetTable((String)getProjectSysName.invoke());
+      dmf.showPlateSetTable((String)getProjectSysName.invoke());
     } catch (SQLException sqle) {
 	LOGGER.warning("SQLE at reformat plate set: " + sqle);
     }
@@ -749,9 +749,9 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 	String name = _name;
 	String descr = _descr;
 	int format = 0;
-	ArrayList<String[]> data = dbm.getDialogMainFrame().getUtilities().loadDataFile(_file_name);
+	ArrayList<String[]> data = dmf.getUtilities().loadDataFile(_file_name);
 
-	Object[][]  dataObject = dbm.getDialogMainFrame().getUtilities().getObjectArrayForArrayList(data); 
+	Object[][]  dataObject = dmf.getUtilities().getObjectArrayForArrayList(data); 
 
 	switch(data.size()-1){
 	case 96:
@@ -767,7 +767,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 	    
 	    break;
 	default:
-	    JOptionPane.showMessageDialog( dbm.getDialogMainFrame(), "Expecting 96, 384, or 1536 lines of data. Found " + (data.size()-1) +  "!", "Error", JOptionPane.ERROR_MESSAGE);	    
+	    JOptionPane.showMessageDialog( dmf, "Expecting 96, 384, or 1536 lines of data. Found " + (data.size()-1) +  "!", "Error", JOptionPane.ERROR_MESSAGE);	    
 	}
 	      
 	    String sqlString = "SELECT new_plate_layout(?,?, ?, ?)";
@@ -883,7 +883,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     }
     }else{
     JOptionPane.showMessageDialog(
-				  dbm.getDialogMainFrame(), "Expecting the headers \"plate\", \"well\", and \"accs.id\", but found\n" + accessions.get(0)[0] + ", " +  accessions.get(0)[1] +  ", and " + accessions.get(0)[2] + "." , "Error", JOptionPane.ERROR_MESSAGE);
+				  dmf, "Expecting the headers \"plate\", \"well\", and \"accs.id\", but found\n" + accessions.get(0)[0] + ", " +  accessions.get(0)[1] +  ", and " + accessions.get(0)[2] + "." , "Error", JOptionPane.ERROR_MESSAGE);
     return;
   	
     }
@@ -938,7 +938,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       int hit_list_id = _hit_list_id;
       int dest_plate_set_id =0;
     try {
-	 IFn getProjectID = Clojure.var("ln.codax-manager", "get-project-id");
+	 IFn getProjectID = Clojure.var("lnrocks.core", "get-project-id");
 	 //fails as long   
 	 int project_id = ((Long)getProjectID.invoke()).intValue();
       int plate_format_id = _plate_format_id;
@@ -1139,7 +1139,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
  //      int _plate_layout_id) {
 
  //    try {
- // 	 IFn getProjectID = Clojure.var("ln.codax-manager", "get-project-id");
+ // 	 IFn getProjectID = Clojure.var("lnrocks.core", "get-project-id");
    
  // 	 int project_id = ((Long)getProjectID.invoke()).intValue();
  //      int plate_format_id = Integer.parseInt(_plate_format_id);
@@ -1169,9 +1169,9 @@ if(num_of_plate_ids*format_id!=table.size()-1){
  //    } catch (SQLException sqle) {
  //      LOGGER.severe("Failed to create plate set: " + sqle);
  //    }
- // IFn getProjectSysName = Clojure.var("ln.codax-manager", "get-project-sys-name");
+ // IFn getProjectSysName = Clojure.var("lnrocks.core", "get-project-sys-name");
    
- //    dbm.getDialogMainFrame().showPlateSetTable((String)getProjectSysName.invoke());    
+ //    dmf.showPlateSetTable((String)getProjectSysName.invoke());    
  //  }
 
 }

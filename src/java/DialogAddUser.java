@@ -17,48 +17,42 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 
-public class DialogEditPlateSet extends JDialog {
+public class DialogAddUser extends JDialog {
   static JButton button;
   static JLabel label;
   static JLabel Description;
   static JTextField nameField;
   static JTextField ownerField;
-  static JTextField descriptionField;
+  static JTextField tagsField;
+  static JTextField passwordField;
   static JButton okButton;
   static JButton cancelButton;
-  static String plate_set_sys_name;
-  static String project_sys_name;
-    
+    static JComboBox<ComboItem> groupList;
+
   final Instant instant = Instant.now();
   static DialogMainFrame dmf;
-  
     //  private static Session session;
-  private static DatabaseManager dbm;
+  //private static DatabaseManager dbm;
   final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    private IFn require = Clojure.var("clojure.core", "require");
+  private IFn require = Clojure.var("clojure.core", "require");
 
-  public DialogEditPlateSet(
-      DatabaseManager _dbm, String _plate_set_sys_name, String _name, String _description) {
-      dbm = _dbm;
-      dmf = dbm.getDialogMainFrame();
-      require.invoke(Clojure.read("ln.codax-manager"));
-      //session = dmf.getSession();
-        IFn getProjectSysName = Clojure.var("ln.codax-manager", "get-project-sys-name");
 
-	project_sys_name = (String)getProjectSysName.invoke();
-    //dbm = session.getDatabaseManager();
-    plate_set_sys_name = _plate_set_sys_name;
+  public DialogAddUser(DialogMainFrame _dmf) {
+      
+      dmf = _dmf;
+      // session = dmf.getSession();
+      //dbm = session.getDatabaseManager();
 
     JPanel pane = new JPanel(new GridBagLayout());
     pane.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -67,7 +61,7 @@ public class DialogEditPlateSet extends JDialog {
     // Image img = new
     // ImageIcon(DialogAddProject.class.getResource("../resources/mwplate.png")).getImage();
     // this.setIconImage(img);
-    this.setTitle("Edit Plate Set " + plate_set_sys_name);
+    this.setTitle("Add a User");
     // c.gridwidth = 2;
 
     label = new JLabel("Date:", SwingConstants.RIGHT);
@@ -78,20 +72,24 @@ public class DialogEditPlateSet extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    label = new JLabel("Owner:", SwingConstants.RIGHT);
-    // c.fill = GridBagConstraints.HORIZONTAL;
-    c.gridx = 0;
-    c.gridy = 1;
-    pane.add(label, c);
-
-    label = new JLabel("Plate Set Name:", SwingConstants.RIGHT);
+    label = new JLabel("User Name:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 2;
     pane.add(label, c);
 
-    label = new JLabel("Description:", SwingConstants.RIGHT);
+    label = new JLabel("Tags:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 3;
+    pane.add(label, c);
+
+        label = new JLabel("Password:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 4;
+    pane.add(label, c);
+
+    label = new JLabel("Group:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 5;
     pane.add(label, c);
 
     label = new JLabel(df.format(Date.from(instant)));
@@ -100,28 +98,37 @@ public class DialogEditPlateSet extends JDialog {
     c.gridy = 0;
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(label, c);
-
-      IFn getUser = Clojure.var("ln.codax-manager", "get-user");
-   
-      label = new JLabel((String)getUser.invoke());
-    c.gridx = 1;
-    c.gridy = 1;
-    c.gridheight = 1;
-    pane.add(label, c);
-
-    nameField = new JTextField(30);
-    nameField.setText(_name);
+ 
+   nameField = new JTextField(30);
     c.gridwidth = 2;
     c.gridx = 1;
     c.gridy = 2;
     pane.add(nameField, c);
 
-    descriptionField = new JTextField(30);
-    descriptionField.setText(_description);
+    tagsField = new JTextField(30);
     c.gridx = 1;
     c.gridy = 3;
-    c.gridheight = 2;
-    pane.add(descriptionField, c);
+    c.gridheight = 1;
+    pane.add(tagsField, c);
+
+        passwordField = new JTextField(30);
+    c.gridx = 1;
+    c.gridy = 4;
+    c.gridheight = 1;
+    pane.add(passwordField, c);
+
+       IFn getAllUserGroups = Clojure.var("lnrocks.core", "get-all-user-groups");
+ 
+    ComboItem[] groups = (ComboItem[])(getAllUserGroups.invoke());
+
+    groupList = new JComboBox<ComboItem>(groups);
+    groupList.setSelectedIndex(0);
+    c.gridx = 1;
+    c.gridy = 5;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane.add(groupList, c);
 
     okButton = new JButton("OK");
     okButton.setMnemonic(KeyEvent.VK_O);
@@ -130,19 +137,17 @@ public class DialogEditPlateSet extends JDialog {
     okButton.setForeground(Color.GREEN);
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 2;
-    c.gridy = 5;
+    c.gridy = 6;
     c.gridwidth = 1;
     c.gridheight = 1;
     okButton.addActionListener(
         (new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-
-            // DatabaseManager dm = new DatabaseManager();
-            // dbm.persistObject(new Project(descriptionField.getText(), ownerField.getText(),
-            // nameField.getText()));
-            dbm.getDatabaseInserter()
-                .updatePlateSet(nameField.getText(), descriptionField.getText(), plate_set_sys_name);
-            dmf.getPlateSetPanel().updatePanel(project_sys_name); //the plate set table needs the project id
+          public void actionPerformed(ActionEvent e) {    
+    IFn insertUser = Clojure.var("lnrocks.core", "insertUser");
+ 
+           // dbm.getDatabaseInserter()
+             //   .insertUser(
+		//	    nameField.getText(), tagsField.getText(), passwordField.getText(), ((ComboItem)groupList.getSelectedItem()).getKey() ); 
             dispose();
           }
         }));
@@ -155,7 +160,7 @@ public class DialogEditPlateSet extends JDialog {
     cancelButton.setEnabled(true);
     cancelButton.setForeground(Color.RED);
     c.gridx = 1;
-    c.gridy = 5;
+    c.gridy = 6;
     pane.add(cancelButton, c);
     cancelButton.addActionListener(
         (new ActionListener() {
@@ -172,5 +177,5 @@ public class DialogEditPlateSet extends JDialog {
     this.setVisible(true);
   }
 
-
+  private void addToDB() {}
 }

@@ -26,10 +26,10 @@ public class PlatePanel extends JPanel {
   private String plate_set_sys_name;
     // private Session session;
     
-    public PlatePanel(DatabaseManager _dbm, CustomTable _table, String _plate_set_sys_name) {
+    public PlatePanel(DialogMainFrame dmf, CustomTable _table, String _plate_set_sys_name) {
     this.setLayout(new BorderLayout());
     dbm = _dbm;
-    dmf = dbm.getDialogMainFrame();
+    dmf = dmf;
     plate_set_sys_name = _plate_set_sys_name;
     // session = dmf.getSession();
     table = _table;

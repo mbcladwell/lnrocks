@@ -1,7 +1,4 @@
 
-
-
-
 package lnrocks;
 
 import java.awt.BorderLayout;
@@ -42,7 +39,7 @@ public class DialogAddPlateSet extends JDialog   {
     static JButton cancelButton;
     final Instant instant = Instant.now();
     final DialogMainFrame dmf;
-    final DatabaseManager dbm;
+    //final DatabaseManager dbm;
     //   private Task task;
     //    final Session session;
     final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
@@ -50,11 +47,11 @@ public class DialogAddPlateSet extends JDialog   {
     // final EntityManager em;
     private IFn require = Clojure.var("clojure.core", "require");
 
-  public DialogAddPlateSet(DatabaseManager _dbm) {
-      dbm = _dbm;
-      this.dmf = dbm.getDialogMainFrame();
-    require.invoke(Clojure.read("ln.codax-manager"));
-     IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+  public DialogAddPlateSet(DialogMainFrame _dmf) {
+      
+      this.dmf = _dmf;
+    require.invoke(Clojure.read("lnrocks.core"));
+     IFn getUser = Clojure.var("lnrocks.core", "get-user");
       //this.session = dmf.getSession();
      owner = (String)getUser.invoke();
     // Create and set up the window.
@@ -155,10 +152,10 @@ public class DialogAddPlateSet extends JDialog   {
     formatList.addActionListener(
 				 (new ActionListener() {
 					 public void actionPerformed(ActionEvent e) {
-					     layoutNames = dbm.getDatabaseRetriever().getSourcePlateLayoutNames((int)formatList.getSelectedItem(), 0);
-					     layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
-					     layoutList.setModel(layout_names_list_model );
-					     layoutList.setSelectedIndex(-1);
+					//     layoutNames = dbm.getDatabaseRetriever().getSourcePlateLayoutNames((int)formatList.getSelectedItem(), 0);
+					  //   layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
+					   //  layoutList.setModel(layout_names_list_model );
+					  //   layoutList.setSelectedIndex(-1);
           }
         }));
     pane.add(formatList, c);
@@ -171,7 +168,9 @@ public class DialogAddPlateSet extends JDialog   {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    ComboItem[] plateTypes = dbm.getDatabaseRetriever().getPlateTypes();
+	IFn getPlateTypes = Clojure.var("lnrocks.core", "get-plate-types");
+
+    ComboItem[] plateTypes = (ComboItem[])getPlateTypes.invoke();
 
     typeList = new JComboBox<ComboItem>(plateTypes);
     typeList.setSelectedIndex(0);
@@ -188,7 +187,9 @@ public class DialogAddPlateSet extends JDialog   {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    ComboItem[] layoutTypes = dbm.getDatabaseRetriever().getPlateLayoutNames(96);
+	IFn getPlateLayoutNames = Clojure.var("lnrocks.core", "get-plate-layout-names");
+
+    ComboItem[] layoutTypes = (ComboItem[])getPlateLayoutNames.invoke(96);
     LOGGER.info("layoutTypes: " + layoutTypes[0].toString());
     layoutList = new JComboBox<ComboItem>(layoutTypes);
     layoutList.setSelectedIndex(0);
@@ -217,7 +218,7 @@ public class DialogAddPlateSet extends JDialog   {
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 	      Task task = new Task();
-	      	     IFn getProjectID = Clojure.var("ln.codax-manager", "get-project-id");
+	      	     IFn getProjectID = Clojure.var("lnrocks.core", "get-project-id");
 
 	      //task.addPropertyChangeListener(this);
 	    progress_bar.main( new String[] {"Creating Plate Set"} );
@@ -267,19 +268,19 @@ public class DialogAddPlateSet extends JDialog   {
         /*
          * Main task. Executed in background thread.
          */
-	     IFn getProjectID = Clojure.var("ln.codax-manager", "get-project-id");
+	     IFn getProjectID = Clojure.var("lnrocks.core", "get-project-id");
 
         @Override
         public Void doInBackground() {
-	    dbm.getDatabaseInserter()
-		.insertPlateSet(nameField.getText(),
-				descriptionField.getText(),
-				Integer.valueOf(numberField.getText()),
-				Integer.valueOf(formatList.getSelectedItem().toString()),
-				((ComboItem)typeList.getSelectedItem()).getKey(),
-				((Long)getProjectID.invoke()).intValue(),
-				((ComboItem)layoutList.getSelectedItem()).getKey(),
-				true);
+	   // dbm.getDatabaseInserter()
+		//.insertPlateSet(nameField.getText(),
+		//		descriptionField.getText(),
+		//		Integer.valueOf(numberField.getText()),
+		//		Integer.valueOf(formatList.getSelectedItem().toString()),
+		//		((ComboItem)typeList.getSelectedItem()).getKey(),
+		//		((Long)getProjectID.invoke()).intValue(),
+		//		((ComboItem)layoutList.getSelectedItem()).getKey(),
+		//		true);
 	
 	   
             return null;
@@ -293,8 +294,8 @@ public class DialogAddPlateSet extends JDialog   {
             Toolkit.getDefaultToolkit().beep();
             setCursor(null); //turn off the wait cursor
 	    progress_bar.setVisible(false);
-	    IFn getProjectSysName = Clojure.var("ln.codax-manager", "get-project-sys-name");
-	    dbm.getDialogMainFrame().showPlateSetTable((String)getProjectSysName.invoke());
+	    IFn getProjectSysName = Clojure.var("lnrocks.core", "get-project-sys-name");
+	    dmf.showPlateSetTable((String)getProjectSysName.invoke());
             dispose();
 	    //  System.out.println("complete done in swingworker in DialogAddPlateSet");
      }

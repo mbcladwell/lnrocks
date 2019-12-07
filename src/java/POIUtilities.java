@@ -20,8 +20,8 @@ public class POIUtilities {
   private static final String newline = "\n";
     private DatabaseManager dbm;
 
-  public POIUtilities(DatabaseManager _dbm) {
-      dbm = _dbm;    
+  public POIUtilities(DialogMainFrame _dmf) {
+      dbm = _dmf;    
   }
   /**
    * Convert any table to a spreadsheet. This first row is a header. Use the first column in

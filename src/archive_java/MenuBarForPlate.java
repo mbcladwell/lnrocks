@@ -31,15 +31,15 @@ public class MenuBarForPlate extends JMenuBar {
    private IFn require = Clojure.var("clojure.core", "require");
 
 
-  public MenuBarForPlate(DatabaseManager _dbm, CustomTable _table) {
+  public MenuBarForPlate(DialogMainFrame dmf, CustomTable _table) {
       dbm = _dbm;
     plate_table = _table;
-    //dmf = dbm.getDialogMainFrame();
+    //dmf = dmf;
     // Create the menu bar.
     // JMenuBar menuBar = new JMenuBar();
     //    this.em = em;
     // Build the first menu.
-     require.invoke(Clojure.read("ln.codax-manager"));
+     require.invoke(Clojure.read("lnrocks.core"));
     
     JMenu menu = new JMenu("Plate");
     menu.setMnemonic(KeyEvent.VK_P);
@@ -55,14 +55,14 @@ public class MenuBarForPlate extends JMenuBar {
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 	      try {
-		  IFn getProjectSysName = Clojure.var("ln.codax-manager", "get-project-sys-name");
+		  IFn getProjectSysName = Clojure.var("lnrocks.core", "get-project-sys-name");
 		  String project_sys_name = (String)getProjectSysName.invoke();
 	 
-		  dbm.getDialogMainFrame().showAllPlatesTable(project_sys_name);
+		  dmf.showAllPlatesTable(project_sys_name);
 		      
           
             } catch (IndexOutOfBoundsException s) {
-		JOptionPane.showMessageDialog(dbm.getDialogMainFrame(),
+		JOptionPane.showMessageDialog(dmf,
 					      "Select a row!","Error",JOptionPane.ERROR_MESSAGE);
             }
           }
@@ -81,9 +81,9 @@ public class MenuBarForPlate extends JMenuBar {
           public void actionPerformed(ActionEvent e) {
 	      System.out.println("in MenuBarForPlates launching dbm.groupPlates");
             dbm.groupPlates(plate_table);
-    	    IFn getPlateSetSysName = Clojure.var("ln.codax-manager", "get-plate-set-sys-name");
+    	    IFn getPlateSetSysName = Clojure.var("lnrocks.core", "get-plate-set-sys-name");
 
-    	    dbm.getDialogMainFrame().showPlateTable((String)getPlateSetSysName.invoke());
+    	    dmf.showPlateTable((String)getPlateSetSysName.invoke());
           }
         });
     menu.add(menuItem);
@@ -92,7 +92,7 @@ public class MenuBarForPlate extends JMenuBar {
     menuItem = new JMenuItem("Export", KeyEvent.VK_E);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
     menuItem.getAccessibleContext().setAccessibleDescription("Export as .csv.");
-    menuItem.putClientProperty("mf", dbm.getDialogMainFrame());
+    menuItem.putClientProperty("mf", dmf);
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
@@ -133,19 +133,19 @@ public class MenuBarForPlate extends JMenuBar {
 	      String plate_sys_name = results[1][1];
 	  
 	      //dbm.setPlateSysName(plate_sys_name);
-	      IFn setPlateSysName = Clojure.var("ln.codax-manager", "set-plate-sys-name");
+	      IFn setPlateSysName = Clojure.var("lnrocks.core", "set-plate-sys-name");
 	      setPlateSysName.invoke(plate_sys_name);
 	      
-	      IFn setPlateID = Clojure.var("ln.codax-manager", "set-plate-id");
+	      IFn setPlateID = Clojure.var("lnrocks.core", "set-plate-id");
 	      setPlateID.invoke(Integer.parseInt(plate_sys_name.substring(4)));
 	      
-              dbm.getDialogMainFrame().showWellTable(plate_sys_name);
+              dmf.showWellTable(plate_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
-			JOptionPane.showMessageDialog(dbm.getDialogMainFrame(),
+			JOptionPane.showMessageDialog(dmf,
 					      "Select a row!","Error",JOptionPane.ERROR_MESSAGE);
           
             } catch (IndexOutOfBoundsException s) {
-		JOptionPane.showMessageDialog(dbm.getDialogMainFrame(),
+		JOptionPane.showMessageDialog(dmf,
 					      "Select a row!","Error",JOptionPane.ERROR_MESSAGE);
             }
           }
@@ -164,7 +164,7 @@ public class MenuBarForPlate extends JMenuBar {
     upbutton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            dbm.getDialogMainFrame().flipToPlateSet();
+            dmf.flipToPlateSet();
           }
         });
 

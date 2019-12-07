@@ -64,7 +64,7 @@ public class DialogAddPlateSetData extends JDialog
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public DialogAddPlateSetData(
-      DatabaseManager _dbm,
+      DialogMainFrame dmf,
       String _plate_set_sys_name,
       int _plate_set_id,
       int _format_id,
@@ -73,13 +73,13 @@ public class DialogAddPlateSetData extends JDialog
     plate_set = new ComboItem(_plate_set_id, _plate_set_sys_name);
     format = new ComboItem(_format_id, String.valueOf(_format_id));
     plate_num = _plate_num;
-    require.invoke(Clojure.read("ln.codax-manager"));
+    require.invoke(Clojure.read("lnrocks.core"));
     	progress_bar = new ProgressBar();
 
     dbm = _dbm;
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
-    this.dmf = dbm.getDialogMainFrame();
+    this.dmf = dmf;
     //session = dmf.getSession();
     //this.dbm = session.getDatabaseManager();
     this.dbr = dbm.getDatabaseRetriever();
@@ -353,7 +353,7 @@ public class DialogAddPlateSetData extends JDialog
     helpButton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	          IFn getHelpURLPrefix = Clojure.var("ln.codax-manager", "get-help-url-prefix");
+	          IFn getHelpURLPrefix = Clojure.var("lnrocks.core", "get-help-url-prefix");
 
 		  openWebpage(URI.create((String)getHelpURLPrefix.invoke() + "importassaydata"));
           }

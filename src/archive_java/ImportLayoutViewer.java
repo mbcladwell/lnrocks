@@ -50,13 +50,13 @@ public class ImportLayoutViewer extends JDialog implements java.awt.event.Action
     private DatabaseManager dbm;    
     private DefaultComboBoxModel<ComboItem> layout_names_list_model;
     
-    public ImportLayoutViewer(DatabaseManager _dbm, Object[][] _gridData) {
+    public ImportLayoutViewer(DialogMainFrame dmf, Object[][] _gridData) {
 	dbm= _dbm;
-	this.dmf = dbm.getDialogMainFrame();
+	this.dmf = dmf;
     this.gridData = dmf.getUtilities().convertTableToPlate( _gridData, "type");
     //this.session = dmf.getSession();
-    require.invoke(Clojure.read("ln.codax-manager"));
-     IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+    require.invoke(Clojure.read("lnrocks.core"));
+     IFn getUser = Clojure.var("lnrocks.core", "get-user");
     
      owner = (String)getUser.invoke();
     // Create and set up the window.

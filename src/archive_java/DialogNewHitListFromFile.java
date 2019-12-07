@@ -55,12 +55,12 @@ public class DialogNewHitListFromFile extends JDialog {
     private int[] hit_ids;
     private IFn require = Clojure.var("clojure.core", "require");
     
-    public DialogNewHitListFromFile(DatabaseManager _dbm, int _assay_run_id,  int[] _hit_ids) {
+    public DialogNewHitListFromFile(DialogMainFrame dmf, int _assay_run_id,  int[] _hit_ids) {
 	dbm = _dbm;
 	//    this.session = _session;
-    this.dmf = dbm.getDialogMainFrame();
-    require.invoke(Clojure.read("ln.codax-manager"));
-     IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+    this.dmf = dmf;
+    require.invoke(Clojure.read("lnrocks.core"));
+     IFn getUser = Clojure.var("lnrocks.core", "get-user");
      owner = (String)getUser.invoke();
     assay_run_id = _assay_run_id;
     hit_ids = _hit_ids;

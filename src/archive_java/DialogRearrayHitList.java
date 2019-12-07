@@ -65,9 +65,9 @@ public class DialogRearrayHitList extends JDialog {
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
 
-    public DialogRearrayHitList(DatabaseManager _dbm, int _plate_set_id, String _plate_set_sys_name, int _source_plate_set_format, int _hit_list_id, String _hit_list_sys_name, int _unknown_count) {
+    public DialogRearrayHitList(DialogMainFrame dmf, int _plate_set_id, String _plate_set_sys_name, int _source_plate_set_format, int _hit_list_id, String _hit_list_sys_name, int _unknown_count) {
 	dbm = _dbm;
-	this.dmf = dbm.getDialogMainFrame();
+	this.dmf = dmf;
     plate_set_id = _plate_set_id;
     plate_set_sys_name = _plate_set_sys_name;
     source_plate_set_format = _source_plate_set_format;
@@ -75,8 +75,8 @@ public class DialogRearrayHitList extends JDialog {
     hit_list_sys_name = _hit_list_sys_name;
     dest_plate_set_format = source_plate_set_format;
     unknown_count = _unknown_count;
-    require.invoke(Clojure.read("ln.codax-manager"));
-     IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+    require.invoke(Clojure.read("lnrocks.core"));
+     IFn getUser = Clojure.var("lnrocks.core", "get-user");
     
      //    this.session = dmf.getSession();
      owner = (String)getUser.invoke();

@@ -28,10 +28,10 @@ public class WellPanel extends JPanel {
     //   private Session session;    
     private DatabaseManager dbm;
     
-  public WellPanel(DatabaseManager _dbm, CustomTable _table) {
+  public WellPanel(DialogMainFrame dmf, CustomTable _table) {
     this.setLayout(new BorderLayout());
     dbm = _dbm;
-    dmf = dbm.getDialogMainFrame();
+    dmf = dmf;
     table = _table;
     //  session = dmf.getSession();
     

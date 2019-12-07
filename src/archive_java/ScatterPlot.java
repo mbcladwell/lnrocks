@@ -92,13 +92,13 @@ public class ScatterPlot extends JFrame {
     private DatabaseManager dbm;
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-    public ScatterPlot(DatabaseManager _dbm, int _assay_run_id) {
+    public ScatterPlot(DialogMainFrame dmf, int _assay_run_id) {
 	super("Scatter Plot for AR-" + String.valueOf(_assay_run_id));
 	dbm = _dbm;
 	setSize(800, 600);
 	//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	this.setLayout(new BorderLayout());
-	this.dmf = dbm.getDialogMainFrame();
+	this.dmf = dmf;
 	//session = dmf.getSession();
 	assay_run_id = _assay_run_id;
 	//need the assay run id

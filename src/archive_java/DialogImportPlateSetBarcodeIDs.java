@@ -76,7 +76,7 @@ public class DialogImportPlateSetBarcodeIDs extends JDialog
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public DialogImportPlateSetBarcodeIDs(
-      DatabaseManager _dbm,
+      DialogMainFrame dmf,
       String _plate_set_sys_name,
       int _plate_set_id,
       int _plate_num) {
@@ -85,7 +85,7 @@ public class DialogImportPlateSetBarcodeIDs extends JDialog
     // format = new ComboItem(_format_id, String.valueOf(_format_id));
     plate_num = _plate_num;
     plate_set_id = _plate_set_id;
-    require.invoke(Clojure.read("ln.codax-manager"));
+    require.invoke(Clojure.read("lnrocks.core"));
     require.invoke(Clojure.read("ln.db-inserter"));
     //    expected_rows = dbr.getNumberOfSamplesForPlateSetID(_plate_set_id);
     // Create and set up the window.
@@ -249,7 +249,7 @@ public class DialogImportPlateSetBarcodeIDs extends JDialog
     helpButton.addActionListener(
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	          IFn getHelpURLPrefix = Clojure.var("ln.codax-manager", "get-help-url-prefix");
+	          IFn getHelpURLPrefix = Clojure.var("lnrocks.core", "get-help-url-prefix");
 
 		  openWebpage(URI.create((String)getHelpURLPrefix.invoke() + "barcodeids"));
             
@@ -280,7 +280,7 @@ public class DialogImportPlateSetBarcodeIDs extends JDialog
 
     if (e.getSource() == okButton) {
 
-	barcodes = dbm.getDialogMainFrame().getUtilities().loadDataFile(fileField.getText());
+	barcodes = dmf.getUtilities().loadDataFile(fileField.getText());
 	if(!((barcodes.size()-1) == expected_rows)){  //If Top N is the algorithm
 	    	JOptionPane.showMessageDialog(dmf,
 					      new String("Expecting " + String.valueOf(expected_rows) + " rows but found " + (barcodes.size()-1) + " rows." ), "Import Error",      JOptionPane.ERROR_MESSAGE);

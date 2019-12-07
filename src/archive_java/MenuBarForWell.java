@@ -32,12 +32,12 @@ public class MenuBarForWell extends JMenuBar {
 
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  public MenuBarForWell(DatabaseManager _dbm, CustomTable _table) {
+  public MenuBarForWell(DialogMainFrame dmf, CustomTable _table) {
       dbm = _dbm;
       //session = _s;
       //dmf = session.getDialogMainFrame();
     well_table = _table;
-       require.invoke(Clojure.read("ln.codax-manager"));
+       require.invoke(Clojure.read("lnrocks.core"));
   
     // Create the menu bar.
     // JMenuBar menuBar = new JMenuBar();
@@ -57,14 +57,14 @@ public class MenuBarForWell extends JMenuBar {
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 	      try {
-		  IFn getProjectSysName = Clojure.var("ln.codax-manager", "get-project-sys-name");
+		  IFn getProjectSysName = Clojure.var("lnrocks.core", "get-project-sys-name");
 		  String project_sys_name = (String)getProjectSysName.invoke();
 	 
-		  dbm.getDialogMainFrame().showAllWellsTable(project_sys_name);
+		  dmf.showAllWellsTable(project_sys_name);
 		      
           
             } catch (IndexOutOfBoundsException s) {
-		JOptionPane.showMessageDialog(dbm.getDialogMainFrame(),
+		JOptionPane.showMessageDialog(dmf,
 					      "Select a row!","Error",JOptionPane.ERROR_MESSAGE);
             }
 
@@ -113,7 +113,7 @@ public class MenuBarForWell extends JMenuBar {
     upbutton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	      dbm.getDialogMainFrame().flipToPlate();
+	      dmf.flipToPlate();
           }
         });
 

@@ -26,7 +26,7 @@ public class AdminMenu extends JMenu {
     private JFileChooser fileChooser;
     private JMenu projectMenu;
     //    private Session session;
-    private DatabaseManager dbm;
+    // private DatabaseManager dbm;
     private Utilities utils;
     private IFn require = Clojure.var("clojure.core", "require");
     
@@ -48,7 +48,7 @@ public class AdminMenu extends JMenu {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	      new DialogAddUser(dbm);           
+	      new DialogAddUser(dmf);           
           }
         });
     this.add(menuItem);
@@ -61,7 +61,7 @@ public class AdminMenu extends JMenu {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	      new DialogAddProject(dbm);
+	      new DialogAddProject(dmf);
    
           }
         });
@@ -81,10 +81,10 @@ public class AdminMenu extends JMenu {
 		  String name = project_table.getValueAt(rowIndex, 1).toString();
 		  String owner = project_table.getValueAt(rowIndex, 2).toString();
 		  String description = project_table.getValueAt(rowIndex, 3).toString();
-		      IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+		      IFn getUser = Clojure.var("lnrocks.core", "get-user");
  
 		      if (owner.equals((String)getUser.invoke())) {
-		      new DialogEditProject(dbm, projectid, name, description);
+		      new DialogEditProject(dmf, projectid, name, description);
 	      } else {
                 JOptionPane.showMessageDialog(
                     dmf,
@@ -111,7 +111,7 @@ public class AdminMenu extends JMenu {
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 	      try{
-		      IFn getUser = Clojure.var("lnrocks.core", "get-user");
+		  IFn getUser = Clojure.var("lnrocks.core", "get-user");
  
 		  int rowIndex = project_table.getSelectedRow();
 		  String projectid = project_table.getValueAt(rowIndex, 0).toString();
@@ -127,7 +127,8 @@ public class AdminMenu extends JMenu {
 							     JOptionPane.YES_NO_OPTION);
 		      if(n == JOptionPane.YES_OPTION){
 			  int prj_id = Integer.parseInt(projectid.substring(4));
-			  dbm.getDatabaseInserter().deleteProject(prj_id);
+			  IFn deleteProject = Clojure.var("lnrocks.core", "delete-project");
+			  deleteProject.invoke(prj_id);
 			  
 		      }
 		    
@@ -170,7 +171,7 @@ public class AdminMenu extends JMenu {
 							 "File format Error",
 							 JOptionPane.ERROR_MESSAGE);
 		       }
-		       new DialogImportLayoutViewer(dbm, imported_layout);
+		       // new DialogImportLayoutViewer(dbm, imported_layout);
 		 
 		   } else {
 		       LOGGER.info("Open command cancelled by user.\n");
@@ -187,9 +188,9 @@ public class AdminMenu extends JMenu {
     menuItem.addActionListener(
 	   new ActionListener() {
 	       public void actionPerformed(ActionEvent e) {
-	       		      IFn getAllProps = Clojure.var("lnrocks.core", "get-all-props");
+		   // IFn getAllProps = Clojure.var("lnrocks.core", "get-all-props");
 
-			      new DialogPropertiesNotFound(getAllProps.invoke());
+			      //   new DialogPropertiesNotFound(getAllProps.invoke());
 		 		   	      
 	  }
         });

@@ -82,7 +82,7 @@ public int new_plate_format_id;
    * @param _format number of wells per plate
    */
   public DialogReformatPlateSet(
-      DatabaseManager _dbm,
+      DialogMainFrame dmf,
       int _plate_set_id,
       String _plate_set_sys_name,
       String _descr,
@@ -93,9 +93,9 @@ public int new_plate_format_id;
       int _plate_layout_name_id) {
       dbm = _dbm;
       //this.session = _session;
-      this.dmf = dbm.getDialogMainFrame();
-    require.invoke(Clojure.read("ln.codax-manager"));
-     IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+      this.dmf = dmf;
+    require.invoke(Clojure.read("lnrocks.core"));
+     IFn getUser = Clojure.var("lnrocks.core", "get-user");
      owner = (String)getUser.invoke();
     old_plate_set_id = _plate_set_id;
     //  HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;

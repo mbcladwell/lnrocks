@@ -34,12 +34,12 @@ public class DatabaseRetriever {
     private IFn require = Clojure.var("clojure.core", "require");
 
   /** */
-  public DatabaseRetriever(DatabaseManager _dbm) {
+  public DatabaseRetriever(DialogMainFrame dmf) {
     this.dbm = _dbm;
     this.conn = dbm.getConnection();
     //session = dbm.getSession();
-    dmf = dbm.getDialogMainFrame();
-    require.invoke(Clojure.read("ln.codax-manager"));
+    dmf = dmf;
+    require.invoke(Clojure.read("lnrocks.core"));
     
   }
 

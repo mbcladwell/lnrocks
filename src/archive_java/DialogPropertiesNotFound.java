@@ -95,21 +95,21 @@ public class DialogPropertiesNotFound extends JDialog
 	//session = new Session();
 	//dmf = session.getDialogMainFrame();
 	IFn require = Clojure.var("clojure.core", "require");
-	require.invoke(Clojure.read("ln.codax-manager"));
+	require.invoke(Clojure.read("lnrocks.core"));
 	//Map<String, String> allprops = (HashMap)getAllProps.invoke();
 	//LOGGER.info("allprops: " + allprops);
     fileChooser = new JFileChooser();
 
     dbSetupPanel = new DatabaseSetupPanel();
-    IFn getSource = Clojure.var("ln.codax-manager", "get-source");
-    IFn getConnURL = Clojure.var("ln.codax-manager", "get-connection-string");
-    IFn getHost = Clojure.var("ln.codax-manager", "get-host");
-    IFn getPort = Clojure.var("ln.codax-manager", "get-port");
-    IFn getDBuser = Clojure.var("ln.codax-manager", "get-db-user");
-    IFn getDBpassword = Clojure.var("ln.codax-manager", "get-db-password");
-    IFn getDBname = Clojure.var("ln.codax-manager", "get-dbname");
-    IFn getSSLmode = Clojure.var("ln.codax-manager", "get-sslmode");
-    IFn getAllPropsMethod  = Clojure.var("ln.codax-manager", "get-all-props");	
+    IFn getSource = Clojure.var("lnrocks.core", "get-source");
+    IFn getConnURL = Clojure.var("lnrocks.core", "get-connection-string");
+    IFn getHost = Clojure.var("lnrocks.core", "get-host");
+    IFn getPort = Clojure.var("lnrocks.core", "get-port");
+    IFn getDBuser = Clojure.var("lnrocks.core", "get-db-user");
+    IFn getDBpassword = Clojure.var("lnrocks.core", "get-db-password");
+    IFn getDBname = Clojure.var("lnrocks.core", "get-dbname");
+    IFn getSSLmode = Clojure.var("lnrocks.core", "get-sslmode");
+    IFn getAllPropsMethod  = Clojure.var("lnrocks.core", "get-all-props");	
 
     
     tabbedPane = new JTabbedPane();
@@ -421,7 +421,7 @@ tabbedPane.addTab("Database setup", icon, panel3,
 
     panel3.add(dbSetupPanel);
     java.io.File nodeFile = new java.io.File("/ln-props/nodes");
-    //IFn recentlyModified  = Clojure.var("ln.codax-manager", "recently-modified?");
+    //IFn recentlyModified  = Clojure.var("lnrocks.core", "recently-modified?");
     Long elapsed = System.currentTimeMillis() - nodeFile.lastModified();
     if(elapsed < 10000){
 	    messageLabel.setText("newly created");
@@ -482,14 +482,14 @@ tabbedPane.addTab("Database setup", icon, panel3,
 
   public void actionPerformed(ActionEvent e) {
       int top_n_number = 0;
-    IFn getSource = Clojure.var("ln.codax-manager", "get-source");
-    IFn getConnURL = Clojure.var("ln.codax-manager", "get-connection-string");
-    IFn getHost = Clojure.var("ln.codax-manager", "get-host");
-    IFn getPort = Clojure.var("ln.codax-manager", "get-port");
-    IFn getDBuser = Clojure.var("ln.codax-manager", "get-db-user");
-    IFn getDBpassword = Clojure.var("ln.codax-manager", "get-db-password");
-    IFn getDBname = Clojure.var("ln.codax-manager", "get-dbname");
-    IFn getSSLmode = Clojure.var("ln.codax-manager", "get-sslmode");
+    IFn getSource = Clojure.var("lnrocks.core", "get-source");
+    IFn getConnURL = Clojure.var("lnrocks.core", "get-connection-string");
+    IFn getHost = Clojure.var("lnrocks.core", "get-host");
+    IFn getPort = Clojure.var("lnrocks.core", "get-port");
+    IFn getDBuser = Clojure.var("lnrocks.core", "get-db-user");
+    IFn getDBpassword = Clojure.var("lnrocks.core", "get-db-password");
+    IFn getDBname = Clojure.var("lnrocks.core", "get-dbname");
+    IFn getSSLmode = Clojure.var("lnrocks.core", "get-sslmode");
 
       if (e.getSource() == sourceBox) {  
    switch(((ComboItem)sourceBox.getSelectedItem()).getKey()){
@@ -571,7 +571,7 @@ tabbedPane.addTab("Database setup", icon, panel3,
     
     if (e.getSource() == updateLnProps) {
 	
-	IFn updateLnPropsMethod  = Clojure.var("ln.codax-manager", "update-ln-props");	  
+	IFn updateLnPropsMethod  = Clojure.var("lnrocks.core", "update-ln-props");	  
 	updateLnPropsMethod.invoke( hostField.getText(),
 				      portField.getText(),
 				    dbnameField.getText(),
@@ -588,7 +588,7 @@ tabbedPane.addTab("Database setup", icon, panel3,
 
    //     if (e.getSource() == readlnpropsButton) {
 	
-   // 	IFn getAllPropsMethod  = Clojure.var("ln.codax-manager", "get-all-props");	
+   // 	IFn getAllPropsMethod  = Clojure.var("lnrocks.core", "get-all-props");	
    // 	Map<String, String>  props = (Map<String, String>)getAllPropsMethod.invoke();
 
    // 	hostField.setText(props.get(":host"));
@@ -611,9 +611,9 @@ tabbedPane.addTab("Database setup", icon, panel3,
       if (returnVal == JFileChooser.APPROVE_OPTION) {
         java.io.File file = fileChooser.getSelectedFile();
 	selectedLabelResponse.setText(file.toString());
-	IFn setLnProps  = Clojure.var("ln.codax-manager", "set-ln-props");
+	IFn setLnProps  = Clojure.var("lnrocks.core", "set-ln-props");
 	setLnProps.invoke(file.toString());
-	IFn getAllProps  = Clojure.var("ln.codax-manager", "get-all-props");
+	IFn getAllProps  = Clojure.var("lnrocks.core", "get-all-props");
 	
 	Map<String, String> results = new HashMap<>();
 	results = (Map<String, String>)getAllProps.invoke();

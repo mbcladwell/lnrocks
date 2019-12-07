@@ -62,16 +62,16 @@ public class DialogGroupPlateSet extends JDialog {
    * @param _format number of wells per plate
    */
     public DialogGroupPlateSet(
-			       DatabaseManager _dbm,
+			       DialogMainFrame dmf,
 			       HashMap<String, String> _plate_set_num_plates,
 			       String _format,
 			       ArrayList<String> _plate_sys_names,
 			       String _layout) {
       //this.session = _session;
       dbm = _dbm;
-    this.dmf = dbm.getDialogMainFrame();
-    require.invoke(Clojure.read("ln.codax-manager"));
-     IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+    this.dmf = dmf;
+    require.invoke(Clojure.read("lnrocks.core"));
+     IFn getUser = Clojure.var("lnrocks.core", "get-user");
     
      owner = (String)getUser.invoke();
     HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
@@ -250,7 +250,7 @@ public class DialogGroupPlateSet extends JDialog {
     okButton.addActionListener(
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	      IFn getProjectID = Clojure.var("ln.codax-manager", "get-project-id");
+	      IFn getProjectID = Clojure.var("lnrocks.core", "get-project-id");
 
             dbm.getDatabaseInserter()
                 .groupPlateSetsIntoNewPlateSet(

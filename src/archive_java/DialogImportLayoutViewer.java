@@ -83,12 +83,12 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
 
 
     
-    public DialogImportLayoutViewer(DatabaseManager _dbm, ArrayList<String[]> _data) {
+    public DialogImportLayoutViewer(DialogMainFrame dmf, ArrayList<String[]> _data) {
 	dbm = _dbm;
-	this.dmf = dbm.getDialogMainFrame();
+	this.dmf = dmf;
 	//   this.session = dmf.getSession();
- require.invoke(Clojure.read("ln.codax-manager"));
-    IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+ require.invoke(Clojure.read("lnrocks.core"));
+    IFn getUser = Clojure.var("lnrocks.core", "get-user");
     
     owner = (String)getUser.invoke();
 

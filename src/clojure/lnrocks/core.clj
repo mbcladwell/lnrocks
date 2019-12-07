@@ -139,7 +139,24 @@
 
 (defn get-plate-sys-name [])
 
+(defn delete-project [prj-id])
 
+(defn update-project
+  "see database inserter"
+  [name descr prj-id]
+  )
+
+(defn get-all-user-groups [])
+
+(defn insert-user "In DialogAddUser" [name tag password group])
+
+(defn get-plate-set-owner-id [pd-id])
+
+(defn get-plate-layout-names [ format])
+
+(defn get-worklist [wl-id])
+
+(defn get-plate-types [])
 ;;(crux/entity (crux/db node ) :ps1)
 ;;(insp/inspect-tree (crux/entity (crux/db node ) :ps1))
 

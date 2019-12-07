@@ -76,12 +76,12 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 
 
     
-  public LayoutViewer(DatabaseManager _dbm) {
+  public LayoutViewer(DialogMainFrame dmf) {
       dbm = _dbm;
-      this.dmf = dbm.getDialogMainFrame();
+      this.dmf = dmf;
       // this.session = dmf.getSession();
-    require.invoke(Clojure.read("ln.codax-manager"));
-       IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+    require.invoke(Clojure.read("lnrocks.core"));
+       IFn getUser = Clojure.var("lnrocks.core", "get-user");
   
        owner = (String)getUser.invoke();
     //layoutNames = session.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);

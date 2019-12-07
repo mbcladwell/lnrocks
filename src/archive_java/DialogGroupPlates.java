@@ -62,12 +62,12 @@ public class DialogGroupPlates extends JDialog {
    * @param _plate_set_num_plates plate set id and the number of plates in the plate set
    * @param _format number of wells per plate
    */
-  public DialogGroupPlates(DatabaseManager _dbm, Set<String> _plates, String _format) {
+  public DialogGroupPlates(DialogMainFrame dmf, Set<String> _plates, String _format) {
       dbm = _dbm;
-      this.dmf = dbm.getDialogMainFrame();
+      this.dmf = dmf;
       //this.session = dmf.getSession();
-      require.invoke(Clojure.read("ln.codax-manager"));
-      IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+      require.invoke(Clojure.read("lnrocks.core"));
+      IFn getUser = Clojure.var("lnrocks.core", "get-user");
       
       owner = (String)getUser.invoke();
     Set<String> plates = _plates;
@@ -86,7 +86,7 @@ public class DialogGroupPlates extends JDialog {
     // String a_ps = list.get(0); // a plate_set from which I will determine the layout
     // LOGGER.info("a_ps: " + a_ps);
     //figure out the layout from the parent plate_set
-    IFn getPlateSetSysName = Clojure.var("ln.codax-manager", "get-plate-set-sys-name");
+    IFn getPlateSetSysName = Clojure.var("lnrocks.core", "get-plate-set-sys-name");
     
     IFn getLayoutIDforPlateSetSysName = Clojure.var("ln.db-retriever", "get-layout-id-for-plate-set-sys-name");
     int layout_id = (int)getLayoutIDforPlateSetSysName.invoke((String)getPlateSetSysName.invoke());
@@ -254,7 +254,7 @@ public class DialogGroupPlates extends JDialog {
     okButton.addActionListener(
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	      IFn getProjectID = Clojure.var("ln.codax-manager", "get-project-id");
+	      IFn getProjectID = Clojure.var("lnrocks.core", "get-project-id");
 	      System.out.println("in DialogGrouPlates launching dbi.groupPlatesIntoPlateSet");
 	      dbm.getDatabaseInserter()
 		  .groupPlatesIntoPlateSet(

@@ -58,18 +58,18 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
         private IFn require = Clojure.var("clojure.core", "require");
 
     
-    public HitListViewer(DatabaseManager _dbm, int _hit_list_id) {
+    public HitListViewer(DialogMainFrame dmf, int _hit_list_id) {
 	dbm = _dbm;
-	this.dmf = dbm.getDialogMainFrame();
+	this.dmf = dmf;
 	// this.session = dmf.getSession();
-	require.invoke(Clojure.read("ln.codax-manager"));
-	IFn getProjectSysName = Clojure.var("ln.codax-manager", "get-project-sys-name");
+	require.invoke(Clojure.read("lnrocks.core"));
+	IFn getProjectSysName = Clojure.var("lnrocks.core", "get-project-sys-name");
 
 	this.setTitle("Hit List Viewer - " + (String)getProjectSysName.invoke());
-	IFn getProjectID = Clojure.var("ln.codax-manager", "get-project-id");
+	IFn getProjectID = Clojure.var("lnrocks.core", "get-project-id");
 	//fails as long
 	project_id = (((Long)getProjectID.invoke()).intValue());
-      IFn getUser = Clojure.var("ln.codax-manager", "get-user");
+      IFn getUser = Clojure.var("lnrocks.core", "get-user");
 
       owner = (String)getUser.invoke();
     hit_list_id = _hit_list_id;
@@ -181,7 +181,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
 	JTable new_hits_table = dbm.getDatabaseRetriever().getSamplesForHitList(selected_hit_list_id);
 	TableModel new_model = new_hits_table.getModel();
 	hits_table.setModel(new_model); 
-	IFn getProjectID = Clojure.var("ln.codax-manager", "get-project-id");
+	IFn getProjectID = Clojure.var("lnrocks.core", "get-project-id");
  
 	JTable new_counts_table = dbm.getDatabaseRetriever().getHitCountPerPlateSet(((Long)getProjectID.invoke()).intValue(), selected_hit_list_id);
 	TableModel new_model2 = new_counts_table.getModel();
@@ -195,7 +195,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
 
 	
     if (e.getSource() == export_hits_button) {
-	Object[][] results = dbm.getDialogMainFrame().getUtilities().getSelectedRowsAndHeaderAsStringArray(hits_table);
+	Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(hits_table);
 	if(results.length>1){
 	    // LOGGER.info("hit list table: " + results);
 	   POIUtilities poi = new POIUtilities(dbm);

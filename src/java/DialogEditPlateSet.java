@@ -26,7 +26,7 @@ import javax.swing.SwingConstants;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 
-public class DialogEditProject extends JDialog {
+public class DialogEditPlateSet extends JDialog {
   static JButton button;
   static JLabel label;
   static JLabel Description;
@@ -35,10 +35,12 @@ public class DialogEditProject extends JDialog {
   static JTextField descriptionField;
   static JButton okButton;
   static JButton cancelButton;
-  static String projectID;
+  static String plate_set_sys_name;
+  static String project_sys_name;
+    
   final Instant instant = Instant.now();
   static DialogMainFrame dmf;
- 
+  
     //  private static Session session;
   private static DatabaseManager dbm;
   final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
@@ -46,14 +48,17 @@ public class DialogEditProject extends JDialog {
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     private IFn require = Clojure.var("clojure.core", "require");
 
-  public DialogEditProject(
-      DatabaseManager _dbm, String _projectid, String _name, String _description) {
-      dbm = _dbm;
-      dmf = dbm.getDialogMainFrame();
-      // session = dmf.getSession();
-      //dbm = session.getDatabaseManager();
-    projectID = _projectid;
-    require.invoke(Clojure.read("ln.codax-manager"));
+  public DialogEditPlateSet(
+      DialogMainFrame _dmf, String _plate_set_sys_name, String _name, String _description) {
+
+      dmf = _dmf;
+      require.invoke(Clojure.read("lnrocks.core"));
+      //session = dmf.getSession();
+        IFn getProjectSysName = Clojure.var("lnrocks.core", "get-project-sys-name");
+
+	project_sys_name = (String)getProjectSysName.invoke();
+    //dbm = session.getDatabaseManager();
+    plate_set_sys_name = _plate_set_sys_name;
 
     JPanel pane = new JPanel(new GridBagLayout());
     pane.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -62,7 +67,7 @@ public class DialogEditProject extends JDialog {
     // Image img = new
     // ImageIcon(DialogAddProject.class.getResource("../resources/mwplate.png")).getImage();
     // this.setIconImage(img);
-    this.setTitle("Edit Project");
+    this.setTitle("Edit Plate Set " + plate_set_sys_name);
     // c.gridwidth = 2;
 
     label = new JLabel("Date:", SwingConstants.RIGHT);
@@ -79,7 +84,7 @@ public class DialogEditProject extends JDialog {
     c.gridy = 1;
     pane.add(label, c);
 
-    label = new JLabel("Project Name:", SwingConstants.RIGHT);
+    label = new JLabel("Plate Set Name:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 2;
     pane.add(label, c);
@@ -96,9 +101,9 @@ public class DialogEditProject extends JDialog {
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(label, c);
 
-        IFn getUser = Clojure.var("ln.codax-manager", "get-user");
- 
-	label = new JLabel((String)getUser.invoke());
+      IFn getUser = Clojure.var("lnrocks.core", "get-user");
+   
+      label = new JLabel((String)getUser.invoke());
     c.gridx = 1;
     c.gridy = 1;
     c.gridheight = 1;
@@ -132,12 +137,9 @@ public class DialogEditProject extends JDialog {
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 
-            // DatabaseManager dm = new DatabaseManager();
-            // dbm.persistObject(new Project(descriptionField.getText(), ownerField.getText(),
-            // nameField.getText()));
-            dbm.getDatabaseInserter()
-                .updateProject(nameField.getText(), descriptionField.getText(), projectID);
-            dmf.getProjectPanel().updatePanel();
+    //         dbm.getDatabaseInserter()
+      //          .updatePlateSet(nameField.getText(), descriptionField.getText(), plate_set_sys_name);
+        //    dmf.getPlateSetPanel().updatePanel(project_sys_name); //the plate set table needs the project id
             dispose();
           }
         }));
@@ -167,5 +169,5 @@ public class DialogEditProject extends JDialog {
     this.setVisible(true);
   }
 
-  private void addToDB() {}
+
 }
