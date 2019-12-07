@@ -96,18 +96,18 @@
 (defn get-plate-sets-for-project [ prj-id]
   (dbr/get-plate-sets-for-project node prj-id))
 
-;;(get-plate-sets-for-project 1)
+(defn get-plates-for-plate-set-id [ ps-id]
+  (dbr/get-plates-for-plate-set-id node ps-id))
+
 ;;(dbr/get-plates-for-plate-set-id node 1)
 
-;;(pprint  (dbr/get-wells-for-plate-id node 1))
+(defn get-wells-for-plate-id [ plt-id]
+  (dbr/get-wells-for-plate-id node plt-id))
 
-(def a (:wells (crux/entity (crux/db node) :plt1)))
-(count a )
-(:H12 a)
-(case 96 96 util/vec96wells 384 util/vec384wells 1536 util/vec1536wells)
 
-((get util/vec96wells 0) a)
- (:accession (crux/entity (crux/db node) (keyword (str "spl" 1)))) 
+;;(get-plate-sets-for-project 1)
+
+;;(pprint  (nth (first(dbr/get-wells-for-plate-id node 1)) 2)
 
 
 ;;(insp/inspect-tree (crux/entity (crux/db node) :spl1))
@@ -161,9 +161,9 @@
   "I don't do a whole lot ... yet."
   [& args]
   (println "In main")
-  ;;(lnrocks.DialogMainFrame. )
+  (lnrocks.DialogMainFrame. )
   )
 
-(-main)
+
 
 

@@ -295,7 +295,9 @@
                                ]
                        :args [{'n1 psid}]
                        :order-by [['n2 :desc]]})
-      colnames ["PlateSetID" "PlateID"  "Order" "Format" "Type" "Barcode ID"]]
+        ps (str "PS-" (nth (first data) 0))
+        plt (str "PLT-" (nth (first data) 1))
+        colnames ["PlateSetID" "PlateID"  "Order" "Format" "Type" "Barcode ID"]]
     (into {} (java.util.HashMap.
               {":colnames" colnames
                ":data" data} ))))
@@ -315,31 +317,26 @@
         ps (str "PS-" (nth (first data) 0))
         plt (str "PLT-" (nth (first data) 1))
         wells  (nth (first data) 2)
+        dummy (println (str "wells: " wells))
         num-wells (count wells)
         vec-wells (case num-wells 96 util/vec96wells 384 util/vec384wells 1536 util/vec1536wells)
         data2 (loop [
-                    counter 0
-                    well 
-                    mydata [ ]
+                     counter 1
+                     well (get vec-wells  (- counter 1))
+                     mydata [[ps plt (name well)  counter  (str "SPL-" (well wells)) (:accession (crux/entity (crux/db node) (keyword (str "spl" (well wells)))))  ] ]
+                     ;;dummy (clojure.pprint/pprint (str  mydata "\n"))
                     ]
                (if (= counter 96)
                  mydata
                  (recur
                   (+ counter 1)
-                  (get vec-wells  counter)
-                  (conj mydata [ps plt (name well) (+ counter 1)  (str "SPL-" (well wells)) (:accession (crux/entity (crux/db node) (keyword (str "spl" (well wells)))))  ]))))
-      
+                  (get vec-wells  (- counter 1))
+                  (conj mydata [ps plt (name well)  counter  (str "SPL-" (well wells)) (:accession (crux/entity (crux/db node) (keyword (str "spl" (well wells)))))  ])
+                  ;;nil
+                 ;; (clojure.pprint/pprint mydata)
+                  )))   
       colnames ["PlateSetID" "PlateID"  "Well" "Well_NUM" "Sample" "Accession"]]
     (into {} (java.util.HashMap.
               {":colnames" colnames
                ":data" data2} ))))
 
-(def a [[1 2 2 2 96 "assay" nil][1 1 1 96 "assay" nil]])
-  data2  (map #(assoc % 0 (str "PS-" (nth % 0))) data)
-        data3  (map #(assoc % 1 (str "PLT-" (nth % 1))) data2)
-       
-(map #(str "PLT-" %) a)
-
-(map #(nth % 0) a)
-
-(map #(assoc % 0 (str "PLT-" (nth % 0))) a)

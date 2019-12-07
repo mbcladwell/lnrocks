@@ -103,12 +103,12 @@ public class DialogMainFrame extends JFrame {
     
  public void showPlateSetTable(String _project_sys_name) {
      int project_id = Integer.parseInt(_project_sys_name.substring(4));
-     
-   //     plate_set_card = new PlateSetPanel(dbm, dbm.getPlateSetTableData(_project_sys_name), _project_sys_name);
-   //   plate_set_card = new PlateSetPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.PLATESET), _project_sys_name);
-
-   // cards.add(plate_set_card, "PlateSetPanel");
-   // card_layout.show(cards, "PlateSetPanel");
+      IFn getPlateSetsForProject = Clojure.var("lnrocks.core", "get-plate-sets-for-project");
+      LOGGER.info("prj-id: " + project_id);
+      plate_set_card = new PlateSetPanel(this, (CustomTable)getPlateSetsForProject.invoke(project_id),  _project_sys_name);
+    
+    cards.add(plate_set_card, "PlateSetPanel");
+    card_layout.show(cards, "PlateSetPanel");
 
  }
 
