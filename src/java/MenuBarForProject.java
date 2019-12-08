@@ -53,7 +53,7 @@ public class MenuBarForProject extends JMenuBar {
           public void actionPerformed(ActionEvent e) {
 
             String[][] results = project_table.getSelectedRowsAndHeaderAsStringArray();
-            POIUtilities poi = new POIUtilities(dbm);
+            POIUtilities poi = new POIUtilities(dmf);
             poi.writeJTableToSpreadsheet("Projects", results);
             try {
               Desktop d = Desktop.getDesktop();
@@ -92,8 +92,8 @@ public class MenuBarForProject extends JMenuBar {
 		 LOGGER.info("down button results: " + results);
 		 LOGGER.info("down button row results: " + results[1][0]);
 		 //    dbm.updateSessionWithProject(results[1][0]);
-		 dmf.setMainFrameTitle(results[1][0]);
-	      dmf.showPlateSetTable(results[1][0]);
+		 dmf.setMainFrameTitle(results[1][1]);
+	      dmf.showPlateSetTable(results[1][1]);
 	     
             } catch (ArrayIndexOutOfBoundsException s) {
 		JOptionPane.showMessageDialog( dmf,

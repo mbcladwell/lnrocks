@@ -87,24 +87,24 @@ public class ProjectPanel extends JPanel {
     c.gridy = 1;
     textPanel.add(label, c);
 
-    //      IFn getUser = Clojure.var("lnrocks.core", "get-user");
+         IFn getUser = Clojure.var("lnrocks.core", "get-user");
 
-    // 	 JLabel userLabel = new JLabel((String)getUser.invoke(), SwingConstants.LEFT);
-    // c.gridx = 1;
-    // c.gridy = 0;
-    // // c.gridwidth = 3;
-    // c.weightx = 0.9;
-    // c.fill = GridBagConstraints.HORIZONTAL;
-    // c.anchor = GridBagConstraints.LINE_START;
-    // textPanel.add(userLabel, c);
+    	 JLabel userLabel = new JLabel((String)getUser.invoke(), SwingConstants.LEFT);
+     c.gridx = 1;
+     c.gridy = 0;
+    // c.gridwidth = 3;
+    c.weightx = 0.9;
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.anchor = GridBagConstraints.LINE_START;
+    textPanel.add(userLabel, c);
 
-    //     IFn getUserGroup = Clojure.var("lnrocks.core", "get-user-group");
+        IFn getUserGroup = Clojure.var("lnrocks.core", "get-user-group");
 
-    // 	JLabel groupLabel = new JLabel((String)getUserGroup.invoke(), SwingConstants.LEFT);
-    // c.gridx = 1;
-    // c.gridy = 1;
-    // textPanel.add(groupLabel, c);
-    // headerPanel.add(textPanel, BorderLayout.CENTER);
+    	JLabel groupLabel = new JLabel((String)getUserGroup.invoke(), SwingConstants.LEFT);
+    c.gridx = 1;
+    c.gridy = 1;
+    textPanel.add(groupLabel, c);
+    headerPanel.add(textPanel, BorderLayout.CENTER);
 
     this.add(headerPanel, BorderLayout.NORTH);
 
@@ -112,7 +112,7 @@ public class ProjectPanel extends JPanel {
     this.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
        FilterPanel fp = new FilterPanel(dmf, table, 0, DialogMainFrame.PROJECT );
-    // this.add(fp, BorderLayout.SOUTH);
+     this.add(fp, BorderLayout.SOUTH);
   }
 
   public JTable getTable() {

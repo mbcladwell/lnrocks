@@ -247,8 +247,10 @@
 	             :where [[e :id n]
                              [e :project-sys-name s1]
                              [e :name s2]
-                             [e :owner s3]
-                             [e :description s4]]
+                             [e :owner-id n2]
+                             [e :description s4]
+                             [e2 :id n2]
+                             [e2 :lnuser_name s3]]
                      :order-by [[n :desc]]})
       colnames ["ID" "ProjectID" "Name" "Owner" "Description"] ]
   (into {} (java.util.HashMap.

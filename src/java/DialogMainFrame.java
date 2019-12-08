@@ -94,8 +94,11 @@ public class DialogMainFrame extends JFrame {
 
   public void showProjectTable() {
       IFn getAllProjects = Clojure.var("lnrocks.core", "get-all-projects");
-      
-      project_card = new ProjectPanel(this, (CustomTable)getAllProjects.invoke());
+
+       CustomTable projectTable = new CustomTable(this, buildTableModel((Map)getAllProjects.invoke()));
+    project_card = new ProjectPanel(this, projectTable);
+   
+    //   project_card = new ProjectPanel(this, (CustomTable)getAllProjects.invoke());
       cards.add(project_card, "ProjectPanel");
       card_layout.show(cards, "ProjectPanel");
   }
@@ -105,7 +108,11 @@ public class DialogMainFrame extends JFrame {
      int project_id = Integer.parseInt(_project_sys_name.substring(4));
       IFn getPlateSetsForProject = Clojure.var("lnrocks.core", "get-plate-sets-for-project");
       LOGGER.info("prj-id: " + project_id);
-      plate_set_card = new PlateSetPanel(this, (CustomTable)getPlateSetsForProject.invoke(project_id),  _project_sys_name);
+
+           CustomTable plateSetTable = new CustomTable(this, buildTableModel((Map)getPlateSetsForProject.invoke(project_id)));
+    plate_set_card = new PlateSetPanel(this, plateSetTable,  _project_sys_name);
+  
+    //  plate_set_card = new PlateSetPanel(this, (CustomTable)getPlateSetsForProject.invoke(project_id),  _project_sys_name);
     
     cards.add(plate_set_card, "PlateSetPanel");
     card_layout.show(cards, "PlateSetPanel");
@@ -199,7 +206,7 @@ public class DialogMainFrame extends JFrame {
 	Vector<String> columnNames = new Vector<String>();
 
 	for (int column = 0; column < columnCount; column++) {
-	  //	  System.out.println((colnames.get(column)).toString());
+	  	  System.out.println((colnames.get(column)).toString());
 	  columnNames.addElement(colnames.get(column).toString());
       }
     //   // data of the table
@@ -215,7 +222,7 @@ public class DialogMainFrame extends JFrame {
         }
          data.add(vector);
       }
-      // LOGGER.info("data: " + data);
+       LOGGER.info("data: " + data);
        return new DefaultTableModel(data, columnNames);
 
     //   //          data.stream().map(List::toArray).toArray(Object[][]::new), columnNames);

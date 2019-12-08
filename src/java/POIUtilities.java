@@ -18,10 +18,10 @@ public class POIUtilities {
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   private File file;
   private static final String newline = "\n";
-    private DatabaseManager dbm;
+    private DialogMainFrame dmf;
 
   public POIUtilities(DialogMainFrame _dmf) {
-      dbm = _dmf;    
+      dmf = _dmf;    
   }
   /**
    * Convert any table to a spreadsheet. This first row is a header. Use the first column in

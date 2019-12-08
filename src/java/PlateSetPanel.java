@@ -12,11 +12,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableModel;
+import clojure.java.api.Clojure;
+import clojure.lang.IFn;
 
 public class PlateSetPanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private IFn require = Clojure.var("clojure.core", "require");
 
   private CustomTable table;
   private JScrollPane scrollPane;
@@ -24,6 +27,7 @@ public class PlateSetPanel extends JPanel {
     private DatabaseManager dbm;
   private JPanel textPanel;
   private String project_sys_name;
+    private int project_id;
     // private Session session;
 
   public PlateSetPanel(DialogMainFrame _dmf, CustomTable _table, String _project_sys_name) {
@@ -33,10 +37,10 @@ public class PlateSetPanel extends JPanel {
     //session = dmf.getSession();
     table = _table;
     project_sys_name = _project_sys_name;
-
+    project_id = Integer.valueOf(project_sys_name.substring(4)).intValue();
     JPanel headerPanel = new JPanel();
     headerPanel.setLayout(new BorderLayout());
-    headerPanel.add(new MenuBarForPlateSet(dbm, table), BorderLayout.NORTH);
+    headerPanel.add(new MenuBarForPlateSet(dmf, table), BorderLayout.NORTH);
 
     textPanel = new JPanel();
     textPanel.setLayout(new GridBagLayout());
@@ -63,10 +67,11 @@ public class PlateSetPanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_START;
     textPanel.add(projectLabel, c);
 
+           IFn getDescriptionForProject = Clojure.var("lnrocks.core", "get-descr-for-project");
+
     JLabel descriptionLabel =
         new JLabel(
-            dbm.getDatabaseRetriever()
-                .getDescriptionForProject(project_sys_name),
+		   (String)getDescriptionForProject.invoke(project_id),
             SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 1;

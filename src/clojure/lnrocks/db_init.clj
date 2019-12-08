@@ -15,7 +15,8 @@
 ;;;Database setup
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
+;;number is the last used
+;;use + 1 as the next available
 (def counters
  {:crux.db/id :counters
   :project 0
@@ -26,7 +27,8 @@
   :assay-run 0
   :work-list 0
   :session-id 1
-  :layout 0}
+  :layout 0
+  :user 2}
   )
 
 
@@ -60,6 +62,7 @@
    :plate-id 1
    :plate-sys-name "PLT-1"})
   
+
 
 (def helpers
   [{:crux.db/id :plate-formats :96 96 :384 384 :1536 1536}

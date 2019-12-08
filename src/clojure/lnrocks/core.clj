@@ -84,6 +84,22 @@
          )))))
 
   
+(def user-groups  ["admin" "user"])
+(defn get-user-groups []
+  user-groups)
+
+(def assay-types ["ELISA"  "Octet"  "SNP"  "HCS"  "HTRF"  "FACS"])
+(defn get-assay-types []
+  assay-types)
+
+(def plate-types ["assay"  "rearray"  "master"  "daughter"  "archive"  "replicate"])
+
+(defn get-plate-types []
+  plate-types)
+
+(def formats [96 384 1536])
+(defn get-plate-formats []
+  formats)
 
 
 ;;(dbr/get-plates-for-plate-set-id node 1)
@@ -96,6 +112,9 @@
 (defn get-plate-sets-for-project [ prj-id]
   (dbr/get-plate-sets-for-project node prj-id))
 
+;;(get-plate-sets-for-project 1)
+
+
 (defn get-plates-for-plate-set-id [ ps-id]
   (dbr/get-plates-for-plate-set-id node ps-id))
 
@@ -104,10 +123,7 @@
 (defn get-wells-for-plate-id [ plt-id]
   (dbr/get-wells-for-plate-id node plt-id))
 
-
-;;(get-plate-sets-for-project 1)
-
-;;(pprint  (nth (first(dbr/get-wells-for-plate-id node 1)) 2)
+;;(dbr/get-wells-for-plate-id node 1)
 
 
 ;;(insp/inspect-tree (crux/entity (crux/db node) :spl1))
@@ -127,36 +143,126 @@
  (defn get-user-group [ ]
  (:user-group (crux/entity (crux/db node ) :props)))
 
+;;(get-user-group)
+
+(defn get-user [ ]
+ (:user (crux/entity (crux/db node ) :props)))
+
+;;(get-user)
+
 (defn get-help-url-prefix [ ]
   (:help-url-prefix (crux/entity (crux/db node ) :props)))
 
  (defn open-help-page [s]
    (browse/browse-url (str (get-help-url-prefix) s)))
 
-(defn get-project-sys-name [])
+(defn get-project-sys-name []
+   (:project-sys-name (crux/entity (crux/db node ) :props)))
 
-(defn get-plate-set-sys-name [])
+;;(get-project-sys-name)
 
-(defn get-plate-sys-name [])
+(defn get-project-id []
+   (:project-id (crux/entity (crux/db node ) :props)))
 
-(defn delete-project [prj-id])
+(defn get-project-desc [prj-id]
+(:description (crux/entity (crux/db node ) (keyword (str "prj" prj-id)))  ))
+
+(defn get-plate-set-sys-name []
+  (:plate-set-sys-name (crux/entity (crux/db node ) :props)))
+
+(defn get-plate-set-id []
+  (:plate-set-id (crux/entity (crux/db node ) :props)))
+
+(defn get-plate-sys-name []
+  (:plate-sys-name (crux/entity (crux/db node ) :props)))
+
+(defn get-plate-id []
+  (:plate-id (crux/entity (crux/db node ) :props)))
+
+
+(defn delete-project [prj-id]
+   (crux/submit-tx  node  [[:crux.tx/evict (keyword (str "prj" prj-id))]])  )
+
+;;(delete-project 6)
 
 (defn update-project
   "see database inserter"
   [name descr prj-id]
-  )
+  (let [ old (crux/entity (crux/db node) (keyword (str "prj" prj-id)))
+        new1 (assoc old :name name)
+        new2 (assoc new1 :description descr)
+        new3 (assoc new2 :lnsession-id (get-session-id))]
+  (crux/submit-tx node [[:crux.tx/cas old new3]])))
 
-(defn get-all-user-groups [])
+;;(update-project "newname" "newdescr" 5)
+;;(insp/inspect-tree (crux/entity (crux/db node) :prj5))
 
-(defn insert-user "In DialogAddUser" [name tag password group])
+(defn insert-user
+  "In DialogAddUser"
+  [name tag password group]
+  (let [ user-id (dbr/counter node :user 1)
+        new-user {:crux.db/id (keyword (str "lnuser" user-id))
+                  :id user-id
+                  :group group
+                  :lnuser_name name
+                  :tags #{[tag]}
+                  :password password}]
+    (crux/submit-tx node [[:crux.tx/put new-user]])))
 
-(defn get-plate-set-owner-id [pd-id])
 
-(defn get-plate-layout-names [ format])
 
-(defn get-worklist [wl-id])
+(defn get-plate-set-owner-id [ps-id]
+  (:owner-id (crux/entity (crux/db node ) (keyword (str "ps" ps-id)))  ))
 
-(defn get-plate-types [])
+;;(get-plate-set-owner-id 1)
+;;(insp/inspect-tree (crux/entity (crux/db node) :ps5))
+
+
+
+(defn get-plate-layout-names
+ "select id, name from plate_layout_name WHERE plate_format_id = ?;"
+  [ format]
+(let [data (crux/q (crux/db node)
+	           '{:find [n s1 ]
+	             :where [[e :id n]
+                             [e :name s1]
+                             [e :plate-format-id format]
+                            ]
+                     :order-by [[n :desc]]})
+      colnames ["ID" "Plate Layout Name" ] ]
+  (into {} (java.util.HashMap.
+            {":colnames" colnames
+             ":data" data}))))
+
+  ;;(get-plate-layout-names 96)
+;;(insp/inspect-tree (crux/entity (crux/db node ) :lyt1))
+
+
+(defn get-worklist
+  "SELECT sample_id, source_plate, source_well, dest_plate, dest_well FROM worklists WHERE rearray_pairs_id = ?;
+:worklist now part of plate-set"
+  [wl-id]
+(let [data (crux/q (crux/db node)
+	           '{:find [n s1 ]
+	             :where [[e :id n]
+                             [e :name s1]
+                             [e :plate-format-id format]
+                            ]
+                     :order-by [[n :desc]]})
+      colnames ["ID" "Plate Layout Name" ] ]
+  (into {} (java.util.HashMap.
+            {":colnames" colnames
+             ":data" data}))))
+
+;;(insp/inspect-tree (crux/entity (crux/db node ) :ps1))
+
+
+  
+
+
+(defn get-plate-set-data [ ps-id])
+
+
 ;;(crux/entity (crux/db node ) :ps1)
 ;;(insp/inspect-tree (crux/entity (crux/db node ) :ps1))
 

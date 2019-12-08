@@ -224,7 +224,7 @@
             :project-id (Integer/parseInt (String. (:project-id x)))
             :plate-layout-name-id (Integer/parseInt (String. (:plate-layout-name-id x)))
             :lnsession-id (Integer/parseInt (String. (:lnsession-id x)))
-            :owner "ln_admin"
+            :owner-id 1
             :worklist nil}))
 
 
@@ -284,7 +284,7 @@
             :name (:name x )
             :lnsession-id (Integer/parseInt (String. (:lnsession-id x)))
             :id (Integer/parseInt (String. (:id x)))
-            :owner "ln_admin"
+            :owner-id 1
             }))
 
 

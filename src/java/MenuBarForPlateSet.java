@@ -245,7 +245,8 @@ public class MenuBarForPlateSet extends JMenuBar {
           public void actionPerformed(ActionEvent e) {
 		if(!plate_set_table.getSelectionModel().isSelectionEmpty()){
 
-       		    
+               IFn getPlateSetData = Clojure.var("lnrocks.core", "get-plate-set-data");
+    		    
 		    Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(plate_set_table);
 		    if(results.length>1){
 			String[] plate_set_ids = new String[results.length];
@@ -255,14 +256,15 @@ public class MenuBarForPlateSet extends JMenuBar {
 			  plate_set_ids[i] =  plate_set_table.getModel().getValueAt(i, 0).toString().substring(3);
 			  LOGGER.info("psid: " + plate_set_ids[i] );
 			  }
+   
+			    Object[][] plate_set_data = (Object[][])getPlateSetData.invoke(plate_set_ids);
 
-			 //   Object[][] plate_set_data = dbm.getDatabaseRetriever().getPlateSetData(plate_set_ids);
-			 //   POIUtilities poi = new POIUtilities(dmf);
+			    POIUtilities poi = new POIUtilities(dmf);
 			    
-			//    poi.writeJTableToSpreadsheet("Plate Set Information", plate_set_data);
+			    poi.writeJTableToSpreadsheet("Plate Set Information", plate_set_data);
 			
-			//    Desktop d = Desktop.getDesktop();
-			 //   d.open(new File("./Writesheet.xlsx"));
+			    Desktop d = Desktop.getDesktop();
+			    d.open(new File("./Writesheet.xlsx"));
 			}catch(IOException ioe){
 			    JOptionPane.showMessageDialog(dmf, "IOException!: " + ioe);   
 			}    
