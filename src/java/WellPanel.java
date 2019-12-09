@@ -13,7 +13,8 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableModel;
 
-public class PlatePanel extends JPanel {
+
+public class WellPanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -21,22 +22,22 @@ public class PlatePanel extends JPanel {
   private CustomTable table;
   private JScrollPane scrollPane;
   private DialogMainFrame dmf;
-    private DatabaseManager dbm;
   private JPanel textPanel;
-  private String plate_set_sys_name;
-    // private Session session;
+  private String plateset_sys_name;
+  private String plate_sys_name;
+    //   private Session session;    
+    private DatabaseManager dbm;
     
-    public PlatePanel(DialogMainFrame dmf, CustomTable _table, String _plate_set_sys_name) {
+  public WellPanel(DialogMainFrame dmf, CustomTable _table) {
     this.setLayout(new BorderLayout());
-    dbm = _dbm;
-    dmf = dmf;
-    plate_set_sys_name = _plate_set_sys_name;
-    // session = dmf.getSession();
+   
+    dmf = _dmf;
     table = _table;
-
+    //  session = dmf.getSession();
+    
     JPanel headerPanel = new JPanel();
     headerPanel.setLayout(new BorderLayout());
-    headerPanel.add(new MenuBarForPlate(dbm, table), BorderLayout.NORTH);
+    headerPanel.add(new MenuBarForWell(dmf, table), BorderLayout.NORTH);
 
     textPanel = new JPanel();
     textPanel.setLayout(new GridBagLayout());
@@ -48,13 +49,14 @@ public class PlatePanel extends JPanel {
     c.weightx = 0.1;
     c.insets = new Insets(5, 5, 2, 2);
     textPanel.add(label, c);
-    /*
-    label = new JLabel("Project: ", SwingConstants.RIGHT);
+
+    /*    label = new JLabel("Project: ", SwingConstants.RIGHT);
     c.gridx = 2;
     c.gridy = 0;
     c.anchor = GridBagConstraints.LINE_END;
     textPanel.add(label, c);
-
+    
+    
     JLabel projectLabel = new JLabel(dmf.getSession().getProjectSysName(), SwingConstants.LEFT);
     c.gridx = 3;
     c.gridy = 0;
@@ -69,12 +71,14 @@ public class PlatePanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_END;
     textPanel.add(label, c);
 
-    //LOGGER.info("table.getValueAt(0, 0)" + table.getValueAt(0, 0));
+    plate_sys_name = (String) table.getValueAt(1,1);
+    System.out.println("plate_sys_name: " + plate_sys_name);
+    plateset_sys_name =
+        dbm.getDatabaseRetriever()
+    	.getPlateSetSysNameForPlateSysName(plate_sys_name);
 
-    //  plateset_sys_name =
-    //  dbm.getDatabaseRetriever()
-    //      .getPlateSetSysNameForPlateSysName((String) table.getValueAt(0, 0));
-    JLabel platesetLabel = new JLabel(plate_set_sys_name, SwingConstants.LEFT);
+    
+    JLabel platesetLabel = new JLabel(plateset_sys_name, SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 0;
     c.gridwidth = 1;
@@ -87,7 +91,7 @@ public class PlatePanel extends JPanel {
     JLabel descriptionLabel =
         new JLabel(
             dbm.getDatabaseRetriever()
-                .getDescriptionForPlateSet(plate_set_sys_name),
+                .getDescriptionForPlateSet(plateset_sys_name),
             SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 1;
@@ -99,18 +103,18 @@ public class PlatePanel extends JPanel {
     scrollPane = new JScrollPane(table);
     this.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
-    FilterPanel fp = new FilterPanel(dbm, table, Integer.parseInt(plate_set_sys_name.substring(3)) ,DialogMainFrame.PLATE );
+    FilterPanel fp = new FilterPanel(dbm, (JTable)table, Integer.parseInt(plate_sys_name.substring(4)) , DialogMainFrame.WELL );
     this.add(fp, BorderLayout.SOUTH);
   }
 
-  public JTable getTable() {
+  public CustomTable getTable() {
     return table;
   }
 
-  public void updatePanel(String _plate_set_sys_name) {
-    String plate_set_sys_name = _plate_set_sys_name;
-      int plate_set_id = Integer.parseInt(plate_set_sys_name.substring(3));
-    JTable table = dbm.getDatabaseRetriever().getDMFTableData(plate_set_id, DialogMainFrame.PLATE);
+    public void updatePanel(String _plate_sys_name) {
+    String plate_sys_name = _plate_sys_name;
+      int plate_id = Integer.parseInt(plate_sys_name.substring(4));
+    JTable table = dbm.getDatabaseRetriever().getDMFTableData(plate_id, DialogMainFrame.WELL);
     TableModel model = table.getModel();
     this.table.setModel(model);
   }

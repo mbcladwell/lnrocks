@@ -109,10 +109,10 @@
 ;;(new-plate-set "my set 1" "desc" 3 96 1 1 1 2 true)
 ;;(:plates (crux/entity (crux/db node ) :PS-13))
 ;;(crux/entity (crux/db node ) :counters)
-(defn get-plates-in-project [node x]
-  (crux/q (crux/db node)
-          '{:find [e p  ]
-            :where [[e :ps-name p]]}))
+;; (defn get-plates-in-project [node x]
+;;   (crux/q (crux/db node)
+;;           '{:find [e p  ]
+;;             :where [[e :ps-name p]]}))
                     
   ;;(count (get-plates-in-project 2))
 
@@ -260,8 +260,9 @@
 
 
 (defn get-plate-sets-for-project [node prj-id]
-(let [data (crux/q (crux/db node)
-	           {:find '[n s1 s2 s3 n3 s4 s5 s6 s8 s7]
+  
+   (let [data  (crux/q (crux/db node)
+	           {:find '[n s1 s2 s3 n3 s4 s5 s6 s8 ]
 	             :where '[[e :id n]
                               [e :plate-set-sys-name s1]
                               [e :plate-set-name s2]
@@ -270,14 +271,15 @@
                               [e :plate-type s4]
                               [e :plate-layout-name-id s5]
                               [e :descr s6]
-                              [e :worklist s7]
+                             ;;[e :worklist s7]
                               [e2 :id s5]
                               [e2 :name s8]
                               [e2 :layout n5]
                               [e :project-id n2]]
                      :args [{'n2 prj-id}]
-                     :order-by [['n :desc]]})
-      colnames ["PlateSetID" "PlateSetName" "Name" "Format" "# plates" "Type" "Layout" "Description" "Layout" "Worklist"]]
+                    :order-by [['n :desc]]})
+    ;;  data2  (doall (map #(if (nil? (nth % 9)) (assoc % 9 "NA"))  data))
+      colnames ["PlateSetID" "PlateSetName" "Name" "Format" "# plates" "Type" "Layout" "Description" "Layout"  ]]
   (into {} (java.util.HashMap.
             {":colnames" colnames
              ":data" data} ))))

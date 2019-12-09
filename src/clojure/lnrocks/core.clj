@@ -126,6 +126,8 @@
 ;;(dbr/get-wells-for-plate-id node 1)
 
 
+(defn get-all-plates-for-project [ prj-id])
+
 ;;(insp/inspect-tree (crux/entity (crux/db node) :spl1))
 ;;(insp/inspect-tree  new-ps1)
 ;;    (egd/assoc-plt-with-ps node)
@@ -208,6 +210,8 @@
                   :tags #{[tag]}
                   :password password}]
     (crux/submit-tx node [[:crux.tx/put new-user]])))
+
+
 
 
 

@@ -25,7 +25,7 @@ public class MenuBarForWell extends JMenuBar {
 
   private static final long serialVersionUID = 1L;
   DialogMainFrame dmf;
-    DatabaseManager dbm;
+ 
   CustomTable well_table;
     //    Session session;
      private IFn require = Clojure.var("clojure.core", "require");
@@ -33,7 +33,7 @@ public class MenuBarForWell extends JMenuBar {
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public MenuBarForWell(DialogMainFrame dmf, CustomTable _table) {
-      dbm = _dbm;
+   
       //session = _s;
       //dmf = session.getDialogMainFrame();
     well_table = _table;
@@ -87,7 +87,7 @@ public class MenuBarForWell extends JMenuBar {
           public void actionPerformed(ActionEvent e) {
 
             String[][] results = well_table.getSelectedRowsAndHeaderAsStringArray();
-            POIUtilities poi = new POIUtilities(dbm);
+            POIUtilities poi = new POIUtilities(dmf);
             poi.writeJTableToSpreadsheet("Projects", results);
             try {
               Desktop d = Desktop.getDesktop();
@@ -119,12 +119,12 @@ public class MenuBarForWell extends JMenuBar {
 
     this.add(upbutton);
 
-      menu = new ViewerMenu(dbm);
+    menu = new ViewerMenu(dmf);
     this.add(menu);
 
     this.add(Box.createHorizontalGlue());
 
-          menu = new HelpMenu();
+    menu = new HelpMenu();
     this.add(menu);
   
    }

@@ -32,7 +32,7 @@ public class MenuBarForPlate extends JMenuBar {
 
 
   public MenuBarForPlate(DialogMainFrame dmf, CustomTable _table) {
-      dbm = _dbm;
+   
     plate_table = _table;
     //dmf = dmf;
     // Create the menu bar.

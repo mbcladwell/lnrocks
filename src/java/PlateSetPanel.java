@@ -67,11 +67,11 @@ public class PlateSetPanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_START;
     textPanel.add(projectLabel, c);
 
-           IFn getDescriptionForProject = Clojure.var("lnrocks.core", "get-descr-for-project");
+           IFn getProjectDesc = Clojure.var("lnrocks.core", "get-project-desc");
 
     JLabel descriptionLabel =
         new JLabel(
-		   (String)getDescriptionForProject.invoke(project_id),
+		   (String)getProjectDesc.invoke(project_id),
             SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 1;
