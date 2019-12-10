@@ -259,10 +259,9 @@
 
 
 
-(defn get-plate-sets-for-project [node prj-id]
-  
+(defn get-plate-sets-for-project [node prj-id] 
    (let [data  (crux/q (crux/db node)
-	           {:find '[n s1 s2 s3 n3 s4 s5 s6 s8 ]
+	           {:find '[n s1 s2 s3 n3 s4 s5 s6 s8 s7 ]
 	             :where '[[e :id n]
                               [e :plate-set-sys-name s1]
                               [e :plate-set-name s2]
@@ -271,28 +270,38 @@
                               [e :plate-type s4]
                               [e :plate-layout-name-id s5]
                               [e :descr s6]
-                             ;;[e :worklist s7]
+                             [e :worklist s7]
                               [e2 :id s5]
                               [e2 :name s8]
                               [e2 :layout n5]
                               [e :project-id n2]]
                      :args [{'n2 prj-id}]
                     :order-by [['n :desc]]})
-    ;;  data2  (doall (map #(if (nil? (nth % 9)) (assoc % 9 "NA"))  data))
-      colnames ["PlateSetID" "PlateSetName" "Name" "Format" "# plates" "Type" "Layout" "Description" "Layout"  ]]
-  (into {} (java.util.HashMap.
-            {":colnames" colnames
-             ":data" data} ))))
+         data2  (vector (loop [counter 0
+                       oldvec (nth data counter)
+                       newvec (assoc oldvec 9 "--")
+                       data2 [newvec]]
+                  (if (= counter (count data))
+                    data2
+                    (recur
+                     (+ counter 1)
+                     (nth data counter)
+                     (assoc oldvec 9 "--")
+                     (conj data2 newvec)
+                     ))))
+      colnames ["PlateSetID" "PlateSetName" "Name" "Format" "# plates" "Type" "Layout" "Description" "Layout" "Worklist"  ]]
+            {:colnames colnames
+             :data data} ))
 
 (defn get-plates-for-plate-set-id
   [node psid]
   (let [
         data (crux/q (crux/db node)
-	             {:find '[n1  n2 n3 n4 s3 s2 ]
+	             {:find '[n1  n2 n3 n4 s3  ]
 	              :where '[[e :plate-set-id n1]  ;;e is plate
                                [e :id n2]
                                [e :plate-order n3]
-                               [e :barcode s2]
+                             ;;  [e :barcode s2]
                                [e2 :id n1 ]   ;;e2 is plate-set
                                [e2 :plate-type s3]
                                [e2 :plate-format n4]
@@ -301,7 +310,7 @@
                        :order-by [['n2 :desc]]})
         ps (str "PS-" (nth (first data) 0))
         plt (str "PLT-" (nth (first data) 1))
-        colnames ["PlateSetID" "PlateID"  "Order" "Format" "Type" "Barcode ID"]]
+        colnames ["PlateSetID" "PlateID"  "Order" "Format" "Type"]]
     (into {} (java.util.HashMap.
               {":colnames" colnames
                ":data" data} ))))

@@ -12,11 +12,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableModel;
+import clojure.java.api.Clojure;
+import clojure.lang.IFn;
 
 public class PlatePanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private IFn require = Clojure.var("clojure.core", "require");
 
   private CustomTable table;
   private JScrollPane scrollPane;
@@ -26,7 +29,7 @@ public class PlatePanel extends JPanel {
   private String plate_set_sys_name;
     // private Session session;
     
-    public PlatePanel(DialogMainFrame dmf, CustomTable _table, String _plate_set_sys_name) {
+    public PlatePanel(DialogMainFrame _dmf, CustomTable _table, String _plate_set_sys_name) {
     this.setLayout(new BorderLayout());
     
     dmf = _dmf;
@@ -36,7 +39,7 @@ public class PlatePanel extends JPanel {
 
     JPanel headerPanel = new JPanel();
     headerPanel.setLayout(new BorderLayout());
-    headerPanel.add(new MenuBarForPlate(dbm, table), BorderLayout.NORTH);
+    headerPanel.add(new MenuBarForPlate(dmf, table), BorderLayout.NORTH);
 
     textPanel = new JPanel();
     textPanel.setLayout(new GridBagLayout());
@@ -84,10 +87,10 @@ public class PlatePanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_START;
     textPanel.add(platesetLabel, c);
 
+        IFn getDescriptionForPlateSet = Clojure.var("lnrocks.core", "get-description-for-plate-set");
+
     JLabel descriptionLabel =
-        new JLabel(
-            dbm.getDatabaseRetriever()
-                .getDescriptionForPlateSet(plate_set_sys_name),
+        new JLabel((String)getDescriptionForPlateSet.invoke(plate_set_sys_name),
             SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 1;
@@ -99,7 +102,7 @@ public class PlatePanel extends JPanel {
     scrollPane = new JScrollPane(table);
     this.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
-    FilterPanel fp = new FilterPanel(dbm, table, Integer.parseInt(plate_set_sys_name.substring(3)) ,DialogMainFrame.PLATE );
+    FilterPanel fp = new FilterPanel(dmf, table, Integer.parseInt(plate_set_sys_name.substring(3)) ,DialogMainFrame.PLATE );
     this.add(fp, BorderLayout.SOUTH);
   }
 

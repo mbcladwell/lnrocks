@@ -72,7 +72,31 @@ public class DialogMainFrame extends JFrame {
     CustomTable projectTable = new CustomTable(this, buildTableModel((Map)getAllProjects.invoke()));
     project_card = new ProjectPanel(this, projectTable);
     cards.add(project_card, "ProjectPanel");
-  
+
+    /////////////////////////////////////////////////////////////////
+    System.out.println("");
+    System.out.println("");
+    System.out.println("");
+    System.out.println("==========experimental===========");
+
+  IFn getPlateSetsForProject = Clojure.var("lnrocks.core", "get-plate-sets-for-project");
+   
+     Map<String, PersistentVector> hm = (Map)getPlateSetsForProject.invoke(1);
+     
+     for (Map.Entry<String, PersistentVector> e : hm.entrySet()){
+	 
+	 System.out.println(e.getKey());
+	 System.out.println((e.getValue()).chunkedSeq());
+     }
+
+     //			    + ": " + e.getValue().toArray());}
+
+
+     System.out.println("===================================");
+    System.out.println("");
+    System.out.println("");
+    
+/////////////////////////////////////////////////////////////////
     
     this.getContentPane().add(cards, BorderLayout.CENTER);
 
@@ -110,7 +134,15 @@ public class DialogMainFrame extends JFrame {
      IFn getPlateSetsForProject = Clojure.var("lnrocks.core", "get-plate-sets-for-project");
      LOGGER.info("prj-id: " + project_id);
 
-      CustomTable plateSetTable = new CustomTable(this, buildTableModel((Map)getPlateSetsForProject.invoke(project_id)));
+     Map<String, PersistentVector> hm = (Map)getPlateSetsForProject.invoke(project_id);
+     
+     for (Map.Entry<String, PersistentVector> e : hm.entrySet()){
+	 System.out.println(e.getKey() + ": " + e.getValue().toArray());}
+
+
+     CustomTable plateSetTable = new CustomTable(this, buildTableModel(hm));
+     
+      //    CustomTable plateSetTable = new CustomTable(this, buildTableModel((Map)getPlateSetsForProject.invoke(project_id)));
       plate_set_card = new PlateSetPanel(this, plateSetTable,  _project_sys_name);
 
       cards.add(plate_set_card, "PlateSetPanel");
@@ -118,30 +150,26 @@ public class DialogMainFrame extends JFrame {
 
  }
 
-
     public void showPlateTable(String _plate_set_sys_name) {
       
      int plate_set_id = Integer.parseInt(_plate_set_sys_name.substring(3));
 
-     IFn getPlatesForPlateSet = Clojure.var("lnrocks.core", "get-plates-for-plate-set");
-     CustomTable plateTable = new CustomTable(this, buildTableModel((Map)getPlatesForPlateSet.invoke(plate_set_id)));
+     IFn getPlatesForPlateSetID = Clojure.var("lnrocks.core", "get-plates-for-plate-set-id");
+     CustomTable plateTable = new CustomTable(this, buildTableModel((Map)getPlatesForPlateSetID.invoke(plate_set_id)));
       plate_set_card = new PlateSetPanel(this, plateTable,  _plate_set_sys_name);
 
    cards.add(plate_card, "PlatePanel");
    card_layout.show(cards, "PlatePanel");
  }
 
-     public void showAllPlatesTable(String _project_sys_name) {
+    public void showAllPlatesTable(String _project_sys_name) {
       
-     int project_id = Integer.parseInt(_project_sys_name.substring(4));
-
-
-  IFn getAllPlatesForProject = Clojure.var("lnrocks.core", "get-all-plates-for-project");
-     CustomTable allPlatesTable = new CustomTable(this, buildTableModel((Map)getAllPlatesForProject.invoke(project_id)));
-      all_plates_card = new AllPlatesPanel(this, allPlateaTable,  _project_sys_name);
-
-   cards.add(all_plates_card, "AllPlatesPanel");
-   card_layout.show(cards, "AllPlatesPanel");
+	int project_id = Integer.parseInt(_project_sys_name.substring(4));
+	IFn getAllPlatesForProject = Clojure.var("lnrocks.core", "get-all-plates-for-project");
+	CustomTable allPlatesTable = new CustomTable(this, buildTableModel((Map)getAllPlatesForProject.invoke(project_id)));
+	all_plates_card = new AllPlatesPanel(this, allPlatesTable,  _project_sys_name);
+	cards.add(all_plates_card, "AllPlatesPanel");
+	card_layout.show(cards, "AllPlatesPanel");
  }
 
 
@@ -149,16 +177,24 @@ public class DialogMainFrame extends JFrame {
       int plate_id = Integer.parseInt(_plate_sys_name.substring(4));
       System.out.println(plate_id);
 
+      	IFn getWellsForPlateID = Clojure.var("lnrocks.core", "get-wells-for-plate-id");
+	CustomTable wellTable = new CustomTable(this, buildTableModel((Map)getWellsForPlateID.invoke(plate_id)));
+	well_card = new WellPanel(this, wellTable);
 
-      well_card = new WellPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(plate_id, DialogMainFrame.WELL));
+
+	//well_card = new WellPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(plate_id, DialogMainFrame.WELL));
       cards.add(well_card, "Well");
       card_layout.show(cards, "Well");
   }
 
       public void showAllWellsTable(String _project_sys_name) {
       int project_id = Integer.parseInt(_project_sys_name.substring(4));
-      
-      all_wells_card = new AllWellsPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.ALLWELLS), _project_sys_name);
+
+      	IFn getAllWellsForProject = Clojure.var("lnrocks.core", "get-all-wells");
+	CustomTable allWellsTable = new CustomTable(this, buildTableModel((Map)getAllWellsForProject.invoke(project_id)));
+	all_wells_card = new AllWellsPanel(this, allWellsTable,  _project_sys_name);
+     
+	//all_wells_card = new AllWellsPanel(dbm, dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.ALLWELLS), _project_sys_name);
       cards.add(all_wells_card, "AllWells");
       card_layout.show(cards, "AllWells");
   }
@@ -234,7 +270,7 @@ public class DialogMainFrame extends JFrame {
   // }
 
 
-    public DefaultTableModel buildTableModel(Map<PersistentVector, PersistentVector> hm) {
+    public DefaultTableModel buildTableModel(Map<String, PersistentVector> hm) {
 	System.out.println("hm.getData: " + hm.get(":data"));
 	 
 	clojure.lang.PersistentVector colnames = hm.get(":colnames");
@@ -245,7 +281,7 @@ public class DialogMainFrame extends JFrame {
 	Vector<String> columnNames = new Vector<String>();
 
 	for (int column = 0; column < columnCount; column++) {
-	  	  System.out.println((colnames.get(column)).toString());
+	    System.out.println((colnames.get(column)).toString());
 	  columnNames.addElement(colnames.get(column).toString());
       }
     //   // data of the table
@@ -256,13 +292,13 @@ public class DialogMainFrame extends JFrame {
 	    Vector<Object> vector = new Vector<Object>();
 	    
 	    for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-	  	System.out.println(((PersistentVector)predata.get(row)).get(columnIndex).toString());
+		//	System.out.println(((PersistentVector)predata.get(row)).get(columnIndex).toString());
 		vector.add(((PersistentVector)predata.get(row)).get(columnIndex).toString());
 		//vector.add(rs.getObject(columnIndex));
 	    }
 	    data.add(vector);
 	}
-	LOGGER.info("data: " + data);
+	//LOGGER.info("data: " + data);
 	return new DefaultTableModel(data, columnNames);
 	
     //   //          data.stream().map(List::toArray).toArray(Object[][]::new), columnNames);

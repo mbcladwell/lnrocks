@@ -128,6 +128,35 @@
 
 (defn get-all-plates-for-project [ prj-id])
 
+
+(defn get-plate-sets-for-project [ prj-id]
+  
+   (let [data  (crux/q (crux/db node)
+	           {:find '[n s1 s2 s3 n3 s4 s5 s6 s8 s7 ]
+	             :where '[[e :id n]
+                              [e :plate-set-sys-name s1]
+                              [e :plate-set-name s2]
+                              [e :plate-format s3]
+                              [e :num-plates n3]
+                              [e :plate-type s4]
+                              [e :plate-layout-name-id s5]
+                              [e :descr s6]
+                             [e :worklist s7]
+                              [e2 :id s5]
+                              [e2 :name s8]
+                              [e2 :layout n5]
+                              [e :project-id n2]]
+                     :args [{'n2 prj-id}]
+                    :order-by [['n :desc]]})
+      data2  (doall (map #(if (nil? (nth % 9)) (assoc % 9 "NA"))  data))
+      colnames ["PlateSetID" "PlateSetName" "Name" "Format" "# plates" "Type" "Layout" "Description" "Layout" "Worklist"  ]]
+  (into {} (java.util.HashMap.
+            {":colnames" colnames
+             ":data" data2} ))))
+
+;;(get-plate-sets-for-project 1)
+
+
 ;;(insp/inspect-tree (crux/entity (crux/db node) :spl1))
 ;;(insp/inspect-tree  new-ps1)
 ;;    (egd/assoc-plt-with-ps node)
@@ -136,6 +165,8 @@
   ;;   (def  new-ps1  (update ps1 :plates (comp set conj)
     ;;                    (crux/entity (crux/db node ) :plt1)
       ;;                  (crux/entity (crux/db node ) :plt2)))       
+
+(defn get-all-wells [prj-id])
 
 
 
@@ -172,14 +203,41 @@
 (defn get-plate-set-sys-name []
   (:plate-set-sys-name (crux/entity (crux/db node ) :props)))
 
+(defn set-plate-set-sys-name [ ps-sys-name]
+  (let [old-props (crux/entity (crux/db node ) :props )
+        new-props (assoc old-props :plate-set-sys-name ps-sys-name)
+        ]
+    (crux/submit-tx node [[:crux.tx/cas old-props new-props]])))
+
+
+
 (defn get-plate-set-id []
   (:plate-set-id (crux/entity (crux/db node ) :props)))
+
+(defn set-plate-set-id [ n ]
+(let [old-props (crux/entity (crux/db node ) :props )
+        new-props (assoc old-props :plate-set-id n)
+        ]
+    (crux/submit-tx node [[:crux.tx/cas old-props new-props]])))
 
 (defn get-plate-sys-name []
   (:plate-sys-name (crux/entity (crux/db node ) :props)))
 
+(defn set-plate-sys-name [s]
+  (let [old-props (crux/entity (crux/db node ) :props )
+        new-props (assoc old-props :plate-sys-name s)
+        ]
+    (crux/submit-tx node [[:crux.tx/cas old-props new-props]])))
+
 (defn get-plate-id []
   (:plate-id (crux/entity (crux/db node ) :props)))
+
+
+(defn set-plate-id [n]
+(let [old-props (crux/entity (crux/db node ) :props )
+        new-props (assoc old-props :plate-id n)
+        ]
+    (crux/submit-tx node [[:crux.tx/cas old-props new-props]])))
 
 
 (defn delete-project [prj-id]
@@ -266,6 +324,9 @@
 
 (defn get-plate-set-data [ ps-id])
 
+(defn get-plate-set-sys-name-for-plate-sys-name [ plate-sys-name])
+
+(defn get-description-for-plate-set [ plate-set-sys-name])
 
 ;;(crux/entity (crux/db node ) :ps1)
 ;;(insp/inspect-tree (crux/entity (crux/db node ) :ps1))

@@ -15,11 +15,11 @@ import javax.swing.table.TableModel;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 
-public class AllPlatesPanel extends JPanel {
+public class AllWellsPanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    private IFn require = Clojure.var("clojure.core", "require");
+   private IFn require = Clojure.var("clojure.core", "require");
 
   private CustomTable table;
   private JScrollPane scrollPane;
@@ -29,10 +29,10 @@ public class AllPlatesPanel extends JPanel {
   private String project_sys_name;
     // private Session session;
     
-    public AllPlatesPanel(DialogMainFrame dmf, CustomTable _table, String _project_sys_name) {
+    public AllWellsPanel(DialogMainFrame _dmf, CustomTable _table, String _project_sys_name) {
     this.setLayout(new BorderLayout());
-   
-    dmf = dmf;
+    
+    dmf = _dmf;
     project_sys_name = _project_sys_name;
     // session = dmf.getSession();
     table = _table;
@@ -73,9 +73,8 @@ public class AllPlatesPanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_START;
     textPanel.add(projectLabel, c);
 
-     IFn getDescriptionForProject = Clojure.var("lnrocks.core", "get-project-desc");
+           IFn getDescriptionForProject = Clojure.var("lnrocks.core", "get-project-desc");
 
-    
     JLabel descriptionLabel =
         new JLabel((String)getDescriptionForProject.invoke(project_sys_name),
             SwingConstants.LEFT);
@@ -89,7 +88,7 @@ public class AllPlatesPanel extends JPanel {
     scrollPane = new JScrollPane(table);
     this.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
-    FilterPanel fp = new FilterPanel(dmf, table, Integer.parseInt(project_sys_name.substring(4)) ,DialogMainFrame.ALLPLATES );
+    FilterPanel fp = new FilterPanel(dmf, table, Integer.parseInt(project_sys_name.substring(4)) ,DialogMainFrame.ALLWELLS );
     this.add(fp, BorderLayout.SOUTH);
   }
 
@@ -100,7 +99,14 @@ public class AllPlatesPanel extends JPanel {
   public void updatePanel(String _project_sys_name) {
     String project_sys_name = _project_sys_name;
       int project_id = Integer.parseInt(project_sys_name.substring(4));
-    JTable table = dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.ALLPLATES);
+
+        IFn getAllWells = Clojure.var("lnrocks.core", "get-all-wells");
+
+      //CustomTable table = session.getDatabaseManager().getProjectTableData();
+	CustomTable table = (CustomTable)getAllWells.invoke(project_sys_name);
+
+
+	// JTable table = dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.ALLWELLS);
     TableModel model = table.getModel();
     this.table.setModel(model);
   }

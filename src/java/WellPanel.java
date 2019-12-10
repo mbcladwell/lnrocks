@@ -12,12 +12,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableModel;
+import clojure.java.api.Clojure;
+import clojure.lang.IFn;
 
 
 public class WellPanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private IFn require = Clojure.var("clojure.core", "require");
 
   private CustomTable table;
   private JScrollPane scrollPane;
@@ -26,9 +29,9 @@ public class WellPanel extends JPanel {
   private String plateset_sys_name;
   private String plate_sys_name;
     //   private Session session;    
-    private DatabaseManager dbm;
+    //  private DatabaseManager dbm;
     
-  public WellPanel(DialogMainFrame dmf, CustomTable _table) {
+  public WellPanel(DialogMainFrame _dmf, CustomTable _table) {
     this.setLayout(new BorderLayout());
    
     dmf = _dmf;
@@ -71,11 +74,10 @@ public class WellPanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_END;
     textPanel.add(label, c);
 
+    IFn getPlateSetSysNameForPlateSysName = Clojure.var("lnrocks.core", "get-plate-set-sys-name-for-plate-sys-name");
+
     plate_sys_name = (String) table.getValueAt(1,1);
-    System.out.println("plate_sys_name: " + plate_sys_name);
-    plateset_sys_name =
-        dbm.getDatabaseRetriever()
-    	.getPlateSetSysNameForPlateSysName(plate_sys_name);
+    plateset_sys_name = (String)getPlateSetSysNameForPlateSysName.invoke(plate_sys_name);
 
     
     JLabel platesetLabel = new JLabel(plateset_sys_name, SwingConstants.LEFT);
@@ -88,10 +90,12 @@ public class WellPanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_START;
     textPanel.add(platesetLabel, c);
 
+       IFn getDescriptionForPlateSet = Clojure.var("lnrocks.core", "get-description-for-plate-set");
+
+    
     JLabel descriptionLabel =
         new JLabel(
-            dbm.getDatabaseRetriever()
-                .getDescriptionForPlateSet(plateset_sys_name),
+		   (String)getDescriptionForPlateSet.invoke(plateset_sys_name),
             SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 1;
@@ -103,7 +107,7 @@ public class WellPanel extends JPanel {
     scrollPane = new JScrollPane(table);
     this.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
-    FilterPanel fp = new FilterPanel(dbm, (JTable)table, Integer.parseInt(plate_sys_name.substring(4)) , DialogMainFrame.WELL );
+    FilterPanel fp = new FilterPanel(dmf, (JTable)table, Integer.parseInt(plate_sys_name.substring(4)) , DialogMainFrame.WELL );
     this.add(fp, BorderLayout.SOUTH);
   }
 
@@ -114,8 +118,14 @@ public class WellPanel extends JPanel {
     public void updatePanel(String _plate_sys_name) {
     String plate_sys_name = _plate_sys_name;
       int plate_id = Integer.parseInt(plate_sys_name.substring(4));
-    JTable table = dbm.getDatabaseRetriever().getDMFTableData(plate_id, DialogMainFrame.WELL);
-    TableModel model = table.getModel();
+
+       IFn getWellsForPlate = Clojure.var("lnrocks.core", "get-wells-for-plate");
+	CustomTable table = (CustomTable)getWellsForPlate.invoke(plate_id);
+	//DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+      
+    // JTable table = dbm.getDatabaseRetriever().getDMFTableData(plate_id, DialogMainFrame.WELL);
+     TableModel model = table.getModel();
     this.table.setModel(model);
   }
 }

@@ -26,10 +26,10 @@ public class AllWellsPanel extends JPanel {
   private String project_sys_name;
     // private Session session;
     
-    public AllWellsPanel(DialogMainFrame dmf, CustomTable _table, String _project_sys_name) {
+    public AllWellsPanel(DialogMainFrame _dmf, CustomTable _table, String _project_sys_name) {
     this.setLayout(new BorderLayout());
-    dbm = _dbm;
-    dmf = dmf;
+    
+    dmf = _dmf;
     project_sys_name = _project_sys_name;
     // session = dmf.getSession();
     table = _table;
@@ -85,7 +85,7 @@ public class AllWellsPanel extends JPanel {
     scrollPane = new JScrollPane(table);
     this.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
-    FilterPanel fp = new FilterPanel(dbm, table, Integer.parseInt(project_sys_name.substring(4)) ,DialogMainFrame.ALLWELLS );
+    FilterPanel fp = new FilterPanel(dmf, table, Integer.parseInt(project_sys_name.substring(4)) ,DialogMainFrame.ALLWELLS );
     this.add(fp, BorderLayout.SOUTH);
   }
 

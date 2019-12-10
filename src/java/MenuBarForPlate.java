@@ -99,7 +99,7 @@ public class MenuBarForPlate extends JMenuBar {
 
             String[][] results = plate_table.getSelectedRowsAndHeaderAsStringArray();
 	    // LOGGER.info("results(plate): " + results);
-            POIUtilities poi = new POIUtilities(dbm);
+            POIUtilities poi = new POIUtilities(dmf);
             poi.writeJTableToSpreadsheet("Plates", results);
             try {
               Desktop d = Desktop.getDesktop();
@@ -170,7 +170,7 @@ public class MenuBarForPlate extends JMenuBar {
 
     this.add(upbutton);
 
-        menu = new ViewerMenu(dbm);
+        menu = new ViewerMenu(dmf);
     this.add(menu);
 
     this.add(Box.createHorizontalGlue());

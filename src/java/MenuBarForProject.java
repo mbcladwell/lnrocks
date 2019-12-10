@@ -86,11 +86,11 @@ public class MenuBarForProject extends JMenuBar {
 		int i = project_table.convertRowIndexToModel(project_table.getSelectedRow());
 		String project_sys_name = (String) project_table.getValueAt(i, 1);
 	         String results[][] = project_table.getSelectedRowsAndHeaderAsStringArray();
-		 LOGGER.info("view row: " + project_table.getSelectedRow());
-		 LOGGER.info("model row: " + i);
+		 //	 LOGGER.info("view row: " + project_table.getSelectedRow());
+		 //LOGGER.info("model row: " + i);
 	      
-		 LOGGER.info("down button results: " + results);
-		 LOGGER.info("down button row results: " + results[1][0]);
+		 // LOGGER.info("down button results: " + results);
+		 //LOGGER.info("down button row results: " + results[1][0]);
 		 //    dbm.updateSessionWithProject(results[1][0]);
 		 dmf.setMainFrameTitle(results[1][1]);
 	      dmf.showPlateSetTable(results[1][1]);

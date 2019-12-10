@@ -296,15 +296,15 @@ public class MenuBarForPlateSet extends JMenuBar {
 		//int i = plate_set_table.getSelectedRow();
 		//String plate_set_sys_name = (String) plate_set_table.getValueAt(i, 0);
 	      String results[][] = plate_set_table.getSelectedRowsAndHeaderAsStringArray();
-	      String plate_set_sys_name = results[1][0];
-	      IFn setPlateSetSysName = Clojure.var("ln.codax-manager", "set-plate-set-sys-name");
+	      String plate_set_sys_name = results[1][1];
+	      IFn setPlateSetSysName = Clojure.var("lnrocks.core", "set-plate-set-sys-name");
               setPlateSetSysName.invoke(plate_set_sys_name);
-	      IFn setPlateSetID = Clojure.var("ln.codax-manager", "set-plate-set-id");
+	      IFn setPlateSetID = Clojure.var("lnrocks.core", "set-plate-set-id");
 	      setPlateSetID.invoke(Integer.parseInt(plate_set_sys_name.substring(3)));
 	      // System.out.println("plate_set_sys_name: " + plate_set_sys_name);
 	      //System.out.println("plate_set_id: " + Integer.parseInt(plate_set_sys_name.substring(3)));
 	      
-              //dmf.showPlateTable(plate_set_sys_name);
+              dmf.showPlateTable(plate_set_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
 			JOptionPane.showMessageDialog(dmf,
 					      "Select a row!","Error",JOptionPane.ERROR_MESSAGE);
