@@ -90,7 +90,7 @@ public class MenuBarForProject extends JMenuBar {
 		 //LOGGER.info("model row: " + i);
 	      
 		 // LOGGER.info("down button results: " + results);
-		 //LOGGER.info("down button row results: " + results[1][0]);
+		 //LOGGER.info("down button row results: " + results[1][1]);
 		 //    dbm.updateSessionWithProject(results[1][0]);
 		 dmf.setMainFrameTitle(results[1][1]);
 	      dmf.showPlateSetTable(results[1][1]);

@@ -297,12 +297,13 @@ public class MenuBarForPlateSet extends JMenuBar {
 		//String plate_set_sys_name = (String) plate_set_table.getValueAt(i, 0);
 	      String results[][] = plate_set_table.getSelectedRowsAndHeaderAsStringArray();
 	      String plate_set_sys_name = results[1][1];
+	       System.out.println("plate_set_sys_name: " + plate_set_sys_name);
 	      IFn setPlateSetSysName = Clojure.var("lnrocks.core", "set-plate-set-sys-name");
               setPlateSetSysName.invoke(plate_set_sys_name);
+	      int plate_set_id = Integer.parseInt(plate_set_sys_name.substring(3));
 	      IFn setPlateSetID = Clojure.var("lnrocks.core", "set-plate-set-id");
-	      setPlateSetID.invoke(Integer.parseInt(plate_set_sys_name.substring(3)));
-	      // System.out.println("plate_set_sys_name: " + plate_set_sys_name);
-	      //System.out.println("plate_set_id: " + Integer.parseInt(plate_set_sys_name.substring(3)));
+	      setPlateSetID.invoke(plate_set_id);
+	      System.out.println("plate_set_id: " + plate_set_id);
 	      
               dmf.showPlateTable(plate_set_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
@@ -335,8 +336,8 @@ public class MenuBarForPlateSet extends JMenuBar {
           }
         });
     this.add(upbutton);
-    //menu = new ViewerMenu(d,f);
-   // this.add(menu);
+    menu = new ViewerMenu(d,f);
+   this.add(menu);
    
     this.add(Box.createHorizontalGlue());
 

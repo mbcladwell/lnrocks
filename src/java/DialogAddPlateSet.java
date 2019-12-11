@@ -18,6 +18,7 @@ import java.beans.*;
 import javax.swing.*;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
+import clojure.lang.PersistentVector;
 
 public class DialogAddPlateSet extends JDialog   {
     static JButton button;
@@ -168,9 +169,8 @@ public class DialogAddPlateSet extends JDialog   {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-	IFn getPlateTypes = Clojure.var("lnrocks.core", "get-plate-types");
-
-    ComboItem[] plateTypes = (ComboItem[])getPlateTypes.invoke();
+    IFn getPlateTypes = Clojure.var("lnrocks.core", "get-plate-types");
+    
 
     typeList = new JComboBox<ComboItem>(plateTypes);
     typeList.setSelectedIndex(0);

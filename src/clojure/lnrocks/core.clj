@@ -102,7 +102,6 @@
   formats)
 
 
-;;(dbr/get-plates-for-plate-set-id node 1)
 
 (defn get-all-projects []
   (dbr/get-all-projects node))
@@ -129,33 +128,16 @@
 (defn get-all-plates-for-project [ prj-id])
 
 
-(defn get-plate-sets-for-project [ prj-id]
-  
-   (let [data  (crux/q (crux/db node)
-	           {:find '[n s1 s2 s3 n3 s4 s5 s6 s8 s7 ]
-	             :where '[[e :id n]
-                              [e :plate-set-sys-name s1]
-                              [e :plate-set-name s2]
-                              [e :plate-format s3]
-                              [e :num-plates n3]
-                              [e :plate-type s4]
-                              [e :plate-layout-name-id s5]
-                              [e :descr s6]
-                             [e :worklist s7]
-                              [e2 :id s5]
-                              [e2 :name s8]
-                              [e2 :layout n5]
-                              [e :project-id n2]]
-                     :args [{'n2 prj-id}]
-                    :order-by [['n :desc]]})
-      data2  (doall (map #(if (nil? (nth % 9)) (assoc % 9 "NA"))  data))
-      colnames ["PlateSetID" "PlateSetName" "Name" "Format" "# plates" "Type" "Layout" "Description" "Layout" "Worklist"  ]]
-  (into {} (java.util.HashMap.
-            {":colnames" colnames
-             ":data" data2} ))))
+(defn get-plate-sets-for-project [ prj-id ]
+  (dbr/get-plate-sets-for-project node prj-id))
 
-;;(get-plate-sets-for-project 1)
 
+
+;;(get-plates-for-plate-set-id 1)
+
+
+
+;;(println (test-lz-seq))
 
 ;;(insp/inspect-tree (crux/entity (crux/db node) :spl1))
 ;;(insp/inspect-tree  new-ps1)

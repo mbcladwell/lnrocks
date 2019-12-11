@@ -259,7 +259,7 @@
 
 
 
-(defn get-plate-sets-for-project [node prj-id] 
+(defn get-plate-sets-for-project [ node prj-id]
    (let [data  (crux/q (crux/db node)
 	           {:find '[n s1 s2 s3 n3 s4 s5 s6 s8 s7 ]
 	             :where '[[e :id n]
@@ -277,43 +277,44 @@
                               [e :project-id n2]]
                      :args [{'n2 prj-id}]
                     :order-by [['n :desc]]})
-         data2  (vector (loop [counter 0
-                       oldvec (nth data counter)
-                       newvec (assoc oldvec 9 "--")
-                       data2 [newvec]]
-                  (if (= counter (count data))
-                    data2
-                    (recur
-                     (+ counter 1)
-                     (nth data counter)
-                     (assoc oldvec 9 "--")
-                     (conj data2 newvec)
-                     ))))
+      data2   (mapv #(if (nil? (nth % 9)) (assoc % 9 "NA"))  data)
       colnames ["PlateSetID" "PlateSetName" "Name" "Format" "# plates" "Type" "Layout" "Description" "Layout" "Worklist"  ]]
-            {:colnames colnames
-             :data data} ))
+  (into {} (java.util.HashMap.
+            {":colnames" colnames
+             ":data" data2} ))))
+
+(defn test-lz-seq []
+  (let [myvec [[1 2  nil][3 4 nil][ 5 6 nil][ 7  8 nil]]
+        myvec2  (mapv #(if (nil? (nth % 2)) (assoc % 2 "NA")) myvec)
+        colnames ["VarA" "VarB" "VarC" "VarD"] ]
+     (java.util.HashMap.
+            {":colnames" colnames
+             ":data" myvec2} )))
+
+
 
 (defn get-plates-for-plate-set-id
   [node psid]
   (let [
         data (crux/q (crux/db node)
-	             {:find '[n1  n2 n3 n4 s3  ]
+	             {:find '[n1  n2 n3 n4 s3 s2 ]
 	              :where '[[e :plate-set-id n1]  ;;e is plate
                                [e :id n2]
                                [e :plate-order n3]
-                             ;;  [e :barcode s2]
+                               [e :barcode s2]
                                [e2 :id n1 ]   ;;e2 is plate-set
                                [e2 :plate-type s3]
                                [e2 :plate-format n4]
                                ]
                        :args [{'n1 psid}]
                        :order-by [['n2 :desc]]})
-        ps (str "PS-" (nth (first data) 0))
-        plt (str "PLT-" (nth (first data) 1))
-        colnames ["PlateSetID" "PlateID"  "Order" "Format" "Type"]]
+        data2 (mapv #(if (nil? (nth % 5)) (assoc % 5 "NA"))  data)
+        data3 (mapv #(assoc % 0  (str "PS-" (get % 0)))  data2)
+        data4 (mapv #(assoc % 1  (str "PLT-" (get % 1)))  data3)
+        colnames ["PlateSetID" "PlateID"  "Order" "Format" "Type" "BarcodeID"]]
     (into {} (java.util.HashMap.
               {":colnames" colnames
-               ":data" data} ))))
+               ":data" data4} ))))
 
 (defn get-wells-for-plate-id
   [node plt-id]
@@ -330,7 +331,6 @@
         ps (str "PS-" (nth (first data) 0))
         plt (str "PLT-" (nth (first data) 1))
         wells  (nth (first data) 2)
-        dummy (println (str "wells: " wells))
         num-wells (count wells)
         vec-wells (case num-wells 96 util/vec96wells 384 util/vec384wells 1536 util/vec1536wells)
         data2 (loop [
@@ -347,9 +347,10 @@
                   (conj mydata [ps plt (name well)  counter  (str "SPL-" (well wells)) (:accession (crux/entity (crux/db node) (keyword (str "spl" (well wells)))))  ])
                   ;;nil
                  ;; (clojure.pprint/pprint mydata)
-                  )))   
+                  )))
+        data3 (mapv #(assoc % 5  "NA")  data2)
       colnames ["PlateSetID" "PlateID"  "Well" "Well_NUM" "Sample" "Accession"]]
     (into {} (java.util.HashMap.
               {":colnames" colnames
-               ":data" data2} ))))
+               ":data" data3} ))))
 

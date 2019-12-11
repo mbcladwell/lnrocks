@@ -37,6 +37,7 @@ public class PlateSetPanel extends JPanel {
     //session = dmf.getSession();
     table = _table;
     project_sys_name = _project_sys_name;
+    System.out.println("prj-sys-name: " + project_sys_name);
     project_id = Integer.valueOf(project_sys_name.substring(4)).intValue();
     JPanel headerPanel = new JPanel();
     headerPanel.setLayout(new BorderLayout());

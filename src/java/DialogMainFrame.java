@@ -74,27 +74,36 @@ public class DialogMainFrame extends JFrame {
     cards.add(project_card, "ProjectPanel");
 
     /////////////////////////////////////////////////////////////////
-    System.out.println("");
-    System.out.println("");
-    System.out.println("");
-    System.out.println("==========experimental===========");
+  //   System.out.println("");
+  //   System.out.println("");
+  //   System.out.println("");
+  //   System.out.println("==========test code===========");
+  //   System.out.println("");
 
-  IFn getPlateSetsForProject = Clojure.var("lnrocks.core", "get-plate-sets-for-project");
-   
-     Map<String, PersistentVector> hm = (Map)getPlateSetsForProject.invoke(1);
+  //      IFn testLzSeq = Clojure.var("lnrocks.core", "test-lz-seq");   
+  //      HashMap<String, PersistentVector> hm = (HashMap<String, PersistentVector>)testLzSeq.invoke();
+  //      System.out.println(hm.get(":data"));
+  //     System.out.println(hm.get(":colnames"));
+      
+  //   System.out.println("");
+  //    System.out.println("===================================");
+    
+
+  //   // IFn getPlateSetsForProject = Clojure.var("lnrocks.core", "get-plate-sets-for-project");   
+  // //    Map<String, PersistentVector> hm = (Map)getPlateSetsForProject.invoke(1);
      
-     for (Map.Entry<String, PersistentVector> e : hm.entrySet()){
+  // //    for (Map.Entry<String, PersistentVector> e : hm.entrySet()){
 	 
-	 System.out.println(e.getKey());
-	 System.out.println((e.getValue()).chunkedSeq());
-     }
+  // // 	 System.out.println(e.getKey());
+  // // 	 System.out.println((e.getValue()).chunkedSeq());
+  // //    }
 
-     //			    + ": " + e.getValue().toArray());}
+  //    //			    + ": " + e.getValue().toArray());}
 
 
-     System.out.println("===================================");
-    System.out.println("");
-    System.out.println("");
+  //    System.out.println("===================================");
+  //   System.out.println("");
+  //   System.out.println("");
     
 /////////////////////////////////////////////////////////////////
     
@@ -152,11 +161,11 @@ public class DialogMainFrame extends JFrame {
 
     public void showPlateTable(String _plate_set_sys_name) {
       
-     int plate_set_id = Integer.parseInt(_plate_set_sys_name.substring(3));
+	int plate_set_id = Integer.parseInt(_plate_set_sys_name.substring(3));
 
      IFn getPlatesForPlateSetID = Clojure.var("lnrocks.core", "get-plates-for-plate-set-id");
      CustomTable plateTable = new CustomTable(this, buildTableModel((Map)getPlatesForPlateSetID.invoke(plate_set_id)));
-      plate_set_card = new PlateSetPanel(this, plateTable,  _plate_set_sys_name);
+     plate_card = new PlatePanel(this, plateTable,  _plate_set_sys_name);
 
    cards.add(plate_card, "PlatePanel");
    card_layout.show(cards, "PlatePanel");
@@ -271,24 +280,21 @@ public class DialogMainFrame extends JFrame {
 
 
     public DefaultTableModel buildTableModel(Map<String, PersistentVector> hm) {
-	System.out.println("hm.getData: " + hm.get(":data"));
 	 
 	clojure.lang.PersistentVector colnames = hm.get(":colnames");
         clojure.lang.PersistentVector predata = hm.get(":data");
-        //clojure.lang.LazySeq predata = hm.get(":data");
-	int columnCount = colnames.count();
+      	int columnCount = colnames.count();
 	
 	Vector<String> columnNames = new Vector<String>();
 
 	for (int column = 0; column < columnCount; column++) {
-	    System.out.println((colnames.get(column)).toString());
+	    //    System.out.println((colnames.get(column)).toString());
 	  columnNames.addElement(colnames.get(column).toString());
       }
     //   // data of the table
 	Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 	int rowCount = predata.count();
 	for (int row = 0; row < rowCount; row++) {
-   
 	    Vector<Object> vector = new Vector<Object>();
 	    
 	    for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {

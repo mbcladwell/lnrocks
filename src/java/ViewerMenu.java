@@ -26,7 +26,7 @@ public class ViewerMenu extends JMenu{
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	      //            new LayoutViewer(dbm);
+	                  new LayoutViewer(dmf);
           }
         });
     this.add(menuItem);

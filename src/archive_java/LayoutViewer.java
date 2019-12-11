@@ -69,16 +69,15 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
   private MyModel tableModel;
     private ComboItem [] layoutNames;
     private Object[][] gridData;
-    private DatabaseManager dbm; 
     // private DefaultComboBoxModel<ComboItem> layout_names_list_model;
     private IFn require = Clojure.var("clojure.core", "require");
     private IFn openHelpPage = Clojure.var("ln.session", "open-help-page");
 
 
     
-  public LayoutViewer(DialogMainFrame dmf) {
-      dbm = _dbm;
-      this.dmf = dmf;
+  public LayoutViewer(DialogMainFrame _dmf) {
+     
+      this.dmf = _dmf;
       // this.session = dmf.getSession();
     require.invoke(Clojure.read("lnrocks.core"));
        IFn getUser = Clojure.var("lnrocks.core", "get-user");
