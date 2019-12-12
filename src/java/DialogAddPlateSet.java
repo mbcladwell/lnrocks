@@ -4,7 +4,10 @@ package lnrocks;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.*;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.*; 
+import java.util.Vector; 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -19,6 +22,7 @@ import javax.swing.*;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import clojure.lang.PersistentVector;
+import clojure.lang.PersistentHashSet;
 
 public class DialogAddPlateSet extends JDialog   {
     static JButton button;
@@ -30,7 +34,7 @@ public class DialogAddPlateSet extends JDialog   {
     static JTextField descriptionField;
     static JTextField numberField;
     static JComboBox<Integer> formatList;
-    static JComboBox<ComboItem> typeList;
+    static JComboBox<String> typeList;
     private ComboItem [] layoutNames;
     private JComboBox<ComboItem> layoutList;
     private DefaultComboBoxModel<ComboItem> layout_names_list_model;
@@ -153,10 +157,10 @@ public class DialogAddPlateSet extends JDialog   {
     formatList.addActionListener(
 				 (new ActionListener() {
 					 public void actionPerformed(ActionEvent e) {
-					//     layoutNames = dbm.getDatabaseRetriever().getSourcePlateLayoutNames((int)formatList.getSelectedItem(), 0);
-					  //   layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
-					   //  layoutList.setModel(layout_names_list_model );
-					  //   layoutList.setSelectedIndex(-1);
+					     layoutNames = getSourcePlateLayoutNames((int)formatList.getSelectedItem(), "assay");
+					     layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
+					     layoutList.setModel(layout_names_list_model );
+					     layoutList.setSelectedIndex(-1);
           }
         }));
     pane.add(formatList, c);
@@ -170,16 +174,20 @@ public class DialogAddPlateSet extends JDialog   {
     pane.add(label, c);
 
     IFn getPlateTypes = Clojure.var("lnrocks.core", "get-plate-types");
-    
+    ArrayList<String> plate_types_pre =  new ArrayList<String>((PersistentVector)getPlateTypes.invoke());
+    String[] plate_types = new String[plate_types_pre.size()];
+    for (int j = 0; j < plate_types_pre.size(); j++) { 
+              plate_types[j] = plate_types_pre.get(j); 
+        } 
 
-    typeList = new JComboBox<ComboItem>(plateTypes);
-    typeList.setSelectedIndex(0);
-    c.gridx = 5;
-    c.gridy = 4;
-    c.gridheight = 1;
-    c.anchor = GridBagConstraints.LINE_START;
-    pane.add(typeList, c);
-
+    typeList = new JComboBox<String>(plate_types);
+     typeList.setSelectedIndex(0);
+     c.gridx = 5;
+     c.gridy = 4;
+     c.gridheight = 1;
+     c.anchor = GridBagConstraints.LINE_START;
+     pane.add(typeList, c);
+   
     label = new JLabel("Layout:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 5;
@@ -187,11 +195,12 @@ public class DialogAddPlateSet extends JDialog   {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-	IFn getPlateLayoutNames = Clojure.var("lnrocks.core", "get-plate-layout-names");
 
-    ComboItem[] layoutTypes = (ComboItem[])getPlateLayoutNames.invoke(96);
-    LOGGER.info("layoutTypes: " + layoutTypes[0].toString());
-    layoutList = new JComboBox<ComboItem>(layoutTypes);
+    layoutNames = getSourcePlateLayoutNames((int)formatList.getSelectedItem(), (String)typeList.getSelectedItem());
+    //System.out.println("layoutNames: " + layoutNames.size());
+    layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
+    layoutList = new JComboBox<ComboItem>();
+    layoutList.setModel(layout_names_list_model );
     layoutList.setSelectedIndex(0);
     c.gridx = 1;
     c.gridy = 5;
@@ -199,10 +208,6 @@ public class DialogAddPlateSet extends JDialog   {
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(layoutList, c);
-
-
-
-
     
     okButton = new JButton("OK");
     okButton.setMnemonic(KeyEvent.VK_O);
@@ -256,6 +261,7 @@ public class DialogAddPlateSet extends JDialog   {
           }
         }));
 
+    //    getSourcePlateLayoutNames(96, "assay");
     this.getContentPane().add(pane, BorderLayout.CENTER);
     this.pack();
     this.setLocation(
@@ -264,23 +270,50 @@ public class DialogAddPlateSet extends JDialog   {
     this.setVisible(true);
   }
 
+      /**
+     * Need only source layouts for a given format;
+     * If the destination plate is an assay plate (plate_type="assay"), replicate info must be provided
+     */   
+    public ComboItem[] getSourcePlateLayoutNames(int format_id, String plate_type) {
+    ComboItem[] output = null;
+    //    Array results = null;
+    ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
+    IFn getPlateLayouts = Clojure.var("lnrocks.core", "get-source-plate-layout-names");
+    PersistentHashSet src_plt_lyts = (PersistentHashSet)getPlateLayouts.invoke(format_id);
+    Iterator value = src_plt_lyts.iterator(); 
+
+    while (value.hasNext()) {
+	PersistentVector pv = (PersistentVector)value.next();
+	  
+	if(plate_type=="assay"){
+	    combo_items.add(new ComboItem((int)pv.nth(0), new String(pv.nth(1) + ";" + pv.nth(2) )));	 
+	}else{
+	    combo_items.add(new ComboItem((int)pv.nth(0), (String)pv.nth(1)));
+	}		
+    }
+    
+    output = combo_items.toArray(new ComboItem[combo_items.size()]);
+    
+    return (ComboItem[])output;
+  }
+
          class Task extends SwingWorker<Void, Void> {
         /*
          * Main task. Executed in background thread.
          */
 	     IFn getProjectID = Clojure.var("lnrocks.core", "get-project-id");
-
+   
         @Override
         public Void doInBackground() {
-	   // dbm.getDatabaseInserter()
-		//.insertPlateSet(nameField.getText(),
-		//		descriptionField.getText(),
-		//		Integer.valueOf(numberField.getText()),
-		//		Integer.valueOf(formatList.getSelectedItem().toString()),
-		//		((ComboItem)typeList.getSelectedItem()).getKey(),
-		//		((Long)getProjectID.invoke()).intValue(),
-		//		((ComboItem)layoutList.getSelectedItem()).getKey(),
-		//		true);
+	    IFn newPlateSet = Clojure.var("lnrocks.core", "new-plate-set");
+	    newPlateSet.invoke(nameField.getText(),
+				descriptionField.getText(),
+			    (int)Integer.valueOf(numberField.getText()),
+			    (int)Integer.valueOf(formatList.getSelectedItem().toString()),
+			    (String)typeList.getSelectedItem(),
+				((Long)getProjectID.invoke()).intValue(),
+				((ComboItem)layoutList.getSelectedItem()).getKey(),
+				true);
 	
 	   
             return null;

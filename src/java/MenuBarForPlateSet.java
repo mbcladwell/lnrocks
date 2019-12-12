@@ -335,9 +335,9 @@ public class MenuBarForPlateSet extends JMenuBar {
 
           }
         });
-    this.add(upbutton);
-    menu = new ViewerMenu(d,f);
-   this.add(menu);
+        this.add(upbutton);
+    //  menu = new ViewerMenu(d,f);
+    // this.add(menu);
    
     this.add(Box.createHorizontalGlue());
 

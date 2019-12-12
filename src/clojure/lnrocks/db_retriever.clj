@@ -88,6 +88,37 @@
   [node x]
   (filter #(= (:id %) x) (:plate-layout  (crux/entity (crux/db node ) :plate-layout))))
 
+
+(defn get-plate-layout-names
+ "select id, name from plate_layout_name WHERE plate_format_id = ?;"
+  [ node format]
+(let [data (crux/q (crux/db node)
+	           '{:find [n s1]
+	             :where [[e :id n]
+                             [e :name s1]
+                             [e :plate-format-id n2]
+                             ]
+                     :args [{n2 96}]
+                     })]
+              data))
+
+(defn get-source-plate-layout-names
+ "select id, name from plate_layout_name WHERE plate_format_id = ?;"
+  [ node format]
+(let [data (crux/q (crux/db node)
+	           {:find '[n s1 s3]
+	             :where '[[e :id n]
+                             [e :name s1]
+                             [e :plate-format-id n2]
+                              [e :source-dest s2]
+                              [e :description s3]
+                             ]
+                     :args [{'s2 "source"
+                             'n2 format}]
+                     }) ]
+              data))
+
+
 (defn get-well-numbers
   ;;x: 96, 384, or 1536
   [node x]

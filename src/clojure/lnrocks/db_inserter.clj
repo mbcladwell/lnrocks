@@ -162,7 +162,7 @@ here layout is the passed in map"
            
           ;; dummy (crux/submit-tx node [[:crux.tx/put doc]])]
       (if (> counter  num-plates)
-        (println (str num-plates " plates created. " new-plate-ids))
+         new-plate-ids
         (recur
          (+ counter 1)
          (+ plt-id 1)
@@ -175,31 +175,30 @@ here layout is the passed in map"
                 :plate-order counter
           }
          (conj new-plate-ids plt-id)
-         (crux/submit-tx node [[:crux.tx/put doc]])))
-    )))
+         (crux/submit-tx node [[:crux.tx/put doc]]))))))
 
 
 
-(defn new-plate-set [ node ps-name desc plate-format-id plate-type-id  plate-layout-name-id num-plates project-id user-id with-samples]
+(defn new-plate-set [ node ps-name desc plate-format plate-type  plate-layout-name-id num-plates project-id user-id with-samples]
   (let [
-        layout (crux/entity (crux/db node) plate-layout-name-id)
-        plate-format-id (:format-id layout)
+        layout (crux/entity (crux/db node) (keyword (str "lyt" plate-layout-name-id)))
         unknown-n (:unknown-n layout)    
         all-ids (dbr/get-ps-plt-spl-ids node  1 num-plates (* num-plates unknown-n) )
         ps-id (:plate-set all-ids)
         session-id (:session-id (crux/entity (crux/db node) :props))
+        the-plates (new-plates node all-ids layout num-plates with-samples)
         doc {:crux.db/id (keyword (str "ps" ps-id))
              :plate-set-sys-name (str "PS-" ps-id)
              :plate-set-name ps-name
              :description desc
              :lnsession-id session-id
-             :plate-format-id plate-format-id
-             :plate-type-id plate-type-id
+             :plate-format plate-format
+             :plate-type plate-type
              :id ps-id
              :user-id (:user-id (crux/entity (crux/db node) :props))
              :num-plates num-plates
              :project-id project-id
-             :plates (new-plates node all-ids layout num-plates with-samples)
+             :plates the-plates
              :plate-layout-name-id plate-layout-name-id
              :worklists #{}
              }       ]
