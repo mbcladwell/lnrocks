@@ -143,26 +143,25 @@ here layout is the passed in map"
         ps-id (:plate-set all-ids)
         plt-id-start (:plate all-ids)
         spl-id-start (:sample all-ids)
-        user-id (:user-id (crux/entity (crux/db node) :props))
+        user (:user (crux/entity (crux/db node) :props))
         ]
     (loop [
            counter 1
            plt-id plt-id-start 
            doc   {:crux.db/id (keyword (str "plt" plt-id))
-                :plate-sys-name (str "PLT-" plt-id)
-                :plate-set-id ps-id
-                :id plt-id
-                :user-id user-id
-                :wells (new-wells node format unknown-n with-samples spl-id-start)
-                :plate-order counter
-            }
-
-           new-plate-ids []
+                  :plate-sys-name (str "PLT-" plt-id)
+                  :plate-set-id ps-id
+                  :id plt-id
+                  :user user
+                  :wells (new-wells node format unknown-n with-samples spl-id-start)
+                  :plate-order counter
+                  }
+           new-plates #{doc}
            dummy (crux/submit-tx node [[:crux.tx/put doc]])]
            
           ;; dummy (crux/submit-tx node [[:crux.tx/put doc]])]
-      (if (> counter  num-plates)
-         new-plate-ids
+      (if (> counter (+ num-plates 1))
+         new-plates
         (recur
          (+ counter 1)
          (+ plt-id 1)
@@ -170,11 +169,11 @@ here layout is the passed in map"
                 :plate-sys-name (str "PLT-" plt-id)
                 :plate-set-id ps-id
                 :id plt-id
-                :user-id user-id
+                :user user
                 :wells (new-wells node format unknown-n with-samples spl-id-start)
                 :plate-order counter
           }
-         (conj new-plate-ids plt-id)
+         (conj new-plates doc)
          (crux/submit-tx node [[:crux.tx/put doc]]))))))
 
 
@@ -186,7 +185,6 @@ here layout is the passed in map"
         all-ids (dbr/get-ps-plt-spl-ids node  1 num-plates (* num-plates unknown-n) )
         ps-id (:plate-set all-ids)
         session-id (:session-id (crux/entity (crux/db node) :props))
-        the-plates (new-plates node all-ids layout num-plates with-samples)
         doc {:crux.db/id (keyword (str "ps" ps-id))
              :plate-set-sys-name (str "PS-" ps-id)
              :plate-set-name ps-name
@@ -195,21 +193,24 @@ here layout is the passed in map"
              :plate-format plate-format
              :plate-type plate-type
              :id ps-id
-             :user-id (:user-id (crux/entity (crux/db node) :props))
+             :user (:user (crux/entity (crux/db node) :props))
              :num-plates num-plates
              :project-id project-id
-             :plates the-plates
+             :plates  (new-plates node all-ids layout num-plates with-samples)
              :plate-layout-name-id plate-layout-name-id
              :worklists #{}
-             }       ]
-    (crux/submit-tx node [[:crux.tx/put doc]] )
+             }
+        dummy  (println (str "doc: " doc))
+        old-prj (crux/entity (crux/db node) (keyword (str "prj" project-id)))
+        new-entity-id (keyword (str "ps" ps-id))
+        new-prj (conj (:plate-sets old-prj) (crux/entity (crux/db node) new-entity-id)  )
+        ]  
+    (crux/submit-tx node [[:crux.tx/cas old-prj new-prj]])
     ps-id))
 
 
 
-
-
-
+   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -44,7 +44,7 @@
 
 ;;(egd/load-eg-plate-sets node)
  ;;get assay runs   (println ":ps3 --  " (first (:wells (crux/entity (crux/db node) :ps1)) )
-;;(insp/inspect-tree new-ps5)
+;;(insp/inspect-tree )
 
 
 (defn extract-data-for-id
@@ -125,32 +125,72 @@
 ;;(dbr/get-wells-for-plate-id node 1)
 
 
+(defn new-plate-set [ ps-name desc plate-format plate-type  plate-layout-name-id num-plates project-id user-id with-samples]
+  (let [
+        layout (crux/entity (crux/db node)  plate-layout-name-id)
+        unknown-n (:unknown-n layout)
+        d1 (println layout)       
+        all-ids (dbr/get-ps-plt-spl-ids node  1 num-plates (* num-plates unknown-n) )
+        ps-id (:plate-set all-ids)
+        session-id (:session-id (crux/entity (crux/db node) :props))
+        d2 (println unknown-n)
+        doc {:crux.db/id (keyword (str "ps" ps-id))
+             :plate-set-sys-name (str "PS-" ps-id)
+             :plate-set-name ps-name
+             :description desc
+             :lnsession-id session-id
+             :plate-format plate-format
+             :plate-type plate-type
+             :id ps-id
+             :user (:user (crux/entity (crux/db node) :props))
+             :num-plates num-plates
+             :project-id project-id
+          ;;   :plates  (dbi/new-plates node all-ids layout num-plates with-samples)
+             :plate-layout-name-id plate-layout-name-id
+             :worklists #{}
+             }
+        dummy  (println (str "doc: " doc))
+        old-prj (crux/entity (crux/db node) (keyword (str "prj" project-id)))
+        new-entity-id (keyword (str "ps" ps-id))
+        new-prj (conj (:plate-sets old-prj) (crux/entity (crux/db node) new-entity-id)  )
+        ]  
+;;    (crux/submit-tx node [[:crux.tx/cas old-prj new-prj]])
+    ps-id))
+
+
+
+
 (defn get-all-plates-for-project [ prj-id])
 
 
 (defn get-plate-sets-for-project [ prj-id ]
   (dbr/get-plate-sets-for-project node prj-id))
 
+;;(new-plate-set  "name1" "desc1" 3 96 "assay" :lyt1 3 1 true)
 
+;;(get-plates-for-plate-set-id 17)
 
-;;(get-plates-for-plate-set-id 7)
+;;counters displays the last USED id
 ;; (crux/entity (crux/db node) :counters)
+;; (crux/entity (crux/db node) :props)
 
+;;(dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) )
 
-;;(println (test-lz-seq))
-
-;;(insp/inspect-tree (crux/entity (crux/db node) :lyt1))
+;;(insp/inspect-tree (crux/entity (crux/db node) :ps4 ))
 ;;(insp/inspect-tree  new-ps1)
 ;;    (egd/assoc-plt-with-ps node)
 
-;; (def      ps1 (crux/entity (crux/db node ) :ps1))
-  ;;   (def  new-ps1  (update ps1 :plates (comp set conj)
-    ;;                    (crux/entity (crux/db node ) :plt1)
-      ;;                  (crux/entity (crux/db node ) :plt2)))       
+;;(update-project "newname" "newdescr" 5)
+;;(insp/inspect-tree (crux/entity (crux/db node) :prj5))
 
+;;(crux/entity (crux/db node ) :prj1)
+;;(insp/inspect-tree (crux/entity (crux/db node ) :prj1))
+
+;;(def  all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
+;;(new-plates node {:plate-set 11, :plate 54, :sample 5201}  1 3 true)
+
+           
 (defn get-all-wells [prj-id])
-
-
 
  (defn get-session-id ^Integer [ ]
  (:session-id (crux/entity (crux/db node ) :props)))
@@ -236,8 +276,6 @@
         new3 (assoc new2 :lnsession-id (get-session-id))]
   (crux/submit-tx node [[:crux.tx/cas old new3]])))
 
-;;(update-project "newname" "newdescr" 5)
-;;(insp/inspect-tree (crux/entity (crux/db node) :prj5))
 
 (defn insert-user
   "In DialogAddUser"
@@ -251,20 +289,11 @@
                   :password password}]
     (crux/submit-tx node [[:crux.tx/put new-user]])))
 
-;; (nameField.getText(),                                                                    name
-;; 				descriptionField.getText(),                                 desc
-;; 				Integer.valueOf(numberField.getText()),                     num-plates
-;; 				Integer.valueOf(formatList.getSelectedItem().toString()),   format
-;; 				typeList.getSelectedItem(),                                 type
-;; 				((Long)getProjectID.invoke()).intValue(),                   project-id
-;; 				((ComboItem)layoutList.getSelectedItem()).getKey(),         layout
-;; 				true);                                                      with-samples
 
-(defn new-plate-set [ps-name desc num-plates   plate-format plate-type project-id  plate-layout-name-id  with-samples]
-  (dbi/new-plate-set node ps-name desc plate-format plate-type  plate-layout-name-id num-plates project-id
-                      (get-user) with-samples))
+;;(defn new-plate-set [ps-name desc num-plates   plate-format plate-type project-id  plate-layout-name-id  with-samples]
+ ;; (dbi/new-plate-set node ps-name desc plate-format plate-type  plate-layout-name-id num-plates project-id
+   ;;                   (get-user) with-samples))
 
-;;(new-plate-set "name1" "desc1" 3 96 "assay" 1 1 true)
 
 (defn get-plate-set-owner-id [ps-id]
   (:owner-id (crux/entity (crux/db node ) (keyword (str "ps" ps-id)))  ))
@@ -312,22 +341,6 @@
 
 (defn get-description-for-plate-set [ plate-set-sys-name])
 
-;;(crux/entity (crux/db node ) :ps1)
-;;(insp/inspect-tree (crux/entity (crux/db node ) :plt30)
-
-;;(def  all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
-;;(new-plates node {:plate-set 11, :plate 54, :sample 5201}  1 3 true)
-
-;; (dbi/new-plate-set node "ps-name" "desc" 96 1  :lyt1 3 1 1 true)
-  
-;;(insp/inspect-tree (crux/entity (crux/db node) :plt34))
-           
-;;(count prj1)
-;;(crux/submit-tx node [[:crux.tx/put a]] )
-
-;;(insp/inspect-tree (crux/entity (crux/db node) :ar1))
-
-;;(insp/inspect-tree (lnrocks.eg-data/load-assay-run-data node))
 
 (defn -main
   "I don't do a whole lot ... yet."
