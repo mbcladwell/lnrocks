@@ -125,48 +125,27 @@
 ;;(dbr/get-wells-for-plate-id node 1)
 
 
-(defn new-plate-set [ ps-name desc plate-format plate-type  plate-layout-name-id num-plates project-id user-id with-samples]
-  (let [
-        layout (crux/entity (crux/db node)  plate-layout-name-id)
-        unknown-n (:unknown-n layout)
-        d1 (println layout)       
-        all-ids (dbr/get-ps-plt-spl-ids node  1 num-plates (* num-plates unknown-n) )
-        ps-id (:plate-set all-ids)
-        session-id (:session-id (crux/entity (crux/db node) :props))
-        d2 (println unknown-n)
-        doc {:crux.db/id (keyword (str "ps" ps-id))
-             :plate-set-sys-name (str "PS-" ps-id)
-             :plate-set-name ps-name
-             :description desc
-             :lnsession-id session-id
-             :plate-format plate-format
-             :plate-type plate-type
-             :id ps-id
-             :user (:user (crux/entity (crux/db node) :props))
-             :num-plates num-plates
-             :project-id project-id
-          ;;   :plates  (dbi/new-plates node all-ids layout num-plates with-samples)
-             :plate-layout-name-id plate-layout-name-id
-             :worklists #{}
-             }
-        dummy  (println (str "doc: " doc))
-        old-prj (crux/entity (crux/db node) (keyword (str "prj" project-id)))
-        new-entity-id (keyword (str "ps" ps-id))
-        new-prj (conj (:plate-sets old-prj) (crux/entity (crux/db node) new-entity-id)  )
-        ]  
-;;    (crux/submit-tx node [[:crux.tx/cas old-prj new-prj]])
-    ps-id))
-
-
-
-
 (defn get-all-plates-for-project [ prj-id])
 
 
 (defn get-plate-sets-for-project [ prj-id ]
   (dbr/get-plate-sets-for-project node prj-id))
 
-;;(new-plate-set  "name1" "desc1" 3 96 "assay" :lyt1 3 1 true)
+
+(def doc2 {:a 1 :b 2 :c 3})
+
+
+ (def old-prj (crux/entity (crux/db node)  :prj1))
+      (def   new-prj (assoc old-prj :plate-sets   (conj (:plate-sets old-prj) doc2  )))
+
+
+;;(def all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
+
+;;(dbi/new-plates node all-ids :lyt1  3 true)
+
+;;(dbi/new-wells node 96 92 true 1)
+
+;;(dbi/new-plate-set node "name1" "desc1" 96 "assay" :lyt1 3 :prj2 true)
 
 ;;(get-plates-for-plate-set-id 17)
 
@@ -176,15 +155,16 @@
 
 ;;(dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) )
 
-;;(insp/inspect-tree (crux/entity (crux/db node) :ps4 ))
+;;(insp/inspect-tree (crux/entity (crux/db node) :ps13 ))
 ;;(insp/inspect-tree  new-ps1)
 ;;    (egd/assoc-plt-with-ps node)
 
 ;;(update-project "newname" "newdescr" 5)
-;;(insp/inspect-tree (crux/entity (crux/db node) :prj5))
+;;(insp/inspect-tree  (:plate-sets new-prj))
+
 
 ;;(crux/entity (crux/db node ) :prj1)
-;;(insp/inspect-tree (crux/entity (crux/db node ) :prj1))
+;;(insp/inspect-tree (crux/entity (crux/db node ) :prj2))
 
 ;;(def  all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
 ;;(new-plates node {:plate-set 11, :plate 54, :sample 5201}  1 3 true)

@@ -52,14 +52,15 @@
 (def props
   {:crux.db/id :props
    :help-url-prefix "http://labsolns.com/software/"
-   :session-id 1
-   :project-id 1
+   :session-id :lnsession1
+   :project-id :prj1
    :user-group "admin"
-   :user "ln_admin"
+   :user-name "ln_admin"
+   :user-id :lnuser1
    :project-sys-name "PRJ-1"
    :plate-set-sys-name "PS-1"
-   :plate-set-id 1
-   :plate-id 1
+   :plate-set-id :ps1
+   :plate-id :plt1
    :plate-sys-name "PLT-1"})
   
 
@@ -167,14 +168,14 @@
   [{:crux.db/id :lnuser1
     :id 1
     :group "administrator"
-    :lnuser_name "ln_admin"
+    :lnuser-name "ln_admin"
     :tags #{["ln_admin@labsolns.com"]}
     :password "welcome"}
 
    {:crux.db/id :lnuser2
     :id 2
     :group "user"
-    :lnuser_name "ln_user"
+    :lnuser-name "ln_user"
     :tags #{["ln_user@labsolns.com"]}
     :password "welcome"}
    ]
