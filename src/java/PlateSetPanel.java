@@ -24,7 +24,7 @@ public class PlateSetPanel extends JPanel {
   private CustomTable table;
   private JScrollPane scrollPane;
   private DialogMainFrame dmf;
-    private DatabaseManager dbm;
+    
   private JPanel textPanel;
   private String project_sys_name;
     private int project_id;
@@ -95,8 +95,8 @@ public class PlateSetPanel extends JPanel {
   public void updatePanel(String _project_sys_name) {
     String project_sys_name = _project_sys_name;
     int project_id = Integer.parseInt(project_sys_name.substring(4));
-    JTable table = dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.PLATESET);
-    TableModel model = table.getModel();
-    this.table.setModel(model);
+   // JTable table = dbm.getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.PLATESET);
+   // TableModel model = table.getModel();
+   // this.table.setModel(model);
   }
 }

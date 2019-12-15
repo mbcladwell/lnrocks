@@ -89,7 +89,7 @@ public class ScatterPlot extends JFrame {
     private JPanel panel3;
     //    private Session session;
         private IFn require = Clojure.var("clojure.core", "require");
-    private DatabaseManager dbm;
+    
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     public ScatterPlot(DialogMainFrame dmf, int _assay_run_id) {

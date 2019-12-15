@@ -28,7 +28,7 @@ public class FilterPanel extends JPanel {
     private JTable table;
     private JScrollPane scrollPane;
     private DialogMainFrame dmf;
-    //private DatabaseManager dbm;
+    //
     private JPanel textPanel;
     private JButton clearButton;
     private JButton refreshButton;

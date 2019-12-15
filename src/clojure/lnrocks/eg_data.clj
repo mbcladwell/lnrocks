@@ -427,6 +427,9 @@
 ;; sample 4648
 ;; assay-run 5
 
+
+(dbi/eg-make-projects node)
+
 (defn load-eg-data
   [node]
   (do

@@ -46,7 +46,7 @@ public class DialogGroupPlateSet extends JDialog {
   static JButton cancelButton;
   final Instant instant = Instant.now();
   final DialogMainFrame dmf;
-  private DatabaseManager dbm;
+  
     //final Session session;
   final DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
     private IFn require = Clojure.var("clojure.core", "require");

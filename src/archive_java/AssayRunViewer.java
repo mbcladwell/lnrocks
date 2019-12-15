@@ -45,7 +45,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
   static JLabel label;
   static JComboBox<ComboItem> projectList;
   final DialogMainFrame dmf;
-    private DatabaseManager dbm;
+    
     //    final Session session;
     private int project_id;
     private String owner;

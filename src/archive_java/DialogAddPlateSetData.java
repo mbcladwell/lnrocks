@@ -45,7 +45,7 @@ public class DialogAddPlateSetData extends JDialog
   static JButton cancelButton;
   private static final long serialVersionUID = 1L;
   private DialogMainFrame dmf;
-  private DatabaseManager dbm;
+  
   private DatabaseRetriever dbr;
   private DatabaseInserter dbi;
    private ProgressBar progress_bar;

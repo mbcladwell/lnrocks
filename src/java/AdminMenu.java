@@ -26,7 +26,7 @@ public class AdminMenu extends JMenu {
     private JFileChooser fileChooser;
     private JMenu projectMenu;
     //    private Session session;
-    // private DatabaseManager dbm;
+    // 
     private Utilities utils;
     private IFn require = Clojure.var("clojure.core", "require");
     

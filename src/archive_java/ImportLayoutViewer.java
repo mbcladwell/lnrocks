@@ -47,7 +47,7 @@ public class ImportLayoutViewer extends JDialog implements java.awt.event.Action
     private ComboItem [] layoutNames;
     private Object[][] gridData;
     private IFn require = Clojure.var("clojure.core", "require");
-    private DatabaseManager dbm;    
+        
     private DefaultComboBoxModel<ComboItem> layout_names_list_model;
     
     public ImportLayoutViewer(DialogMainFrame dmf, Object[][] _gridData) {

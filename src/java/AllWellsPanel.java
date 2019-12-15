@@ -24,7 +24,7 @@ public class AllWellsPanel extends JPanel {
   private CustomTable table;
   private JScrollPane scrollPane;
   private DialogMainFrame dmf;
-    private DatabaseManager dbm;
+    
   private JPanel textPanel;
   private String project_sys_name;
     // private Session session;

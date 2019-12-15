@@ -42,6 +42,7 @@
    (egd/diag-eg-data node)
    ))
 
+;;(dbi/eg-make-projects node)
 ;;(egd/load-eg-plate-sets node)
  ;;get assay runs   (println ":ps3 --  " (first (:wells (crux/entity (crux/db node) :ps1)) )
 ;;(insp/inspect-tree )
@@ -155,7 +156,7 @@
 
 ;;(dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) )
 
-;;(insp/inspect-tree (crux/entity (crux/db node) :ps13 ))
+;;(insp/inspect-tree (crux/entity (crux/db node) :prj10 ))
 ;;(insp/inspect-tree  new-ps1)
 ;;    (egd/assoc-plt-with-ps node)
 

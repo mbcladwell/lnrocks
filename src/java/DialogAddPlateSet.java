@@ -44,7 +44,7 @@ public class DialogAddPlateSet extends JDialog   {
     static JButton cancelButton;
     final Instant instant = Instant.now();
     final DialogMainFrame dmf;
-    //final DatabaseManager dbm;
+    //final 
     //   private Task task;
     //    final Session session;
     final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");

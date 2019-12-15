@@ -24,7 +24,6 @@ import clojure.lang.IFn;
 public class MenuBarForProject extends JMenuBar {
 
   DialogMainFrame dmf;
-    DatabaseManager dbm;
   CustomTable project_table;
     //    Session session;
 
@@ -47,7 +46,7 @@ public class MenuBarForProject extends JMenuBar {
     JMenuItem    menuItem = new JMenuItem("Export", KeyEvent.VK_E);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
     menuItem.getAccessibleContext().setAccessibleDescription("Export as .csv.");
-    menuItem.putClientProperty("mf", dbm);
+   // menuItem.putClientProperty("mf", dbm);
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {

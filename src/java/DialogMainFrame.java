@@ -35,7 +35,7 @@ public class DialogMainFrame extends JFrame {
     private PersistentVector data;
     
   private static Utilities utils;
-//    private DatabaseManager dbm;
+//    
     //private DatabaseRetriever dbr;
     // private static Session session;
   private  IFn require = Clojure.var("clojure.core", "require");

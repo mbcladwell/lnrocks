@@ -26,7 +26,6 @@ public class MenuBarForPlate extends JMenuBar {
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   private DialogMainFrame dmf;
-  private   DatabaseManager dbm;
   CustomTable plate_table;
    private IFn require = Clojure.var("clojure.core", "require");
 
@@ -80,7 +79,7 @@ public class MenuBarForPlate extends JMenuBar {
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 	      System.out.println("in MenuBarForPlates launching dbm.groupPlates");
-            dbm.groupPlates(plate_table);
+            //dbm.groupPlates(plate_table);
     	    IFn getPlateSetSysName = Clojure.var("lnrocks.core", "get-plate-set-sys-name");
 
     	    dmf.showPlateTable((String)getPlateSetSysName.invoke());

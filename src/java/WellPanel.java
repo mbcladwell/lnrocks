@@ -29,7 +29,7 @@ public class WellPanel extends JPanel {
   private String plateset_sys_name;
   private String plate_sys_name;
     //   private Session session;    
-    //  private DatabaseManager dbm;
+    //  
     
   public WellPanel(DialogMainFrame _dmf, CustomTable _table) {
     this.setLayout(new BorderLayout());

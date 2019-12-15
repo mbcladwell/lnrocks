@@ -11,7 +11,7 @@ import javax.swing.KeyStroke;
 
 public class ViewerMenu extends JMenu{
     DialogMainFrame dmf;
-   // DatabaseManager dbm;
+   // 
   // J/Table table;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 

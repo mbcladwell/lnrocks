@@ -38,7 +38,7 @@ public class DialogAddProject extends JDialog {
   final Instant instant = Instant.now();
   static DialogMainFrame dmf;
     //private static Session session;
-  //private static DatabaseManager dbm;
+  //
   final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);

@@ -77,7 +77,7 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
     private int num_unknowns;
     private int num_edge;
     private IFn require = Clojure.var("clojure.core", "require");
-    private DatabaseManager dbm; 
+     
     
     // private DefaultComboBoxModel<ComboItem> layout_names_list_model;
 

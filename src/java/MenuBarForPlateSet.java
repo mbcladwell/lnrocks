@@ -25,7 +25,7 @@ import clojure.lang.IFn;
 public class MenuBarForPlateSet extends JMenuBar {
 
   DialogMainFrame dmf;
-   // DatabaseManager dbm;
+   // 
     CustomTable plate_set_table;
     // Session session;
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);

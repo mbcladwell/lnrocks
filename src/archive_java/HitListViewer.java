@@ -37,7 +37,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
     private  JComboBox<ComboItem> all_hit_lists_in_project;
   final DialogMainFrame dmf;
     //    final Session session;
-    private DatabaseManager dbm;
+    
     private int project_id;
     private int hit_list_id;
     

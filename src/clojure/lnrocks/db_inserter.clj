@@ -1010,3 +1010,42 @@ here layout-id is the crux id e.g. :lyt1"
           ; "1"
            ;"96"
           ; 1)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;example data
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn eg-make-projects [node]
+  (do 
+    (new-project node "With AR, HL" "3 plate sets with 2 96 well plates each" :lnuser1)
+        (delay 2000)
+
+   (new-project node "With AR" "1 plate set with 2 384 well plates each" :lnuser1)
+    (delay 2000)
+   (new-project node "With AR" "1 plate set with 1 1536 well plate" :lnuser1)
+    (delay 2000)
+   (new-project node "MyTestProj4" "description4" :lnuser1)
+    (delay 2000)
+   (new-project node "MyTestProj5" "description5" :lnuser1)
+    (delay 2000)
+   (new-project node "MyTestProj6" "description6" :lnuser1)
+    (delay 2000)
+   (new-project node "MyTestProj7" "description7" :lnuser1)
+    (delay 2000)
+   (new-project node "MyTestProj8" "description8" :lnuser1)
+   (new-project node "MyTestProj9" "description9" :lnuser1)
+   (new-project node "Plates only, no data" "2 plate sets with 10 96 well plates each" :lnuser1)   
+   ))
+
+
+(defn eg-make-plate-sets [node]
+  (do
+   (new-plate-set node "2 96 well plates" "with AR (low values), HL" 96 "assay" :lyt1 2 :prj1 true)
+   (new-plate-set node "2 96 well plates" "with AR (low values), HL" 96 "assay" :lyt1 2 :prj1 true)
+   (new-plate-set node "2 96 well plates" "with AR (high values), HL" 96 "assay" :lyt1 2 :prj1 true)
+   (new-plate-set node "2 384 well plates" "with AR (low values), HL" 384 "assay" :lyt13 2 :prj2 true)
+   (new-plate-set node "2 96 well plates" "with AR (low values), HL" 1536 "assay" :lyt37 1 :prj3 true)
+   (new-plate-set node "Plates only" "using LYT-1/96/4in12" 96 "assay" :lyt1 10 :prj10 true)
+   (new-plate-set node "Plates only" "using LYT-1/96/4in12" 96 "assay" :lyt1 10 :prj10 true)
+   ))
