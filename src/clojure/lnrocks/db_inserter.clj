@@ -209,6 +209,7 @@ the extra doc before failing at the if;  will fail due to null pointer if it can
              :plates  (new-plates node all-ids plate-layout-name-id num-plates with-samples)
              :plate-layout-name-id plate-layout-name-id
              :worklists #{}
+             :assay-runs #{}
              }
         dummy (crux/submit-tx node [[:crux.tx/put doc]])
         old-prj (crux/entity (crux/db node)  project-id)

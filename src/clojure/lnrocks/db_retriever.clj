@@ -57,10 +57,6 @@
 (defn update-counters-post-eg-data [node]
  (let [orig-counters (crux/entity (crux/db node) :counters)
        new-counters (assoc orig-counters
-                           :project 10
-                           :plate-set 8
-                           :plate 29
-                           :sample 4648
                            ::assay-run 5
                            :hit-list 6
                            :work-list 0

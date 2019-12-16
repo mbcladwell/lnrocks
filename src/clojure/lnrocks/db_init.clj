@@ -152,16 +152,6 @@
           (crux/submit-tx node [[:crux.tx/put new-pl]] )
          )))))
 
-(defn augment-lyt-dest-sets [node]
-
-  )
-
-(def  table (util/table-to-map "resources/data/plate_layouts_for_import.txt"))
-(def    layout-data (into [] (map #(process-layout-data %) table)))
-
-  (def a (second (second (get (:crux.db/id  :layout-src-dest helpers) 4))))
-
-  (filter (map #(= 1 (:source %)) a) a)
 
 
 (def lnusers

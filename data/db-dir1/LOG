@@ -1,89 +1,86 @@
-2019/12/16-06:32:31.431590 7fa2eb4fe700 RocksDB version: 6.2.2
-2019/12/16-06:32:31.431681 7fa2eb4fe700 Git sha rocksdb_build_git_sha:
-2019/12/16-06:32:31.431688 7fa2eb4fe700 Compile date Aug  3 2019
-2019/12/16-06:32:31.431692 7fa2eb4fe700 DB SUMMARY
-2019/12/16-06:32:31.431808 7fa2eb4fe700 CURRENT file:  CURRENT
-2019/12/16-06:32:31.431816 7fa2eb4fe700 IDENTITY file:  IDENTITY
-2019/12/16-06:32:31.431834 7fa2eb4fe700 MANIFEST file:  MANIFEST-000011 size: 185 Bytes
-2019/12/16-06:32:31.431847 7fa2eb4fe700 SST files in /home/mbc/projects/lnrocks/data/db-dir1 dir, Total Num: 2, files: 000007.sst 000010.sst 
-2019/12/16-06:32:31.431854 7fa2eb4fe700 Write Ahead Log file in /home/mbc/projects/lnrocks/data/db-dir1: 000012.log size: 0 ; 
-2019/12/16-06:32:31.431864 7fa2eb4fe700                         Options.error_if_exists: 0
-2019/12/16-06:32:31.431870 7fa2eb4fe700                       Options.create_if_missing: 1
-2019/12/16-06:32:31.431876 7fa2eb4fe700                         Options.paranoid_checks: 1
-2019/12/16-06:32:31.431881 7fa2eb4fe700                                     Options.env: 0x7fa2ea8f63e0
-2019/12/16-06:32:31.431887 7fa2eb4fe700                                Options.info_log: 0x7fa2dc3fd7f0
-2019/12/16-06:32:31.431892 7fa2eb4fe700                Options.max_file_opening_threads: 16
-2019/12/16-06:32:31.431898 7fa2eb4fe700                              Options.statistics: (nil)
-2019/12/16-06:32:31.431904 7fa2eb4fe700                               Options.use_fsync: 0
-2019/12/16-06:32:31.431909 7fa2eb4fe700                       Options.max_log_file_size: 0
-2019/12/16-06:32:31.431915 7fa2eb4fe700                  Options.max_manifest_file_size: 1073741824
-2019/12/16-06:32:31.431920 7fa2eb4fe700                   Options.log_file_time_to_roll: 0
-2019/12/16-06:32:31.431925 7fa2eb4fe700                       Options.keep_log_file_num: 1000
-2019/12/16-06:32:31.431930 7fa2eb4fe700                    Options.recycle_log_file_num: 0
-2019/12/16-06:32:31.431936 7fa2eb4fe700                         Options.allow_fallocate: 1
-2019/12/16-06:32:31.431941 7fa2eb4fe700                        Options.allow_mmap_reads: 0
-2019/12/16-06:32:31.431946 7fa2eb4fe700                       Options.allow_mmap_writes: 0
-2019/12/16-06:32:31.431951 7fa2eb4fe700                        Options.use_direct_reads: 0
-2019/12/16-06:32:31.431956 7fa2eb4fe700                        Options.use_direct_io_for_flush_and_compaction: 0
-2019/12/16-06:32:31.431962 7fa2eb4fe700          Options.create_missing_column_families: 0
-2019/12/16-06:32:31.431967 7fa2eb4fe700                              Options.db_log_dir: 
-2019/12/16-06:32:31.431973 7fa2eb4fe700                                 Options.wal_dir: /home/mbc/projects/lnrocks/data/db-dir1
-2019/12/16-06:32:31.431979 7fa2eb4fe700                Options.table_cache_numshardbits: 6
-2019/12/16-06:32:31.431984 7fa2eb4fe700                      Options.max_subcompactions: 1
-2019/12/16-06:32:31.431989 7fa2eb4fe700                  Options.max_background_flushes: -1
-2019/12/16-06:32:31.431994 7fa2eb4fe700                         Options.WAL_ttl_seconds: 0
-2019/12/16-06:32:31.431999 7fa2eb4fe700                       Options.WAL_size_limit_MB: 0
-2019/12/16-06:32:31.432004 7fa2eb4fe700             Options.manifest_preallocation_size: 4194304
-2019/12/16-06:32:31.432009 7fa2eb4fe700                     Options.is_fd_close_on_exec: 1
-2019/12/16-06:32:31.432014 7fa2eb4fe700                   Options.advise_random_on_open: 1
-2019/12/16-06:32:31.432019 7fa2eb4fe700                    Options.db_write_buffer_size: 0
-2019/12/16-06:32:31.432024 7fa2eb4fe700                    Options.write_buffer_manager: 0x7fa2dc335680
-2019/12/16-06:32:31.432029 7fa2eb4fe700         Options.access_hint_on_compaction_start: 1
-2019/12/16-06:32:31.432034 7fa2eb4fe700  Options.new_table_reader_for_compaction_inputs: 0
-2019/12/16-06:32:31.432039 7fa2eb4fe700           Options.random_access_max_buffer_size: 1048576
-2019/12/16-06:32:31.432044 7fa2eb4fe700                      Options.use_adaptive_mutex: 0
-2019/12/16-06:32:31.432099 7fa2eb4fe700                            Options.rate_limiter: (nil)
-2019/12/16-06:32:31.432105 7fa2eb4fe700     Options.sst_file_manager.rate_bytes_per_sec: 0
-2019/12/16-06:32:31.432147 7fa2eb4fe700                       Options.wal_recovery_mode: 2
-2019/12/16-06:32:31.432165 7fa2eb4fe700                  Options.enable_thread_tracking: 0
-2019/12/16-06:32:31.432169 7fa2eb4fe700                  Options.enable_pipelined_write: 0
-2019/12/16-06:32:31.432172 7fa2eb4fe700         Options.allow_concurrent_memtable_write: 1
-2019/12/16-06:32:31.432176 7fa2eb4fe700      Options.enable_write_thread_adaptive_yield: 1
-2019/12/16-06:32:31.432180 7fa2eb4fe700             Options.write_thread_max_yield_usec: 100
-2019/12/16-06:32:31.432185 7fa2eb4fe700            Options.write_thread_slow_yield_usec: 3
-2019/12/16-06:32:31.432189 7fa2eb4fe700                               Options.row_cache: None
-2019/12/16-06:32:31.432192 7fa2eb4fe700                              Options.wal_filter: None
-2019/12/16-06:32:31.432196 7fa2eb4fe700             Options.avoid_flush_during_recovery: 0
-2019/12/16-06:32:31.432200 7fa2eb4fe700             Options.allow_ingest_behind: 0
-2019/12/16-06:32:31.432204 7fa2eb4fe700             Options.preserve_deletes: 0
-2019/12/16-06:32:31.432208 7fa2eb4fe700             Options.two_write_queues: 0
-2019/12/16-06:32:31.432212 7fa2eb4fe700             Options.manual_wal_flush: 0
-2019/12/16-06:32:31.432216 7fa2eb4fe700             Options.atomic_flush: 0
-2019/12/16-06:32:31.432219 7fa2eb4fe700             Options.avoid_unnecessary_blocking_io: 0
-2019/12/16-06:32:31.432224 7fa2eb4fe700             Options.max_background_jobs: 2
-2019/12/16-06:32:31.432228 7fa2eb4fe700             Options.max_background_compactions: -1
-2019/12/16-06:32:31.432231 7fa2eb4fe700             Options.avoid_flush_during_shutdown: 0
-2019/12/16-06:32:31.432235 7fa2eb4fe700           Options.writable_file_max_buffer_size: 1048576
-2019/12/16-06:32:31.432239 7fa2eb4fe700             Options.delayed_write_rate : 16777216
-2019/12/16-06:32:31.432243 7fa2eb4fe700             Options.max_total_wal_size: 0
-2019/12/16-06:32:31.432247 7fa2eb4fe700             Options.delete_obsolete_files_period_micros: 21600000000
-2019/12/16-06:32:31.432251 7fa2eb4fe700                   Options.stats_dump_period_sec: 600
-2019/12/16-06:32:31.432255 7fa2eb4fe700                 Options.stats_persist_period_sec: 600
-2019/12/16-06:32:31.432259 7fa2eb4fe700                 Options.stats_history_buffer_size: 1048576
-2019/12/16-06:32:31.432262 7fa2eb4fe700                          Options.max_open_files: -1
-2019/12/16-06:32:31.432266 7fa2eb4fe700                          Options.bytes_per_sync: 0
-2019/12/16-06:32:31.432270 7fa2eb4fe700                      Options.wal_bytes_per_sync: 0
-2019/12/16-06:32:31.432273 7fa2eb4fe700                   Options.strict_bytes_per_sync: 0
-2019/12/16-06:32:31.432278 7fa2eb4fe700       Options.compaction_readahead_size: 0
-2019/12/16-06:32:31.432282 7fa2eb4fe700 Compression algorithms supported:
-2019/12/16-06:32:31.432286 7fa2eb4fe700 	kZSTDNotFinalCompression supported: 1
-2019/12/16-06:32:31.432291 7fa2eb4fe700 	kZSTD supported: 1
-2019/12/16-06:32:31.432295 7fa2eb4fe700 	kXpressCompression supported: 0
-2019/12/16-06:32:31.432299 7fa2eb4fe700 	kLZ4HCCompression supported: 1
-2019/12/16-06:32:31.432304 7fa2eb4fe700 	kLZ4Compression supported: 1
-2019/12/16-06:32:31.432308 7fa2eb4fe700 	kBZip2Compression supported: 1
-2019/12/16-06:32:31.432312 7fa2eb4fe700 	kZlibCompression supported: 1
-2019/12/16-06:32:31.432316 7fa2eb4fe700 	kSnappyCompression supported: 1
-2019/12/16-06:32:31.432324 7fa2eb4fe700 Fast CRC32 supported: Not supported on x86
-2019/12/16-06:32:31.432427 7fa2eb4fe700 [/db_impl.cc:392] Shutdown: canceling all background work
-2019/12/16-06:32:31.432499 7fa2eb4fe700 [/db_impl.cc:565] Shutdown complete
+2019/12/16-17:19:27.289671 7f268ef82700 RocksDB version: 6.2.2
+2019/12/16-17:19:27.289723 7f268ef82700 Git sha rocksdb_build_git_sha:
+2019/12/16-17:19:27.289726 7f268ef82700 Compile date Aug  3 2019
+2019/12/16-17:19:27.289728 7f268ef82700 DB SUMMARY
+2019/12/16-17:19:27.289750 7f268ef82700 SST files in /home/mbc/projects/lnrocks/data/db-dir1 dir, Total Num: 0, files: 
+2019/12/16-17:19:27.289753 7f268ef82700 Write Ahead Log file in /home/mbc/projects/lnrocks/data/db-dir1: 
+2019/12/16-17:19:27.289755 7f268ef82700                         Options.error_if_exists: 0
+2019/12/16-17:19:27.289757 7f268ef82700                       Options.create_if_missing: 1
+2019/12/16-17:19:27.289758 7f268ef82700                         Options.paranoid_checks: 1
+2019/12/16-17:19:27.289760 7f268ef82700                                     Options.env: 0x7f26b89fa3e0
+2019/12/16-17:19:27.289761 7f268ef82700                                Options.info_log: 0x7f26ac1c8a70
+2019/12/16-17:19:27.289762 7f268ef82700                Options.max_file_opening_threads: 16
+2019/12/16-17:19:27.289764 7f268ef82700                              Options.statistics: (nil)
+2019/12/16-17:19:27.289765 7f268ef82700                               Options.use_fsync: 0
+2019/12/16-17:19:27.289767 7f268ef82700                       Options.max_log_file_size: 0
+2019/12/16-17:19:27.289768 7f268ef82700                  Options.max_manifest_file_size: 1073741824
+2019/12/16-17:19:27.289769 7f268ef82700                   Options.log_file_time_to_roll: 0
+2019/12/16-17:19:27.289771 7f268ef82700                       Options.keep_log_file_num: 1000
+2019/12/16-17:19:27.289772 7f268ef82700                    Options.recycle_log_file_num: 0
+2019/12/16-17:19:27.289773 7f268ef82700                         Options.allow_fallocate: 1
+2019/12/16-17:19:27.289774 7f268ef82700                        Options.allow_mmap_reads: 0
+2019/12/16-17:19:27.289776 7f268ef82700                       Options.allow_mmap_writes: 0
+2019/12/16-17:19:27.289777 7f268ef82700                        Options.use_direct_reads: 0
+2019/12/16-17:19:27.289778 7f268ef82700                        Options.use_direct_io_for_flush_and_compaction: 0
+2019/12/16-17:19:27.289779 7f268ef82700          Options.create_missing_column_families: 0
+2019/12/16-17:19:27.289780 7f268ef82700                              Options.db_log_dir: 
+2019/12/16-17:19:27.289782 7f268ef82700                                 Options.wal_dir: /home/mbc/projects/lnrocks/data/db-dir1
+2019/12/16-17:19:27.289783 7f268ef82700                Options.table_cache_numshardbits: 6
+2019/12/16-17:19:27.289784 7f268ef82700                      Options.max_subcompactions: 1
+2019/12/16-17:19:27.289785 7f268ef82700                  Options.max_background_flushes: -1
+2019/12/16-17:19:27.289787 7f268ef82700                         Options.WAL_ttl_seconds: 0
+2019/12/16-17:19:27.289788 7f268ef82700                       Options.WAL_size_limit_MB: 0
+2019/12/16-17:19:27.289789 7f268ef82700             Options.manifest_preallocation_size: 4194304
+2019/12/16-17:19:27.289790 7f268ef82700                     Options.is_fd_close_on_exec: 1
+2019/12/16-17:19:27.289792 7f268ef82700                   Options.advise_random_on_open: 1
+2019/12/16-17:19:27.289793 7f268ef82700                    Options.db_write_buffer_size: 0
+2019/12/16-17:19:27.289794 7f268ef82700                    Options.write_buffer_manager: 0x7f26ac1ca920
+2019/12/16-17:19:27.289795 7f268ef82700         Options.access_hint_on_compaction_start: 1
+2019/12/16-17:19:27.289796 7f268ef82700  Options.new_table_reader_for_compaction_inputs: 0
+2019/12/16-17:19:27.289798 7f268ef82700           Options.random_access_max_buffer_size: 1048576
+2019/12/16-17:19:27.289799 7f268ef82700                      Options.use_adaptive_mutex: 0
+2019/12/16-17:19:27.289800 7f268ef82700                            Options.rate_limiter: (nil)
+2019/12/16-17:19:27.289802 7f268ef82700     Options.sst_file_manager.rate_bytes_per_sec: 0
+2019/12/16-17:19:27.289803 7f268ef82700                       Options.wal_recovery_mode: 2
+2019/12/16-17:19:27.289804 7f268ef82700                  Options.enable_thread_tracking: 0
+2019/12/16-17:19:27.289805 7f268ef82700                  Options.enable_pipelined_write: 0
+2019/12/16-17:19:27.289818 7f268ef82700         Options.allow_concurrent_memtable_write: 1
+2019/12/16-17:19:27.289820 7f268ef82700      Options.enable_write_thread_adaptive_yield: 1
+2019/12/16-17:19:27.289821 7f268ef82700             Options.write_thread_max_yield_usec: 100
+2019/12/16-17:19:27.289822 7f268ef82700            Options.write_thread_slow_yield_usec: 3
+2019/12/16-17:19:27.289824 7f268ef82700                               Options.row_cache: None
+2019/12/16-17:19:27.289825 7f268ef82700                              Options.wal_filter: None
+2019/12/16-17:19:27.289826 7f268ef82700             Options.avoid_flush_during_recovery: 0
+2019/12/16-17:19:27.289827 7f268ef82700             Options.allow_ingest_behind: 0
+2019/12/16-17:19:27.289829 7f268ef82700             Options.preserve_deletes: 0
+2019/12/16-17:19:27.289830 7f268ef82700             Options.two_write_queues: 0
+2019/12/16-17:19:27.289831 7f268ef82700             Options.manual_wal_flush: 0
+2019/12/16-17:19:27.289833 7f268ef82700             Options.atomic_flush: 0
+2019/12/16-17:19:27.289834 7f268ef82700             Options.avoid_unnecessary_blocking_io: 0
+2019/12/16-17:19:27.289835 7f268ef82700             Options.max_background_jobs: 2
+2019/12/16-17:19:27.289837 7f268ef82700             Options.max_background_compactions: -1
+2019/12/16-17:19:27.289838 7f268ef82700             Options.avoid_flush_during_shutdown: 0
+2019/12/16-17:19:27.289839 7f268ef82700           Options.writable_file_max_buffer_size: 1048576
+2019/12/16-17:19:27.289841 7f268ef82700             Options.delayed_write_rate : 16777216
+2019/12/16-17:19:27.289842 7f268ef82700             Options.max_total_wal_size: 0
+2019/12/16-17:19:27.289843 7f268ef82700             Options.delete_obsolete_files_period_micros: 21600000000
+2019/12/16-17:19:27.289844 7f268ef82700                   Options.stats_dump_period_sec: 600
+2019/12/16-17:19:27.289846 7f268ef82700                 Options.stats_persist_period_sec: 600
+2019/12/16-17:19:27.289847 7f268ef82700                 Options.stats_history_buffer_size: 1048576
+2019/12/16-17:19:27.289848 7f268ef82700                          Options.max_open_files: -1
+2019/12/16-17:19:27.289849 7f268ef82700                          Options.bytes_per_sync: 0
+2019/12/16-17:19:27.289851 7f268ef82700                      Options.wal_bytes_per_sync: 0
+2019/12/16-17:19:27.289852 7f268ef82700                   Options.strict_bytes_per_sync: 0
+2019/12/16-17:19:27.289853 7f268ef82700       Options.compaction_readahead_size: 0
+2019/12/16-17:19:27.289854 7f268ef82700 Compression algorithms supported:
+2019/12/16-17:19:27.289856 7f268ef82700 	kZSTDNotFinalCompression supported: 1
+2019/12/16-17:19:27.289858 7f268ef82700 	kZSTD supported: 1
+2019/12/16-17:19:27.289859 7f268ef82700 	kXpressCompression supported: 0
+2019/12/16-17:19:27.289861 7f268ef82700 	kLZ4HCCompression supported: 1
+2019/12/16-17:19:27.289862 7f268ef82700 	kLZ4Compression supported: 1
+2019/12/16-17:19:27.289864 7f268ef82700 	kBZip2Compression supported: 1
+2019/12/16-17:19:27.289865 7f268ef82700 	kZlibCompression supported: 1
+2019/12/16-17:19:27.289867 7f268ef82700 	kSnappyCompression supported: 1
+2019/12/16-17:19:27.289870 7f268ef82700 Fast CRC32 supported: Not supported on x86
+2019/12/16-17:19:27.289900 7f268ef82700 [/db_impl.cc:392] Shutdown: canceling all background work
+2019/12/16-17:19:27.289923 7f268ef82700 [/db_impl.cc:565] Shutdown complete
