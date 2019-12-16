@@ -27,7 +27,7 @@
 (defn get-ps-plt-spl-ids
   ;;args are the integer quantities needed
   ;; :plate-set :plate :sample
-  ;;returns vector of start ids for each  
+  ;;returns vector of start ids for each; stored value is last used - add 1 to get start value;  
   [ node need-ps need-plt need-spl ]
   (let [orig-counters (crux/entity (crux/db node) :counters)
         old-ps (:plate-set orig-counters)

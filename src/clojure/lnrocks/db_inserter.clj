@@ -131,10 +131,11 @@
 ))
 
 
-
 (defn new-plates
 "return a set of the new plate ids
-here layout-id is the crux id e.g. :lyt1"
+here layout-id is the crux id e.g. :lyt1
+When creating the vector of start sample ids, need an extra because loop recur is going to create
+the extra doc before failing at the if;  will fail due to null pointer if it can't make an extra plate"
   [ node all-ids layout-id num-plates with-samples]
   (let [
         layout (crux/entity (crux/db node) layout-id)
@@ -143,26 +144,35 @@ here layout-id is the crux id e.g. :lyt1"
         ps-id (:plate-set all-ids)
         plt-id-start (:plate all-ids)
         spl-id-start (:sample all-ids)
+        spl-start-vec (loop [counter 1
+                             spl-id spl-id-start
+                             myvec []]
+                        (if (> counter (+  num-plates 1)) ;;need an extra plate for the loop recur
+                          myvec
+                          (recur
+                           (+ 1 counter)
+                           (+ spl-id unknown-n)
+                           (conj myvec spl-id))))
+        dummy (println spl-start-vec)
         user-id (:user-id (crux/entity (crux/db node) :props))
         ]
     (loop [
            counter 1
-           plt-id plt-id-start 
-           doc   {:crux.db/id (keyword (str "plt" plt-id))
+           plt-id plt-id-start
+           doc {:crux.db/id (keyword (str "plt" plt-id))
                   :plate-sys-name (str "PLT-" plt-id)
                   :plate-set-id ps-id
                   :id plt-id
                   :user-id user-id
-                  :wells (new-wells node format unknown-n with-samples spl-id-start)
+                  :wells (new-wells node format unknown-n with-samples (get spl-start-vec (- counter 1)))
                   :plate-order counter
-                  }
+                }
            new-plates #{doc}
-           dummy (crux/submit-tx node [[:crux.tx/put doc]])]
-           
-          ;; dummy (crux/submit-tx node [[:crux.tx/put doc]])]
-      (if (> counter (+ num-plates 1))
+           dummy nil      
+      ]
+      (if (> counter   (+ num-plates 1)   )
          new-plates
-        (recur
+        (recur        
          (+ counter 1)
          (+ plt-id 1)
          {:crux.db/id (keyword (str "plt" plt-id))
@@ -170,12 +180,11 @@ here layout-id is the crux id e.g. :lyt1"
                 :plate-set-id ps-id
                 :id plt-id
                 :user-id user-id
-                :wells (new-wells node format unknown-n with-samples spl-id-start)
+                :wells (new-wells node format unknown-n with-samples (get spl-start-vec (- counter 1)))
                 :plate-order counter
           }
          (conj new-plates doc)
          (crux/submit-tx node [[:crux.tx/put doc]]))))))
-
 
 
 (defn new-plate-set [ node ps-name desc plate-format plate-type  plate-layout-name-id num-plates project-id  with-samples]
@@ -1019,33 +1028,42 @@ here layout-id is the crux id e.g. :lyt1"
 (defn eg-make-projects [node]
   (do 
     (new-project node "With AR, HL" "3 plate sets with 2 96 well plates each" :lnuser1)
-        (delay 2000)
-
+    (Thread/sleep 200)
    (new-project node "With AR" "1 plate set with 2 384 well plates each" :lnuser1)
-    (delay 2000)
+    (Thread/sleep 200)
    (new-project node "With AR" "1 plate set with 1 1536 well plate" :lnuser1)
-    (delay 2000)
+    (Thread/sleep 200)
    (new-project node "MyTestProj4" "description4" :lnuser1)
-    (delay 2000)
+    (Thread/sleep 200)
    (new-project node "MyTestProj5" "description5" :lnuser1)
-    (delay 2000)
+    (Thread/sleep 200)
    (new-project node "MyTestProj6" "description6" :lnuser1)
-    (delay 2000)
+    (Thread/sleep 200)
    (new-project node "MyTestProj7" "description7" :lnuser1)
-    (delay 2000)
+    (Thread/sleep 200)
    (new-project node "MyTestProj8" "description8" :lnuser1)
+    (Thread/sleep 200)
    (new-project node "MyTestProj9" "description9" :lnuser1)
+    (Thread/sleep 200)
    (new-project node "Plates only, no data" "2 plate sets with 10 96 well plates each" :lnuser1)   
+    (Thread/sleep 200)
    ))
 
 
 (defn eg-make-plate-sets [node]
   (do
    (new-plate-set node "2 96 well plates" "with AR (low values), HL" 96 "assay" :lyt1 2 :prj1 true)
+    (Thread/sleep 200)
    (new-plate-set node "2 96 well plates" "with AR (low values), HL" 96 "assay" :lyt1 2 :prj1 true)
+    (Thread/sleep 200)
    (new-plate-set node "2 96 well plates" "with AR (high values), HL" 96 "assay" :lyt1 2 :prj1 true)
+    (Thread/sleep 200)
    (new-plate-set node "2 384 well plates" "with AR (low values), HL" 384 "assay" :lyt13 2 :prj2 true)
+    (Thread/sleep 200)
    (new-plate-set node "2 96 well plates" "with AR (low values), HL" 1536 "assay" :lyt37 1 :prj3 true)
+    (Thread/sleep 200)
    (new-plate-set node "Plates only" "using LYT-1/96/4in12" 96 "assay" :lyt1 10 :prj10 true)
+    (Thread/sleep 200)
    (new-plate-set node "Plates only" "using LYT-1/96/4in12" 96 "assay" :lyt1 10 :prj10 true)
+    (Thread/sleep 200)
    ))

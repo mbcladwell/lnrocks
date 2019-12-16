@@ -42,7 +42,15 @@
    (egd/diag-eg-data node)
    ))
 
+
 ;;(dbi/eg-make-projects node)
+;;(dbi/eg-make-plate-sets node)
+
+;;(require '[clojure.inspector :as insp])
+
+;;(insp/inspect-tree (crux/entity (crux/db node) :prj1 ))
+
+
 ;;(egd/load-eg-plate-sets node)
  ;;get assay runs   (println ":ps3 --  " (first (:wells (crux/entity (crux/db node) :ps1)) )
 ;;(insp/inspect-tree )
@@ -140,9 +148,18 @@
       (def   new-prj (assoc old-prj :plate-sets   (conj (:plate-sets old-prj) doc2  )))
 
 
+(loop [counter 1
+       dummy (println (str "loop: " counter))]
+  (if (> counter 3)
+    counter
+    (recur
+         (+ counter 1)
+         (println (str "recur: " counter)))
+       ))
+
 ;;(def all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
 
-;;(dbi/new-plates node all-ids :lyt1  3 true)
+;;(insp/inspect-tree (dbi/new-plates node all-ids :lyt1  3 true))
 
 ;;(dbi/new-wells node 96 92 true 1)
 
@@ -156,7 +173,7 @@
 
 ;;(dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) )
 
-;;(insp/inspect-tree (crux/entity (crux/db node) :prj10 ))
+;;(insp/inspect-tree (crux/entity (crux/db node) :prj2 ))
 ;;(insp/inspect-tree  new-ps1)
 ;;    (egd/assoc-plt-with-ps node)
 
@@ -165,7 +182,7 @@
 
 
 ;;(crux/entity (crux/db node ) :prj1)
-;;(insp/inspect-tree (crux/entity (crux/db node ) :prj2))
+;;(insp/inspect-tree (crux/entity (crux/db node ) :prj8))
 
 ;;(def  all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
 ;;(new-plates node {:plate-set 11, :plate 54, :sample 5201}  1 3 true)

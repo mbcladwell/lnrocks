@@ -428,25 +428,21 @@
 ;; assay-run 5
 
 
-(dbi/eg-make-projects node)
 
 (defn load-eg-data
   [node]
   (do
-    (persist-samples node)                                ;(delay 2000)
-    (load-eg-plate-sets node)
-    (load-eg-projects node)
+;;    (persist-samples node)                                ;(delay 2000)
+;;    (load-eg-plate-sets node)
+;;    (load-eg-projects node)
     (load-assay-run-data node)
-    (assoc-ps-with-prj node)
+;;    (assoc-ps-with-prj node)
     (load-hit-lists node)
     (assoc-ar-with-ps node)
-    (load-eg-plate node)
+;;    (load-eg-plate node)
                                         ;(delay 2000)
     (assoc-hl-with-prj node)
-    (delay 2000)
-    (delay 2000)
-    (delay 2000)
-    (assoc-plt-with-ps node)
+ ;;   (assoc-plt-with-ps node)
     (dbr/update-counters-post-eg-data node)))
 
 
