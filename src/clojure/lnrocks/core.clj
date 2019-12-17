@@ -37,24 +37,56 @@
    (define-db-var)
 
    (init/initialize-db node)
+   (dbi/eg-make-projects node)
+   (dbi/eg-make-plate-sets node)
    (egd/load-eg-data node)
    (init/diag-init node)
    (egd/diag-eg-data node)
    ))
 
 
- 
-;;(dbi/eg-make-projects node)
-;;(dbi/eg-make-plate-sets node)
-
 ;;(require '[clojure.inspector :as insp])
 
-;;(insp/inspect-tree (crux/entity (crux/db node) :prj1 ))
+;;(insp/inspect-tree (crux/entity (crux/db node) :prj12 ))
 
 
 ;;(egd/load-eg-plate-sets node)
  ;;get assay runs   (println ":ps3 --  " (first (:wells (crux/entity (crux/db node) :ps1)) )
 ;;(insp/inspect-tree )
+
+;;(def all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
+
+;;(insp/inspect-tree (dbi/new-plates node all-ids :lyt1  3 true))
+
+;;(dbi/new-wells node 96 92 true 1)
+
+;;(insp/inspect-tree (dbi/new-plate-set node "name1" "desc1" 96 "assay" :lyt1 3 :prj12 true))
+
+;;(get-plates-for-plate-set-id 17)
+
+;;counters displays the last USED id
+;; (crux/entity (crux/db node) :counters)
+;; (crux/entity (crux/db node) :props)
+
+;;(dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) )
+
+;;(insp/inspect-tree (crux/entity (crux/db node) :prj2 ))
+;;(insp/inspect-tree  new-ps1)
+;;    (egd/assoc-plt-with-ps node)
+
+;;(update-project "newname" "newdescr" 5)
+;;(insp/inspect-tree  (:plate-sets new-prj))
+
+;;(dbi/new-project node "prj name" " proj desc" :lnuser1)
+
+;;(crux/entity (crux/db node ) :prj1)
+;;(insp/inspect-tree (crux/entity (crux/db node ) :prj8))
+
+;;(def  all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
+;;(new-plates node {:plate-set 11, :plate 54, :sample 5201}  1 3 true)
+
+           
+
 
 
 (defn extract-data-for-id
@@ -142,53 +174,7 @@
   (dbr/get-plate-sets-for-project node prj-id))
 
 
-(def doc2 {:a 1 :b 2 :c 3})
 
-
- (def old-prj (crux/entity (crux/db node)  :prj1))
-      (def   new-prj (assoc old-prj :plate-sets   (conj (:plate-sets old-prj) doc2  )))
-
-
-(loop [counter 1
-       dummy (println (str "loop: " counter))]
-  (if (> counter 3)
-    counter
-    (recur
-         (+ counter 1)
-         (println (str "recur: " counter)))
-       ))
-
-;;(def all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
-
-;;(insp/inspect-tree (dbi/new-plates node all-ids :lyt1  3 true))
-
-;;(dbi/new-wells node 96 92 true 1)
-
-;;(dbi/new-plate-set node "name1" "desc1" 96 "assay" :lyt1 3 :prj2 true)
-
-;;(get-plates-for-plate-set-id 17)
-
-;;counters displays the last USED id
-;; (crux/entity (crux/db node) :counters)
-;; (crux/entity (crux/db node) :props)
-
-;;(dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) )
-
-;;(insp/inspect-tree (crux/entity (crux/db node) :prj2 ))
-;;(insp/inspect-tree  new-ps1)
-;;    (egd/assoc-plt-with-ps node)
-
-;;(update-project "newname" "newdescr" 5)
-;;(insp/inspect-tree  (:plate-sets new-prj))
-
-
-;;(crux/entity (crux/db node ) :prj1)
-;;(insp/inspect-tree (crux/entity (crux/db node ) :prj8))
-
-;;(def  all-ids (dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) ))
-;;(new-plates node {:plate-set 11, :plate 54, :sample 5201}  1 3 true)
-
-           
 (defn get-all-wells [prj-id])
 
  (defn get-session-id ^Integer [ ]
@@ -327,11 +313,6 @@
   (into {} (java.util.HashMap.
             {":colnames" colnames
              ":data" data}))))
-
-;;(insp/inspect-tree (crux/entity (crux/db node ) :ps8))
-
-
-  
 
 
 (defn get-plate-set-data [ ps-id])

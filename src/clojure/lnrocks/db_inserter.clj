@@ -34,7 +34,7 @@
 
 
 
-(defn new-project [ node prj-name desc user-id]
+(defn new-project [ node prj-name desc ]
   (let [prj-id (:start (dbr/counter node :project 1))
         session-id (:session-id (crux/entity (crux/db node) :props))
         doc {:crux.db/id (keyword (str "prj" prj-id))
@@ -43,12 +43,12 @@
              :description desc
              :lnsession-id session-id
              :id prj-id
+             :user-id (:user-id (crux/entity (crux/db node) :props))
              :plate-sets #{}
              :hit-lists #{}
              }       ]
     (crux/submit-tx node [[:crux.tx/put doc]] )
     prj-id))
-
 
 
 
@@ -166,7 +166,7 @@ the extra doc before failing at the if;  will fail due to null pointer if it can
                   :user-id user-id
                   :wells (new-wells node format unknown-n with-samples (get spl-start-vec (- counter 1)))
                   :plate-order counter
-                }
+xb                }
            new-plates #{doc}
            dummy nil      
       ]
@@ -1028,25 +1028,25 @@ the extra doc before failing at the if;  will fail due to null pointer if it can
 
 (defn eg-make-projects [node]
   (do 
-    (new-project node "With AR, HL" "3 plate sets with 2 96 well plates each" :lnuser1)
+    (new-project node "With AR, HL" "3 plate sets with 2 96 well plates each" )
     (Thread/sleep 200)
-   (new-project node "With AR" "1 plate set with 2 384 well plates each" :lnuser1)
+   (new-project node "With AR" "1 plate set with 2 384 well plates each" )
     (Thread/sleep 200)
-   (new-project node "With AR" "1 plate set with 1 1536 well plate" :lnuser1)
+   (new-project node "With AR" "1 plate set with 1 1536 well plate" )
     (Thread/sleep 200)
-   (new-project node "MyTestProj4" "description4" :lnuser1)
+   (new-project node "MyTestProj4" "description4" )
     (Thread/sleep 200)
-   (new-project node "MyTestProj5" "description5" :lnuser1)
+   (new-project node "MyTestProj5" "description5" )
     (Thread/sleep 200)
-   (new-project node "MyTestProj6" "description6" :lnuser1)
+   (new-project node "MyTestProj6" "description6" )
     (Thread/sleep 200)
-   (new-project node "MyTestProj7" "description7" :lnuser1)
+   (new-project node "MyTestProj7" "description7" )
     (Thread/sleep 200)
-   (new-project node "MyTestProj8" "description8" :lnuser1)
+   (new-project node "MyTestProj8" "description8" )
     (Thread/sleep 200)
-   (new-project node "MyTestProj9" "description9" :lnuser1)
+   (new-project node "MyTestProj9" "description9" )
     (Thread/sleep 200)
-   (new-project node "Plates only, no data" "2 plate sets with 10 96 well plates each" :lnuser1)   
+   (new-project node "Plates only, no data" "2 plate sets with 10 96 well plates each" )   
     (Thread/sleep 200)
    ))
 
