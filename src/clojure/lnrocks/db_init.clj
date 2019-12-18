@@ -71,15 +71,9 @@
    ;;{:crux.db/id :plate-layout :plate-layout (load-plate-layouts)}
    {:crux.db/id :assay-type  :1 "ELISA" :2 "Octet" :3 "SNP" :4 "HCS" :5 "HTRF" :6 "FACS"}
    {:crux.db/id :well-type  :1 "unknown" :2 "positive" :3 "negative" :4 "blank" :5 "edge"}
-  ;; {:crux.db/id :well-numbers :well-numbers (dbi/load-well-numbers) }
-   {:crux.db/id :layout-src-dest :layout-src-dest   [{:source 1 :dest  2}{:source 1 :dest 3}{:source 1 :dest 4}{:source 1 :dest 5}{:source 1 :dest 6}{:source 7 :dest 8}{:source 7 :dest 9}{:source 7 :dest 10}{:source 7 :dest 11}{:source 7 :dest 12}{:source 13 :dest 14}{:source 13 :dest 15}{:source 13 :dest 16}{:source 13 :dest 17}{:source 13 :dest 18}{:source 19 :dest 20}{:source 19 :dest 21}{:source 19 :dest 22}{:source 19 :dest 23}{:source 19 :dest 24}{:source 25 :dest 26}{:source 25 :dest 27}{:source 25 :dest 28}{:source 25 :dest 29}{:source 25 :dest 30}{:source 31 :dest 32}{:source 31 :dest 33}{:source 31 :dest 34}{:source 31 :dest 35}{:source 31 :dest 36}{:source 37 :dest 41}{:source 38 :dest 41}{:source 39 :dest 41}{:source 40 :dest 41}]}
+  ;; {:crux.db/id :well-numbers :well-numbers (dbi/load-well-numbers) } 
    ])
-
-
-
-
-
-     
+   
      
 ;;         [(jdbc/create-table-ddl :rearray_pairs
 ;;                                 [[:id "INT(20) NOT NULL PRIMARY KEY AUTO_INCREMENT"]
@@ -102,6 +96,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;Required data
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn process-layout-data
   "processes that tab delimitted, R generated layouts for import
    order is important; must correlate with SQL statement order of ?'s"
@@ -129,13 +124,14 @@
             :unknown-n (Integer/parseInt(:unknown-n x))
             :control-loc (:control-loc x)
             :source-dest (:source-dest x)
-            :source (:source x)
-            :dest #{(:dest x)}  }))
+                }))
 
 
 
-(defn load-plate-layouts [node]
-  ;;add data to layout names using the key :layout
+(defn load-plate-layouts
+  "add data to layout names using the key :layout
+  source layouts have a :dest key that is a set of associated destinations"
+  [node]
   (let   [table (util/table-to-map "resources/data/plate_layouts_for_import.txt")
           layout-data (into [] (map #(process-layout-data %) table))
           table2 (util/table-to-map "resources/data/plate_layout_name.txt")
@@ -143,14 +139,55 @@
           result (map #(assoc % :layout (extract-data-for-id (:id %)  layout-data)) layout-names)]         
     (loop [counter 1
            new-pl  (first (filter #(= (:id %) counter) result))
-           dummy    (crux/submit-tx node [[:crux.tx/put new-pl]] )]
+           dummy (if (= (:source-dest new-pl) "source")
+                   (assoc new-pl :dest (:dest (first (filter  #(= (:source %) (:id new-pl)) src-dest)))))
+           dummy2   nil
+           ]
       (if (> counter (+ 1 (count result)))
         (println "Plate layouts loaded!")
         (recur
          (+ counter 1)
          (first (filter #(= (:id %) counter) result))
-          (crux/submit-tx node [[:crux.tx/put new-pl]] )
+         (if (= (:source-dest new-pl) "source")
+           (do
+           (assoc new-pl :dest (:dest (first (filter  #(= (:source %) (:id new-pl)) src-dest))))
+           (println (str ":id " (:id new-pl) "       :source-dest " (:source-dest new-pl) "      :dest " (:dest new-pl)     ))     
+           ))
+         (crux/submit-tx node [[:crux.tx/put new-pl]] )
          )))))
+
+
+(def src-dest [ {:source 1 :dest #{:lyt2 :lyt3 :lyt4 :lyt5 :lyt6}}
+                {:source 7 :dest #{:lyt8 :lyt9 :lyt10 :lyt11 :lyt12}}
+               {:source 13 :dest #{:lyt14 :lyt15 :lyt16 :lyt17 :lyt18}}
+               {:source 19 :dest #{:lyt20 :lyt21 :lyt22 :lyt23 :lyt24}}
+               {:source 25 :dest #{:lyt26 :lyt27 :lyt28 :lyt29 :lyt30}}
+               {:source 31 :dest #{:lyt32 :lyt33 :lyt34 :lyt35 :lyt36}}
+               {:source 37 :dest #{:lyt41}}
+               {:source 38 :dest #{:lyt41}}
+               {:source 39 :dest #{:lyt41}}
+               {:source 40 :dest #{:lyt41}}])
+
+
+
+(defn assoc-lyt-src-dest [node]
+  (loop [ counter 0
+         sd-map (nth src-dest counter)
+         old-lyt (crux/entity (crux/db node) (keyword (str "lyt" (:source sd-map) ))) 
+         new-lyt (assoc old-lyt :dest (:dest sd-map))
+         dummy (println (str "counter: " counter "  old id: " (:id old-lyt) "  new id: " (:id new-lyt)  ))
+         ;;dummy2 (crux/submit-tx node [[:crux.tx/cas old-lyt new-lyt]])          
+         ]
+    (if (= counter (count src-dest))
+           (println "Layout src-dest associations made")
+           (recur
+            (+ counter 1)
+            (nth src-dest counter)
+            (crux/entity (crux/db node) (keyword (str "lyt" (:source sd-map) )))
+            (assoc old-lyt :dest (:dest sd-map))
+            (println (str "counter: " counter "  old id: " (:id old-lyt) "  new id: " (:id new-lyt)  ))
+            ;;(crux/submit-tx node [[:crux.tx/cas old-lyt new-lyt]]) 
+            ))))
 
 
 

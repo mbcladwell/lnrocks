@@ -29,7 +29,7 @@
                 :crux.db/id :hl1
                 :description "descr1"
                 :hits #{:spl87 :spl39 :spl51 :spl59 :spl16 :spl49 :spl53 :spl73 :spl65 :spl43}
-                :prj-id 1
+                :prj-id :prj1
                 :id 1}
                {:name "hit list 2"
                 :crux.db/id :hl2
@@ -43,13 +43,13 @@
                 
                 :description "descr3"
                 :hits #{:spl216 :spl193 :spl221 :spl269 :spl244 :spl252 :spl251 :spl204 :spl217 :spl256}
-                :prj-id 2
+                :prj-id :prj2
                 :id 3}
                {:name "hit list 4"
                 :crux.db/id :hl4
                 :description "descr4"
                 :hits #{:spl311 :spl277 :spl357 :spl314 :spl327 :spl303 :spl354 :spl279 :spl346 :spl318 :spl344 :spl299 :spl355 :spl300 :spl325 :spl290 :spl278 :spl326 :spl282 :spl334}
-                :prj-id 2
+                :prj-id :prj2
                 :id 4}
                ;;for project3
                {:name "hit list 5"
@@ -57,13 +57,13 @@
                 
                 :description "descr5"
                 :hits #{:spl410 :spl412 :spl393 :spl397 :spl442 :spl447 :spl428 :spl374 :spl411 :spl437}
-                :prj-id 3
+                :prj-id :prj3
                 :id 5}
                {:name "hit list 6"
                 :crux.db/id :hl6
                 :description "descr6"
                 :hits #{:spl545 :spl514 :spl479 :spl516 :spl528 :spl544 :spl501 :spl472 :spl463 :spl494 :spl531 :spl482 :spl513 :spl468 :spl465 :spl510 :spl535 :spl478 :spl502 :spl488}
-                :prj-id 3
+                :prj-id :prj3
                 :id 6}])
 
 (defn load-hit-lists [node]

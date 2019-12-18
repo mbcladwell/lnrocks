@@ -89,12 +89,26 @@
 
     ;;(javax.swing.JOptionPane/showMessageDialog nil  (str "Expecting the headers \"plate\", and \"barcode.id\", but found\n" col1name  ", and " col2name  "."  )))))
 ;;(import-barcode-ids :ps7 "/home/mbc/projects/lnrocks/egdata/barcodes/barcodes.txt") 
-
+(defn persist-all-samples [ node unknown-n sample-start-id]
+  (loop [ counter 1
+         spl-id sample-start-id
+         dummy (crux/submit-tx node [[:crux.tx/put {:crux.db/id (keyword (str "spl"  spl-id))
+                                                    :sample-sys-name (str "SPL-"  spl-id )
+                                                    :id  spl-id
+                                                    :accession nil}]])]
+    (if (> counter  unknown-n )
+      nil
+      (recur
+       (+ counter 1)
+       (+ spl-id 1)
+       (crux/submit-tx node [[:crux.tx/put {:crux.db/id (keyword (str "spl"  spl-id))
+                                                          :sample-sys-name (str "SPL-"  spl-id )
+                                                          :id  spl-id
+                                                          :accession nil}]])))))
 
 (defn new-wells
   "format: 96, 384, 1535"
-  [node format unknown-n with-samples sample-start-id]
-  (if with-samples     
+  [node format unknown-n with-samples sample-start-id]   
     (let [ 
           empty-wells (case format
                         96 util/map96wells
@@ -104,31 +118,24 @@
                      96 util/vec96wells
                      384 util/vec384wells
                      1536 util/vec1536wells)  ]
-      (if with-samples 
+      (if with-samples
+        (do
+          (persist-all-samples node unknown-n sample-start-id )
         (loop [ counter 1
                spl-id sample-start-id
-               dummy (crux/submit-tx node [[:crux.tx/put {:crux.db/id (keyword (str "spl"  spl-id))
-                                                          :sample-sys-name (str "SPL-"  spl-id )
-                                                          :id  spl-id
-                                                          :accession nil}]])
-               filled-wells (assoc empty-wells (get well-vec (- counter 1)) (crux/entity (crux/db node) (keyword (str "spl"  spl-id))  ))
-               ]
-          (if (> counter unknown-n )
+               filled-wells (assoc empty-wells (get well-vec (- counter 1)) (crux/entity (crux/db node) (keyword (str "spl"  spl-id))  ))]
+           (if (> counter unknown-n )
             filled-wells
             (recur
              (+ counter 1)
              (+ spl-id 1)
-             (crux/submit-tx node [[:crux.tx/put {:crux.db/id (keyword (str "spl"  spl-id))
-                                                  :sample-sys-name (str "SPL-"  spl-id )
-                                                  :id  spl-id
-                                                  :accession nil}]])
-             (assoc filled-wells (get well-vec (- counter 1)) (crux/entity (crux/db node) (keyword (str "spl"  spl-id))  ) ))))))
+             (assoc filled-wells (get well-vec (- counter 1)) (crux/entity (crux/db node) (keyword (str "spl"  spl-id))  ) )
+               ))))
         (let  [empty-wells (case format
                       96 util/map96wells
                       384 util/map384wells
                       1536 util/map1536wells)]
-      empty-wells)
-))
+      empty-wells))))
 
 
 (defn new-plates
@@ -141,19 +148,18 @@ the extra doc before failing at the if;  will fail due to null pointer if it can
         layout (crux/entity (crux/db node) layout-id)
         unknown-n (:unknown-n layout)
         format (:plate-format-id layout)
-        ps-id (:plate-set all-ids)
+        ps-id   (:plate-set all-ids)
         plt-id-start (:plate all-ids)
         spl-id-start (:sample all-ids)
         spl-start-vec (loop [counter 1
                              spl-id spl-id-start
                              myvec []]
-                        (if (> counter (+  num-plates 1)) ;;need an extra plate for the loop recur
+                        (if (> counter (+  num-plates 1)) ;;need an extra element for the loop recur
                           myvec
                           (recur
                            (+ 1 counter)
                            (+ spl-id unknown-n)
                            (conj myvec spl-id))))
-        dummy (println spl-start-vec)
         user-id (:user-id (crux/entity (crux/db node) :props))
         ]
     (loop [
@@ -166,9 +172,9 @@ the extra doc before failing at the if;  will fail due to null pointer if it can
                   :user-id user-id
                   :wells (new-wells node format unknown-n with-samples (get spl-start-vec (- counter 1)))
                   :plate-order counter
-xb                }
+                }
            new-plates #{doc}
-           dummy nil      
+           dummy nil
       ]
       (if (> counter   (+ num-plates 1)   )
          new-plates
@@ -184,10 +190,11 @@ xb                }
                 :plate-order counter
           }
          (conj new-plates doc)
-         (crux/submit-tx node [[:crux.tx/put doc]]))))))
+         (crux/submit-tx node [[:crux.tx/put doc]])
+         )))))
 
 
-(defn new-plate-set [ node ps-name desc plate-format plate-type  plate-layout-name-id num-plates project-id  with-samples]
+(defn new-plate-set [ node ps-name desc plate-format plate-type  plate-layout-name-id num-plates project-id  with-samples ]
   (let [
         layout (crux/entity (crux/db node) plate-layout-name-id)
         unknown-n (:unknown-n layout)    

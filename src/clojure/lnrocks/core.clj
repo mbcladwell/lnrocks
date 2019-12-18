@@ -15,6 +15,8 @@
   (:gen-class))
 
 ;;https://juxt.pro/blog/posts/crux-tutorial-datalog.html
+(load-file "src/clojure/lnrocks/db_inserter.clj")
+(load-file "src/clojure/lnrocks/db_retriever.clj")
 
 
 (defn define-db-var []
@@ -28,7 +30,8 @@
        :crux.standalone/event-log-kv-store "crux.kv.rocksdb/kv"})))
 
 
-(if (.exists (io/as-file "data"))
+(defn init-db []
+  (if (.exists (io/as-file "data"))
   (do
     (define-db-var)
     (println "db already exists"))
@@ -42,13 +45,18 @@
    (egd/load-eg-data node)
    (init/diag-init node)
    (egd/diag-eg-data node)
-   ))
+   )))
 
+
+(init/load-plate-layouts node)
+(init/assoc-lyt-src-dest node)
+         
+;;   (dbi/new-plate-set node "2 96 well plates" "with AR (low values), HL" 96 "assay" :lyt1 2 :prj1 true)
 
 ;;(require '[clojure.inspector :as insp])
 
-;;(insp/inspect-tree (crux/entity (crux/db node) :prj12 ))
-
+;;(insp/inspect-tree (crux/entity (crux/db node) :lyt13 ))
+;;(insp/inspect-tree (crux/entity (crux/db node) :props ))
 
 ;;(egd/load-eg-plate-sets node)
  ;;get assay runs   (println ":ps3 --  " (first (:wells (crux/entity (crux/db node) :ps1)) )
@@ -60,9 +68,10 @@
 
 ;;(dbi/new-wells node 96 92 true 1)
 
-;;(insp/inspect-tree (dbi/new-plate-set node "name1" "desc1" 96 "assay" :lyt1 3 :prj12 true))
+;;(insp/inspect-tree (dbi/new-plate-set node "name1" "desc1" 96 "assay" :lyt1 3 :prj12 true all-ids))
+;;(insp/inspect-tree (crux/entity (crux/db node) :ps31 ))
 
-;;(get-plates-for-plate-set-id 17)
+
 
 ;;counters displays the last USED id
 ;; (crux/entity (crux/db node) :counters)
@@ -70,7 +79,7 @@
 
 ;;(dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) )
 
-;;(insp/inspect-tree (crux/entity (crux/db node) :prj2 ))
+;;(insp/inspect-tree (crux/entity (crux/db node) :props ))
 ;;(insp/inspect-tree  new-ps1)
 ;;    (egd/assoc-plt-with-ps node)
 
@@ -105,25 +114,6 @@
             :type  (Integer/parseInt(:type x ))
            }))
 
-
-
-
-(defn new-plate-layout [ plate-layout-name, descr, plate-format-id]
-  (let   [table (util/table-to-map "resources/data/plate_layouts_for_import.txt")
-          layout-data nil ;;(into [] (map #(process-layout-data %) table))
-          table2 (util/table-to-map "resources/data/plate_layout_name.txt")
-          layout-names nil ;;(into [] (map #(process-layout-names %) table2))
-          result (map #(assoc % :layout (extract-data-for-id (:id %)  layout-data)) layout-names)]         
-    (loop [counter 1
-           new-pl  (first (filter #(= (:id %) counter) result))]
-         ;;  dummy    (crux/submit-tx node [[:crux.tx/put new-pl]] )]
-      (if (> counter (+ 1 (count result)))
-        (println "Plate layouts loaded!")
-        (recur
-         (+ counter 1)
-         (first (filter #(= (:id %) counter) result))
-        ;;  (crux/submit-tx node [[:crux.tx/put new-pl]] )
-         )))))
 
   
 (def user-groups  ["admin" "user"])
@@ -326,8 +316,10 @@
   "I don't do a whole lot ... yet."
   [& args]
   (println "In main")
-  (lnrocks.DialogMainFrame. )
+  (init-db)
+;;  (lnrocks.DialogMainFrame. )
   )
+(-main)
 
 
 
