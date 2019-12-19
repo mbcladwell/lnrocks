@@ -318,6 +318,19 @@
             {":colnames" colnames
              ":data" myvec2} )))
 
+(defn get-all-plate-ids-for-plate-set-id
+"in the form :ps2"
+  [ node plate-set-id]
+  (let [data (crux/q (crux/db node)
+	           {:find '[ n ]
+	             :where '[[e :crux.db/id n]
+                              [e :plate-set-id s1]
+                              [e :wells s2]
+                              ]
+                     :args [{'s1 plate-set-id}]
+                            
+                     }) ]
+              data))
 
 
 (defn get-plates-for-plate-set-id

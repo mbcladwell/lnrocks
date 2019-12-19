@@ -64,7 +64,7 @@
    :plate-sys-name "PLT-1"})
   
 
-
+;;used for import of init files only
 (def helpers
   [{:crux.db/id :plate-formats :96 96 :384 384 :1536 1536}
    {:crux.db/id :plate-type :1 "assay" :2 "rearray" :3 "master" :4 "daughter" :5 "archive" :6 "replicate"}
@@ -116,7 +116,7 @@
             :sys-name (:sys-name x )
             :name (:name x )
             :description (:description x )
-            :plate-format-id (Integer/parseInt(:plate-format-id x ))
+            :format (Integer/parseInt(:plate-format-id x ))
             :replicates (Integer/parseInt(:replicates x))
             :targets (Integer/parseInt(:targets x))
             :use-edge (Integer/parseInt(:use-edge x))
@@ -139,8 +139,6 @@
           result (map #(assoc % :layout (extract-data-for-id (:id %)  layout-data)) layout-names)]         
     (loop [counter 1
            new-pl  (first (filter #(= (:id %) counter) result))
-           dummy (if (= (:source-dest new-pl) "source")
-                   (assoc new-pl :dest (:dest (first (filter  #(= (:source %) (:id new-pl)) src-dest)))))
            dummy2   nil
            ]
       (if (> counter (+ 1 (count result)))
@@ -148,47 +146,33 @@
         (recur
          (+ counter 1)
          (first (filter #(= (:id %) counter) result))
-         (if (= (:source-dest new-pl) "source")
-           (do
-           (assoc new-pl :dest (:dest (first (filter  #(= (:source %) (:id new-pl)) src-dest))))
-           (println (str ":id " (:id new-pl) "       :source-dest " (:source-dest new-pl) "      :dest " (:dest new-pl)     ))     
-           ))
          (crux/submit-tx node [[:crux.tx/put new-pl]] )
          )))))
 
 
-(def src-dest [ {:source 1 :dest #{:lyt2 :lyt3 :lyt4 :lyt5 :lyt6}}
-                {:source 7 :dest #{:lyt8 :lyt9 :lyt10 :lyt11 :lyt12}}
-               {:source 13 :dest #{:lyt14 :lyt15 :lyt16 :lyt17 :lyt18}}
-               {:source 19 :dest #{:lyt20 :lyt21 :lyt22 :lyt23 :lyt24}}
-               {:source 25 :dest #{:lyt26 :lyt27 :lyt28 :lyt29 :lyt30}}
-               {:source 31 :dest #{:lyt32 :lyt33 :lyt34 :lyt35 :lyt36}}
-               {:source 37 :dest #{:lyt41}}
-               {:source 38 :dest #{:lyt41}}
-               {:source 39 :dest #{:lyt41}}
-               {:source 40 :dest #{:lyt41}}])
-
-
 
 (defn assoc-lyt-src-dest [node]
-  (loop [ counter 0
-         sd-map (nth src-dest counter)
-         old-lyt (crux/entity (crux/db node) (keyword (str "lyt" (:source sd-map) ))) 
-         new-lyt (assoc old-lyt :dest (:dest sd-map))
-         dummy (println (str "counter: " counter "  old id: " (:id old-lyt) "  new id: " (:id new-lyt)  ))
-         ;;dummy2 (crux/submit-tx node [[:crux.tx/cas old-lyt new-lyt]])          
-         ]
-    (if (= counter (count src-dest))
-           (println "Layout src-dest associations made")
-           (recur
-            (+ counter 1)
-            (nth src-dest counter)
-            (crux/entity (crux/db node) (keyword (str "lyt" (:source sd-map) )))
-            (assoc old-lyt :dest (:dest sd-map))
-            (println (str "counter: " counter "  old id: " (:id old-lyt) "  new id: " (:id new-lyt)  ))
-            ;;(crux/submit-tx node [[:crux.tx/cas old-lyt new-lyt]]) 
-            ))))
-
+(do
+  (crux/submit-tx node [[:crux.tx/cas (crux/entity (crux/db node) :lyt1)
+                         (assoc  (crux/entity (crux/db node) :lyt1) :dest #{:lyt2 :lyt3 :lyt4 :lyt5 :lyt6})]])
+ (crux/submit-tx node [[:crux.tx/cas (crux/entity (crux/db node) :lyt7)
+                         (assoc  (crux/entity (crux/db node) :lyt7) :dest #{:lyt8 :lyt9 :lyt10 :lyt11 :lyt12})]])
+ (crux/submit-tx node [[:crux.tx/cas (crux/entity (crux/db node) :lyt13)
+                         (assoc  (crux/entity (crux/db node) :lyt13) :dest #{:lyt14 :lyt15 :lyt16 :lyt17 :lyt18})]])
+ (crux/submit-tx node [[:crux.tx/cas (crux/entity (crux/db node) :lyt19)
+                         (assoc  (crux/entity (crux/db node) :lyt19) :dest #{:lyt20 :lyt21 :lyt22 :lyt23 :lyt24})]])
+ (crux/submit-tx node [[:crux.tx/cas (crux/entity (crux/db node) :lyt25)
+                         (assoc  (crux/entity (crux/db node) :lyt25) :dest #{:lyt26 :lyt27 :lyt28 :lyt29 :lyt30})]])
+ (crux/submit-tx node [[:crux.tx/cas (crux/entity (crux/db node) :lyt31)
+                         (assoc  (crux/entity (crux/db node) :lyt31) :dest #{:lyt32 :lyt33 :lyt34 :lyt35 :lyt36})]])
+(crux/submit-tx node [[:crux.tx/cas (crux/entity (crux/db node) :lyt37)
+                         (assoc  (crux/entity (crux/db node) :lyt37) :dest #{:lyt41 })]])
+(crux/submit-tx node [[:crux.tx/cas (crux/entity (crux/db node) :lyt38)
+                         (assoc  (crux/entity (crux/db node) :lyt38) :dest #{:lyt41 })]])
+(crux/submit-tx node [[:crux.tx/cas (crux/entity (crux/db node) :lyt39)
+                         (assoc  (crux/entity (crux/db node) :lyt39) :dest #{:lyt41 })]])
+(crux/submit-tx node [[:crux.tx/cas (crux/entity (crux/db node) :lyt40)
+                         (assoc  (crux/entity (crux/db node) :lyt40) :dest #{:lyt41 })]])))
 
 
 (def lnusers

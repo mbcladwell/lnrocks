@@ -15,11 +15,14 @@
   (:gen-class))
 
 ;;https://juxt.pro/blog/posts/crux-tutorial-datalog.html
+(load-file "src/clojure/lnrocks/util.clj")
 (load-file "src/clojure/lnrocks/db_inserter.clj")
 (load-file "src/clojure/lnrocks/db_retriever.clj")
+(load-file "src/clojure/lnrocks/db_init.clj")
 
 
-(defn define-db-var []
+
+;;(defn define-db-var []
   
    (def ^crux.api.ICruxAPI node
      (crux/start-node
@@ -27,17 +30,17 @@
        :crux.node/kv-store "crux.kv.rocksdb/kv"
        :crux.standalone/event-log-dir "data/eventlog-1"
        :crux.kv/db-dir "data/db-dir1"
-       :crux.standalone/event-log-kv-store "crux.kv.rocksdb/kv"})))
+       :crux.standalone/event-log-kv-store "crux.kv.rocksdb/kv"}))
 
 
 (defn init-db []
   (if (.exists (io/as-file "data"))
   (do
-    (define-db-var)
+   
     (println "db already exists"))
  (do
    (println "initializing database at startup.")
-   (define-db-var)
+ 
 
    (init/initialize-db node)
    (dbi/eg-make-projects node)
@@ -48,14 +51,18 @@
    )))
 
 
-(init/load-plate-layouts node)
-(init/assoc-lyt-src-dest node)
+
+ ;;(:plates (crux/entity (crux/db node) :ps1 ))
+
+
+;;(init/load-plate-layouts node)
+;;(init/assoc-lyt-src-dest node)
          
 ;;   (dbi/new-plate-set node "2 96 well plates" "with AR (low values), HL" 96 "assay" :lyt1 2 :prj1 true)
 
 ;;(require '[clojure.inspector :as insp])
 
-;;(insp/inspect-tree (crux/entity (crux/db node) :lyt13 ))
+;;(insp/inspect-tree (crux/entity (crux/db node) :ps1 ))
 ;;(insp/inspect-tree (crux/entity (crux/db node) :props ))
 
 ;;(egd/load-eg-plate-sets node)
@@ -79,7 +86,7 @@
 
 ;;(dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) )
 
-;;(insp/inspect-tree (crux/entity (crux/db node) :props ))
+;;(insp/inspect-tree (crux/entity (crux/db node) :lyt1 ))
 ;;(insp/inspect-tree  new-ps1)
 ;;    (egd/assoc-plt-with-ps node)
 
@@ -159,9 +166,15 @@
 
 (defn get-all-plates-for-project [ prj-id])
 
+(defn get-all-plate-ids-for-plate-set-id
+  "ps-id in the form :ps23"
+  [ ps-id]
+(dbr/get-all-plate-ids-for-plate-set-id node ps-id))
+
 
 (defn get-plate-sets-for-project [ prj-id ]
   (dbr/get-plate-sets-for-project node prj-id))
+
 
 
 
@@ -320,7 +333,4 @@
 ;;  (lnrocks.DialogMainFrame. )
   )
 (-main)
-
-
-
 
