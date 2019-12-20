@@ -274,10 +274,10 @@
 	             :where [[e :id n]
                              [e :project-sys-name s1]
                              [e :name s2]
-                             [e :owner-id n2]
+                             [e :user-id n2]
                              [e :description s4]
-                             [e2 :id n2]
-                             [e2 :lnuser_name s3]]
+                             [e2 :crux.db/id n2]
+                             [e2 :lnuser-name s3]]
                      :order-by [[n :desc]]})
       colnames ["ID" "ProjectID" "Name" "Owner" "Description"] ]
   (into {} (java.util.HashMap.
@@ -286,26 +286,29 @@
 
 
 
-(defn get-plate-sets-for-project [ node prj-id]
+(defn get-plate-sets-for-project
+"prj-id is a digit e.g. 1"
+  [ node prj-id]
    (let [data  (crux/q (crux/db node)
-	           {:find '[n s1 s2 s3 n3 s4 s5 s6 s8 s7 ]
-	             :where '[[e :id n]
-                              [e :plate-set-sys-name s1]
-                              [e :plate-set-name s2]
-                              [e :plate-format s3]
-                              [e :num-plates n3]
-                              [e :plate-type s4]
-                              [e :plate-layout-name-id s5]
-                              [e :descr s6]
+	           {:find '[n s1 s2 s3 n3 s4  s6  s8 s7  ]
+	            :where '[[e :id n]
+                             [e :project-id n2]
+                             [e :plate-set-sys-name s1]
+                             [e :plate-set-name s2]
+                             [e :plate-format s3]
+                             [e :num-plates n3]
+                             [e :plate-type s4]
+                             [e :plate-layout-name-id s5]
+                             [e :description s6]
                              [e :worklist s7]
-                              [e2 :id s5]
-                              [e2 :name s8]
-                              [e2 :layout n5]
-                              [e :project-id n2]]
-                     :args [{'n2 prj-id}]
+                             [e2 :crux.db/id s5]
+                             [e2 :name s8]
+                             [e2 :layout n5]]
+                              
+                     :args [{'n2 (keyword (str "prj" prj-id))}]
                     :order-by [['n :desc]]})
-      data2   (mapv #(if (nil? (nth % 9)) (assoc % 9 "NA"))  data)
-      colnames ["PlateSetID" "PlateSetName" "Name" "Format" "# plates" "Type" "Layout" "Description" "Layout" "Worklist"  ]]
+      data2   (mapv #(if (nil? (nth % 8)) (assoc % 8 "NA"))  data)
+      colnames ["PlateSetID" "PlateSetName" "Name" "Format" "# plates" "Type" "Description" "Layout" "Worklist"  ]]
   (into {} (java.util.HashMap.
             {":colnames" colnames
              ":data" data2} ))))
@@ -334,11 +337,12 @@
 
 
 (defn get-plates-for-plate-set-id
+  "psid is an integer"
   [node psid]
   (let [
         data (crux/q (crux/db node)
 	             {:find '[n1  n2 n3 n4 s3 s2 ]
-	              :where '[[e :plate-set-id n1]  ;;e is plate
+	              :where '[[e :plate-set-id  s1]  ;;e is plate
                                [e :id n2]
                                [e :plate-order n3]
                                [e :barcode s2]
@@ -346,10 +350,11 @@
                                [e2 :plate-type s3]
                                [e2 :plate-format n4]
                                ]
-                       :args [{'n1 psid}]
+                      :args [{'n1   psid}
+                             {'s1 :ps1}]                          
                        :order-by [['n2 :desc]]})
         data2 (mapv #(if (nil? (nth % 5)) (assoc % 5 "NA"))  data)
-        data3 (mapv #(assoc % 0  (str "PS-" (get % 0)))  data2)
+        data3 (mapv #(assoc % 0  (str "PS-" (subs (str (get % 0))3)))  data2)
         data4 (mapv #(assoc % 1  (str "PLT-" (get % 1)))  data3)
         colnames ["PlateSetID" "PlateID"  "Order" "Format" "Type" "BarcodeID"]]
     (into {} (java.util.HashMap.

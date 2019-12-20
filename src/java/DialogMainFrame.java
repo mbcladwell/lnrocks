@@ -143,10 +143,10 @@ public class DialogMainFrame extends JFrame {
      IFn getPlateSetsForProject = Clojure.var("lnrocks.core", "get-plate-sets-for-project");
      LOGGER.info("prj-id: " + project_id);
 
-     Map<String, PersistentVector> hm = (Map)getPlateSetsForProject.invoke(project_id);
+     Map<String, PersistentVector> hm = (Map)getPlateSetsForProject.invoke( project_id);
      
-     for (Map.Entry<String, PersistentVector> e : hm.entrySet()){
-	 System.out.println(e.getKey() + ": " + e.getValue().toArray());}
+     //for (Map.Entry<String, PersistentVector> e : hm.entrySet()){
+	 //	 System.out.println(java.util.ArrayList(e.getKey()) + ": " + java.util.ArrayList(e.getValue().toArray()));}
 
 
      CustomTable plateSetTable = new CustomTable(this, buildTableModel(hm));

@@ -22,9 +22,10 @@
 
 
 
-;;(defn define-db-var []
-  
-   (def ^crux.api.ICruxAPI node
+(defn init-db []
+  (if (.exists (io/as-file "data"))
+    (do
+       (def ^crux.api.ICruxAPI node
      (crux/start-node
       {:crux.node/topology :crux.standalone/topology
        :crux.node/kv-store "crux.kv.rocksdb/kv"
@@ -32,15 +33,16 @@
        :crux.kv/db-dir "data/db-dir1"
        :crux.standalone/event-log-kv-store "crux.kv.rocksdb/kv"}))
 
-
-(defn init-db []
-  (if (.exists (io/as-file "data"))
-  (do
-   
     (println "db already exists"))
  (do
    (println "initializing database at startup.")
- 
+    (def ^crux.api.ICruxAPI node
+     (crux/start-node
+      {:crux.node/topology :crux.standalone/topology
+       :crux.node/kv-store "crux.kv.rocksdb/kv"
+       :crux.standalone/event-log-dir "data/eventlog-1"
+       :crux.kv/db-dir "data/db-dir1"
+       :crux.standalone/event-log-kv-store "crux.kv.rocksdb/kv"}))
 
    (init/initialize-db node)
    (dbi/eg-make-projects node)
@@ -50,13 +52,10 @@
    (egd/diag-eg-data node)
    )))
 
-
+;;(init-db)
 
  ;;(:plates (crux/entity (crux/db node) :ps1 ))
 
-
-;;(init/load-plate-layouts node)
-;;(init/assoc-lyt-src-dest node)
          
 ;;   (dbi/new-plate-set node "2 96 well plates" "with AR (low values), HL" 96 "assay" :lyt1 2 :prj1 true)
 
@@ -76,7 +75,7 @@
 ;;(dbi/new-wells node 96 92 true 1)
 
 ;;(insp/inspect-tree (dbi/new-plate-set node "name1" "desc1" 96 "assay" :lyt1 3 :prj12 true all-ids))
-;;(insp/inspect-tree (crux/entity (crux/db node) :ps31 ))
+;;(insp/inspect-tree (crux/entity (crux/db node) :prj1 ))
 
 
 
@@ -86,7 +85,13 @@
 
 ;;(dbr/get-ps-plt-spl-ids node  1 3 (* 3 92) )
 
-;;(insp/inspect-tree (crux/entity (crux/db node) :lyt1 ))
+;;;;(get-plate-sets-for-project 1)
+;;(dbr/get-plates-for-plate-set-id node 1)
+
+(Integer. (subs (str :ps3) 3))
+(subs (str :ps5) 3)
+
+;;(insp/inspect-tree (crux/entity (crux/db node) :plt1 ))
 ;;(insp/inspect-tree  new-ps1)
 ;;    (egd/assoc-plt-with-ps node)
 
@@ -330,7 +335,7 @@
   [& args]
   (println "In main")
   (init-db)
-;;  (lnrocks.DialogMainFrame. )
+(lnrocks.DialogMainFrame. )
   )
-(-main)
+
 
